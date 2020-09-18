@@ -25,7 +25,6 @@ export const AppRoutes: Routes = [
         path: 'category',
         loadChildren: './category/category.module#CategoryModule',
       },
-      
       {
         path: 'components',
         loadChildren: './components/components.module#ComponentsModule',
@@ -34,6 +33,11 @@ export const AppRoutes: Routes = [
         path: 'technician',
         loadChildren: './technician/technician.module#TechnicianModule',
       },
+      {
+        path: 'new-ticket',
+        loadChildren: './new-ticket/new-ticket.module#NewTicketModule',
+      },
+
       {
         path: 'forms',
         loadChildren: './forms/forms.module#Forms',

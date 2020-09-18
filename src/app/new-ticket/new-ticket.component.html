@@ -1,0 +1,56 @@
+<div class="main-content">
+  <div class="container-f luid">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header card-header-text card-header-rose">
+            <div class="card-text">
+              <h4 class="card-title">New Ticket</h4>
+            </div>
+          </div>
+
+          <form>
+            <div class="form-group mx-sm-3 mb-2">
+              <input
+                type="text"
+                class="form-control"
+                id="formGroupExampleInput"
+                placeholder="Category"
+              />
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+              <input
+                type="address"
+                class="form-control"
+                id="formGroupExampleInput2"
+                placeholder="Address"
+              />
+            </div>
+            <div class="card-footer">
+              <button
+                mat-raised-button
+                type="submit"
+                class="btn btn-fill btn-rose"
+              >
+                Submit
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header card-header-text card-header-rose">
+            <div class="card-text">
+              <h4 class="card-title">Custom Skin & Settings Map</h4>
+            </div>
+          </div>
+          <div class="card-content">
+            <div #map id="map" class="mapSize"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

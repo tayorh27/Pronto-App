@@ -49,12 +49,12 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       query.forEach(data => {
         const technician = <MainTechnician>data.data()
         this.technicians.push(technician)
-        this.data.push([technician.id, technician.name, technician.address, technician.phone, technician.email, technician.created_date, technician.modified_date, technician.created_by, 'btn-link'])
+        this.data.push([technician.id, technician.name, technician.address, technician.phone, technician.email, technician.category, technician.created_date, technician.modified_date, technician.created_by, 'btn-link'])
         index = index + 1
       })
       this.dataTable = {
-        headerRow: ['Name', 'Address', 'Phone Number', 'Email', 'Created Date', 'Modified Date', 'Actions'],
-        footerRow: ['Name', 'Address', 'Phone Number', 'Email', 'Created Date', 'Modified Date', 'Actions'],
+        headerRow: ['Name', 'Address', 'Phone Number', 'Email', 'Category', 'Created Date', 'Modified Date', 'Actions'],
+        footerRow: ['Name', 'Address', 'Phone Number', 'Email', 'Category', 'Created Date', 'Modified Date', 'Actions'],
         dataRows: this.data
       };
     });
@@ -81,6 +81,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
   _addr = ''
   _phone = ''
   _email = ''
+  _cat = ''
 
   editTechClick(tech: any) {
     this.editTech = true
@@ -92,6 +93,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     this._addr = this.selectedTechnician.address
     this._phone = this.selectedTechnician.phone
     this._email = this.selectedTechnician.email
+    this._cat = this.selectedTechnician.category
 
   }
 
@@ -100,6 +102,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     const address = (<HTMLInputElement>document.getElementById("tech_addr")).value;
     const phone = (<HTMLInputElement>document.getElementById("tech_phone")).value;
     const email = (<HTMLInputElement>document.getElementById("tech_email")).value;
+    const category = (<HTMLInputElement>document.getElementById("tech_cat")).value;
 
 
     const key = firebase.database().ref().push().key
@@ -122,6 +125,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
         address: address,
         phone: phone,
         email: email,
+        category: category,
         created_by: `${current_name}|${current_email}`,
         created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
         modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
@@ -138,6 +142,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
         address: address,
         phone: phone,
         email: email,
+        category: category,
         modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`
       }
       firebase.firestore().collection('technicians').doc(this.selectedTechnician.id).update(technician).then(d => {
@@ -148,6 +153,26 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     }
 
   }
+
+
+  //drop down
+  selectedValue: string;
+  currentCategory: string[];
+
+  selectTheme = 'primary';
+  Techies = [
+    { value: 'plumber-0', viewValue: 'Plumber' },
+    { value: 'electrician-1', viewValue: 'Electrician' },
+    { value: 'carpenter-2', viewValue: 'Carpenter' },
+    { value: 'painter-3', viewValue: 'Painter' },
+    { value: 'bricklayer-4', viewValue: 'Brick Layer' },
+    { value: 'gardner-5', viewValue: 'Gardner' },
+    { value: 'shoemaker-6', viewValue: 'Shoe Maker' },
+    { value: 'cleaner-7', viewValue: 'Cleaner' },
+    { value: 'mechanic-8', viewValue: 'Automobile Mechanic' },
+
+  ];
+
   ngAfterViewInit() {
 
     (<any>$('#datatables')).DataTable({

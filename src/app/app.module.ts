@@ -3,7 +3,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { APP_BASE_HREF } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -47,6 +47,8 @@ import { AdminLayoutComponent } from './layouts/admin/admin-layout.component';
 import { AuthLayoutComponent } from './layouts/auth/auth-layout.component';
 
 import { AppRoutes } from './app.routing';
+// import { NewTickectComponent } from './new-tickect/new-tickect.component';
+// import { NewTicketComponent } from './new-ticket/new-ticket.component';
 
 // import { UsersComponent } from './users/users.component';
 // import { TechniciansComponent } from './technicians/technicians.component';
@@ -87,12 +89,13 @@ import { AppRoutes } from './app.routing';
   ],
   declarations: [],
 })
-export class MaterialModule {}
+export class MaterialModule { }
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserAnimationsModule,
+    ReactiveFormsModule,
     FormsModule,
     RouterModule.forRoot(AppRoutes, {
       useHash: true,
@@ -109,4 +112,4 @@ export class MaterialModule {}
   providers: [MatNativeDateModule],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }
