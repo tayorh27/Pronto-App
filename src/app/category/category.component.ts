@@ -6,6 +6,8 @@ import 'firebase/database';
 import * as $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-bs4';
+import { AppConfig } from '../services/global.service';
+import swal from 'sweetalert2';
 
 
 // declare const $: any;
@@ -22,7 +24,7 @@ declare interface DataTable {
   templateUrl: './category.component.html',
   styleUrls: ['./category.component.css'],
 })
-export class MyCategoryComponent implements OnInit, OnDestroy {
+export class MyCategoryComponent implements OnInit {
 
   public dataTable: DataTable;
   data: string[][] = []
@@ -34,9 +36,11 @@ export class MyCategoryComponent implements OnInit, OnDestroy {
 
   selectedCategory: MainCategory
 
-  ngOnDestroy() {
+  config = new AppConfig
+  modal_name = ""
+  modal_geo = ''
+  button_pressed = false
 
-  }
   constructor() { }
 
   getCategories() {
@@ -71,6 +75,7 @@ export class MyCategoryComponent implements OnInit, OnDestroy {
   cancelAddCat() {
     this.addNewCat = false
     this.editCat = false
+    this.button_pressed = false
   }
 
   _name = ''
@@ -85,27 +90,60 @@ export class MyCategoryComponent implements OnInit, OnDestroy {
   }
 
 
-  async deleteCategory(cat: any) {
-    const key = ``
-    await firebase.firestore().collection('categories').doc(key).delete()
+  deleteCategory(id: string, name: string) {
+    swal({
+      title: 'Delete Alert',
+      text: 'Are you sure about deleting this category?',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it',
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
+    }).then((result) => {
+      if (result.value) {
+        firebase.firestore().collection('categories').doc(id).delete().then(del => {
+          const current_email = localStorage.getItem('email')
+          const current_name = localStorage.getItem('name')
+          this.config.logActivity(`${current_name}|${current_email} deleted this category: ${name}`)
+          this.config.displayMessage("Successfully deleted", true);
+        }).catch(err => {
+          this.config.displayMessage(`${err}`, false);
+        })
+      } else {
+        swal({
+          title: 'Cancelled',
+          text: 'Deletion not successful',
+          type: 'error',
+          confirmButtonClass: "btn btn-info",
+          buttonsStyling: false
+        }).catch(swal.noop)
+      }
+    })
   }
 
 
   async categorySubmitClicked() {
     const name = (<HTMLInputElement>document.getElementById("cat_name")).value;
 
-    const key = firebase.database().ref().push().key
-
-
-
-    const query = await firebase.firestore().collection('categories').where('name', '==', name).get()
-    if (query.size > 0) {
-      console.log('this particular category exsist already exists')
+    if (name === '') {
       return
     }
 
+    const key = firebase.database().ref().push().key
+    const current_email = localStorage.getItem('email')
+    const current_name = localStorage.getItem('name')
+    this.button_pressed = true
+
 
     if (!this.editCat) {
+      const query = await firebase.firestore().collection('categories').where('name', '==', name).get()
+      if (query.size > 0) {
+        this.button_pressed = false
+        this.config.displayMessage('this particular category exsist already exists', false)
+        return
+      }
       const category: MainCategory = {
         id: key,
         name: name,
@@ -115,9 +153,12 @@ export class MyCategoryComponent implements OnInit, OnDestroy {
       }
 
       firebase.firestore().collection('categories').doc(key).set(category).then(d => {
+        this.config.logActivity(`${current_name}|${current_email} created this category: ${name}`)
         this.cancelAddCat()
+        this.config.displayMessage('Successfully created', true)
       }).catch(err => {
-        console.log(err);
+        this.button_pressed = false
+        this.config.displayMessage(`${err}`, false)
       })
 
     }
@@ -129,9 +170,12 @@ export class MyCategoryComponent implements OnInit, OnDestroy {
       }
 
       firebase.firestore().collection('categories').doc(this.selectedCategory.id).update(category).then(d => {
+        this.config.logActivity(`${current_name}|${current_email} updated this category: ${name}`)
         this.cancelAddCat()
+        this.config.displayMessage('Successfully updated', true)
       }).catch(err => {
-        console.log(err);
+        this.button_pressed = false
+        this.config.displayMessage(`${err}`, false)
       })
     }
   }

@@ -69,6 +69,7 @@
                       >
                       <a
                         href="javascript:void(0)"
+                        (click)="deleteTechClick(row[0], row[4])"
                         class="btn btn-link btn-danger btn-just-icon remove"
                         ><i class="material-icons">close</i></a
                       >
@@ -146,22 +147,34 @@
                 />
               </mat-form-field>
 
+              <mat-form-field>
+                <mat-select
+                  placeholder="Blocked"
+                  [(ngModel)]="user_blocked"
+                  name="_blocked"
+                  id="tech_block"
+                >
+                  <mat-option value="no">No</mat-option>
+                  <mat-option value="yes">Yes</mat-option>
+                </mat-select>
+              </mat-form-field>
+
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12">
                   <mat-form-field>
                     <mat-select
                       multiple
                       placeholder="Category"
-                      [(ngModel)]="currentCategory"
+                      [(ngModel)]="_cat"
                       name="plumber"
                       ariaLabel="Techies[0]"
                       id="tech_cat"
                     >
                       <mat-option
-                        *ngFor="let tech of Techies"
-                        [value]="tech.value"
+                        *ngFor="let tech of categories"
+                        [value]="tech.id"
                       >
-                        {{ tech.viewValue }}
+                        {{ tech.name }}
                       </mat-option>
                     </mat-select>
                   </mat-form-field>
@@ -175,8 +188,9 @@
               type="submit"
               class="btn btn-fill btn-rose btn-block"
               (click)="technicianSubmitClicked()"
+              [disabled]="button_pressed"
             >
-              Submit
+            {{button_pressed ? 'Please wait...' : 'Submit'}}
             </button>
             <button
               mat-raised-button
@@ -188,6 +202,10 @@
             </button>
           </div>
           <br />
+          <div style="display: none;">
+            <p id="madd"></p>
+            <p id="mgeo"></p>
+          </div>
         </div>
       </div>
     </div>

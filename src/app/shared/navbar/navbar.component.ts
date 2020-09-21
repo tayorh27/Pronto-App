@@ -3,6 +3,9 @@ import { ROUTES } from '../.././sidebar/sidebar.component';
 import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import swal from 'sweetalert2';
+import * as firebase from "firebase/app";
+import 'firebase/auth'
 const misc: any = {
     navbar_menu_visible: 0,
     active_collapse: true,
@@ -187,6 +190,34 @@ export class NavbarComponent implements OnInit {
         }
     }
 
+    logout(){
+        swal({
+            title: 'Logout Alert',
+            text: 'Are you sure about logging out?',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, log me out!',
+            cancelButtonText: 'No, keep me',
+            confirmButtonClass: "btn btn-success",
+            cancelButtonClass: "btn btn-danger",
+            buttonsStyling: false
+        }).then((result) => {
+            if (result.value) {
+                firebase.auth().signOut();
+                localStorage.clear();
+                this.router.navigate(['/pages/login'])
+            } else {
+                swal({
+                    title: 'Cancelled',
+                    text: 'Logout not successful',
+                    type: 'error',
+                    confirmButtonClass: "btn btn-info",
+                    buttonsStyling: false
+                }).catch(swal.noop)
+            }
+        })
+    }
+    
     getTitle() {
       var titlee = this.location.prepareExternalUrl(this.location.path());
       if(titlee.charAt(0) === '#'){

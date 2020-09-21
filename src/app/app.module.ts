@@ -47,6 +47,10 @@ import { AdminLayoutComponent } from './layouts/admin/admin-layout.component';
 import { AuthLayoutComponent } from './layouts/auth/auth-layout.component';
 
 import { AppRoutes } from './app.routing';
+import { RouteGuard, LoginRouteGuard } from './route.guard';
+import { AppOverlayModule } from './overlay/overlay.module';
+import { ProgressSpinnerModule, ProgressSpinnerComponent } from './progress-spinner/progress-spinner.module';
+// import { GooglePlaceModule } from "ngx-google-places-autocomplete";
 // import { NewTickectComponent } from './new-tickect/new-tickect.component';
 // import { NewTicketComponent } from './new-ticket/new-ticket.component';
 
@@ -86,6 +90,7 @@ import { AppRoutes } from './app.routing';
     MatToolbarModule,
     MatTooltipModule,
     MatNativeDateModule,
+    // GooglePlaceModule
   ],
   declarations: [],
 })
@@ -98,7 +103,7 @@ export class MaterialModule { }
     ReactiveFormsModule,
     FormsModule,
     RouterModule.forRoot(AppRoutes, {
-      useHash: true,
+      useHash: false,
     }),
     HttpClientModule,
 
@@ -107,9 +112,12 @@ export class MaterialModule { }
     NavbarModule,
     FooterModule,
     FixedpluginModule,
+    AppOverlayModule,
+    ProgressSpinnerModule
   ],
+  entryComponents: [ProgressSpinnerComponent],
   declarations: [AppComponent, AdminLayoutComponent, AuthLayoutComponent],
-  providers: [MatNativeDateModule],
+  providers: [MatNativeDateModule,RouteGuard, LoginRouteGuard],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

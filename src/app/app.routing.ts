@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { AdminLayoutComponent } from './layouts/admin/admin-layout.component';
 import { AuthLayoutComponent } from './layouts/auth/auth-layout.component';
+import { LoginRouteGuard, RouteGuard } from './route.guard';
 
 export const AppRoutes: Routes = [
   {
@@ -20,10 +21,12 @@ export const AppRoutes: Routes = [
       {
         path: 'customer',
         loadChildren: './customer/customer.modules#CustomerModule',
+        canActivate: [RouteGuard],
       },
       {
         path: 'category',
         loadChildren: './category/category.module#CategoryModule',
+        canActivate: [RouteGuard]
       },
       {
         path: 'components',
@@ -32,12 +35,18 @@ export const AppRoutes: Routes = [
       {
         path: 'technician',
         loadChildren: './technician/technician.module#TechnicianModule',
+        canActivate: [RouteGuard]
       },
       {
         path: 'new-ticket',
         loadChildren: './new-ticket/new-ticket.module#NewTicketModule',
+        canActivate: [RouteGuard]
       },
-
+      {
+        path: 'settings',
+        canActivate: [RouteGuard],
+        loadChildren: './settings/setttings.module#SettingsModule'
+      },
       {
         path: 'forms',
         loadChildren: './forms/forms.module#Forms',
@@ -79,6 +88,7 @@ export const AppRoutes: Routes = [
       {
         path: 'pages',
         loadChildren: './pages/pages.module#PagesModule',
+        canActivate: [LoginRouteGuard]
       },
     ],
   },

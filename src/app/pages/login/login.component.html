@@ -10,7 +10,7 @@
               <div class="card-header card-header-rose text-center">
                 <h4 class="card-title">Log in</h4>
                 <div class="social-line">
-                  <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
+                  <!-- <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
                     <i class="fa fa-facebook-square"></i>
                   </a>
                   <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
@@ -18,12 +18,12 @@
                   </a>
                   <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
                     <i class="fa fa-google-plus"></i>
-                  </a>
+                  </a> -->
                 </div>
               </div>
               <div class="card-body ">
-                <p class="card-description text-center">Or Be Classical</p>
-                <span class="bmd-form-group">
+                <!-- <p class="card-description text-center">Or Be Classical</p> -->
+                <!-- <span class="bmd-form-group">
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -32,7 +32,7 @@
                     </div>
                     <input type="text" class="form-control" placeholder="First Name...">
                   </div>
-                </span>
+                </span> -->
                 <span class="bmd-form-group">
                   <div class="input-group">
                     <div class="input-group-prepend">
@@ -40,7 +40,7 @@
                         <i class="material-icons">email</i>
                       </span>
                     </div>
-                    <input type="email" class="form-control" placeholder="Email...">
+                    <input type="email" class="form-control" id="mEmail" placeholder="Email..." required>
                   </div>
                 </span>
                 <span class="bmd-form-group">
@@ -50,12 +50,33 @@
                         <i class="material-icons">lock_outline</i>
                       </span>
                     </div>
-                    <input type="password" class="form-control" placeholder="Password...">
+                    <input type="password" class="form-control" id="mPassword" placeholder="Password..." required>
                   </div>
                 </span>
+                <div class="row">
+                  <label class="col-md-2"></label>
+                  <div class="col-md-10">
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" value="" id="userNew"> Check this box if you are a new user
+                        <span class="form-check-sign">
+                          <span class="check"></span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="card-footer justify-content-center">
-                <a href="#pablo" class="btn btn-rose btn-link btn-lg">Lets Go</a>
+                <a href="javascript:void(0)" class="btn btn-rose btn-link btn-lg" (click)="login()" *ngIf="!login_pressed">Lets Go</a>
+                <div class="loader" *ngIf="login_pressed || forgot_pressed">
+                  <svg class="circular" viewBox="25 25 50 50">
+                      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                  </svg>
+              </div>
+              </div>
+              <div class="card-footer justify-content-center">
+                <a href="javascript:void(0)" class="btn btn-danger btn-link btn-sm" (click)="forgotpassword()" *ngIf="!forgot_pressed"><i>Forgot Password?</i></a>
               </div>
             </div>
           </form>
@@ -66,32 +87,32 @@
       <div class="container">
         <nav class="pull-left">
           <ul>
-            <li>
-              <a href="https://www.creative-tim.com">
+            <!-- <li>
+              <a href="javascript:void(0)">
                 Creative Tim
               </a>
-            </li>
-            <li>
-              <a href="https://creative-tim.com/about-us">
+            </li> -->
+            <!-- <li>
+              <a href="javascript:void(0)">
                 About Us
               </a>
             </li>
             <li>
-              <a href="http://blog.creative-tim.com">
+              <a href="javascript:void(0)">
                 Blog
               </a>
             </li>
             <li>
-              <a href="https://www.creative-tim.com/license">
+              <a href="javascript:void(0)">
                 Licenses
               </a>
-            </li>
+            </li> -->
           </ul>
         </nav>
         <div class="copyright pull-right">
           &copy;
             {{test | date: 'yyyy'}}, made with <i class="material-icons">favorite</i> by
-          <a href="https://www.creative-tim.com" target="_blank">Creative Tim</a> for a better web.
+          <a href="https://tagdev.tech" target="_blank">TagDev</a> for a better web.
         </div>
       </div>
     </footer>

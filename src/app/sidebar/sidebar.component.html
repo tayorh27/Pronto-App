@@ -6,9 +6,9 @@
                 <img src="/assets/img/angular2-logo-white.png"/>
             </div>
           </a>
-            <a href="https://www.creative-tim.com" class="simple-text logo-normal">
-              Creative Tim
-            </a>
+          <a href="javascript:void(0)" class="simple-text logo-normal">
+            PRONTO APP
+          </a>
         </div>
 
 
@@ -16,31 +16,31 @@
 
             <div class="user">
                 <div class="photo">
-                    <img src="./assets/img/faces/avatar.jpg" />
+                  <img src="{{image}}" />
                 </div>
                 <div class="user-info">
                     <a data-toggle="collapse" href="#collapseExample" class="collapsed">
                         <span>
-                            Tania Andrew
+                          {{name}}
                             <b class="caret"></b>
                         </span>
                     </a>
                     <div class="collapse" id="collapseExample">
                         <ul class="nav">
                             <li class="nav-item">
-                                <a href="javascript:void(0)" class="nav-link">
+                                <a href="javascript:void(0)" class="nav-link" [routerLink]="['/pages/user',true]">
                                     <span class="sidebar-mini">MP</span>
                                     <span class="sidebar-normal">My Profile</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="javascript:void(0)" class="nav-link">
+                                <a href="javascript:void(0)" class="nav-link" [routerLink]="['/pages/user', false]">
                                     <span class="sidebar-mini">EP</span>
                                     <span class="sidebar-normal">Edit Profile</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="javascript:void(0)" class="nav-link">
+                            <li class="nav-item" *ngIf="role == 'Administrator'">
+                                <a href="javascript:void(0)" [routerLink]="['/settings']" class="nav-link">
                                     <span class="sidebar-mini">S</span>
                                     <span class="sidebar-normal">Settings</span>
                                 </a>
@@ -52,7 +52,7 @@
 
             <div *ngIf="isMobileMenu()">
 
-              <form class="navbar-form">
+              <!-- <form class="navbar-form">
                 <span class="bmd-form-group"><div class="input-group no-border">
                   <input type="text" value="" class="form-control" placeholder="Search...">
                   <button mat-raised-button type="submit" class="btn btn-white btn-round btn-just-icon">
@@ -60,18 +60,18 @@
                     <div class="ripple-container"></div>
                   </button>
                 </div></span>
-              </form>
+              </form> -->
 
               <ul class="nav navbar-nav nav-mobile-menu">
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                   <a class="nav-link" href="#pablo">
                     <i class="material-icons">dashboard</i>
                     <p>
                       <span class="d-lg-none d-md-block">Stats</span>
                     </p>
                   </a>
-                </li>
-                <li class="nav-item dropdown">
+                </li> -->
+                <!-- <li class="nav-item dropdown">
                   <a class="nav-link" href="#pablo" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="material-icons">notifications</i>
                     <span class="notification">5</span>
@@ -86,12 +86,12 @@
                     <a class="dropdown-item" href="#">Another Notification</a>
                     <a class="dropdown-item" href="#">Another One</a>
                   </div>
-                </li>
+                </li> -->
                 <li class="nav-item">
-                  <a class="nav-link" href="#pablo">
-                    <i class="material-icons">person</i>
+                  <a class="nav-link" href="javascript:void(0)" (click)="logout()">
+                    <i class="material-icons">close</i>
                     <p>
-                      <span class="d-lg-none d-md-block">Account</span>
+                      <span class="d-lg-none d-md-block">Logout</span>
                     </p>
                   </a>
                 </li>
@@ -101,21 +101,21 @@
             <ul class="nav">
                 <li routerLinkActive="active" *ngFor="let menuitem of menuItems" class="nav-item">
                     <!--If is a single link-->
-                    <a [routerLink]="[menuitem.path]" *ngIf="menuitem.type === 'link'" class="nav-link">
+                    <a [routerLink]="[menuitem.path]" *ngIf="menuitem.type === 'link' && menuitem.access" class="nav-link">
                         <i class="material-icons">{{menuitem.icontype}}</i>
                         <p>{{menuitem.title}}</p>
                     </a>
                     <!--If it have a submenu-->
-                    <a data-toggle="collapse" href="#{{menuitem.collapse}}" *ngIf="menuitem.type === 'sub'" (click)="updatePS()" class="nav-link">
+                    <a data-toggle="collapse" href="#{{menuitem.collapse}}" *ngIf="menuitem.type === 'sub' && menuitem.access" (click)="updatePS()" class="nav-link">
                         <i class="material-icons">{{menuitem.icontype}}</i>
                         <p>{{menuitem.title}}<b class="caret"></b></p>
                     </a>
 
                     <!--Display the submenu items-->
-                    <div id="{{menuitem.collapse}}" class="collapse" *ngIf="menuitem.type === 'sub'">
+                    <div id="{{menuitem.collapse}}" class="collapse" *ngIf="menuitem.type === 'sub' && menuitem.access">
                         <ul class="nav">
                             <li routerLinkActive="active" *ngFor="let childitem of menuitem.children" class="nav-item">
-                                <a [routerLink]="[menuitem.path, childitem.path]" class="nav-link">
+                                <a href="javascript:void(0)" (click)="gotoLink(menuitem.path, childitem.path)" class="nav-link">
                                     <span class="sidebar-mini">{{childitem.ab}}</span>
                                     <span class="sidebar-normal">{{childitem.title}}</span>
                                 </a>
@@ -123,12 +123,12 @@
                         </ul>
                     </div>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a href="http://md-pro-angular.creative-tim.com/documentation/tutorial?ref=md-pro-archive" class="nav-link">
                         <i class="material-icons">school</i>
                         <p>Documentation</p>
                     </a>
-                </li>
+                </li> -->
 
             </ul>
 

@@ -50,7 +50,7 @@
                       <a href="javascript:void(0)" (click)="editCatClick(row[0])"
                         class="btn btn-link btn-warning btn-just-icon edit"><i class="material-icons">edit</i></a>
                       <a href="javascript:void(0)" class="btn btn-link btn-danger btn-just-icon remove"
-                        (click)="deleteCategory(row[0])"><i class="material-icons">close</i></a>
+                        (click)="deleteCategory(row[0], row[1])"><i class="material-icons">close</i></a>
                     </td>
                   </tr>
                 </tbody>
@@ -85,8 +85,8 @@
           </div>
           <div class="card-footer">
             <button mat-raised-button type="submit" class="btn btn-fill btn-rose btn-block"
-              (click)="categorySubmitClicked()">
-              Submit
+              (click)="categorySubmitClicked()" [disabled]="button_pressed">
+              {{button_pressed ? 'Please wait...' : 'Submit'}}
             </button>
             <button mat-raised-button type="submit" class="btn btn-fill btn-block btn-danger" (click)="cancelAddCat()">
               Cancel

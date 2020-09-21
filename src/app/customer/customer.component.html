@@ -61,7 +61,12 @@
                     <td>{{ row[5] }}</td>
                     <td>{{ row[6] }}</td>
                     <td class="text-right">
-                      
+                      <a
+                        href="javascript:void(0)"
+                        (click)="ticketCusClick(row[4])"
+                        class="btn btn-link btn-warning btn-just-icon create_new_folder"
+                        ><i class="material-icons">create_new_folder</i></a
+                      >
                       <a
                         href="javascript:void(0)"
                         (click)="editCusClick(row[0])"
@@ -70,6 +75,7 @@
                       >
                       <a
                         href="javascript:void(0)"
+                        (click)="deleteCusClick(row[0], row[4])"
                         class="btn btn-link btn-danger btn-just-icon remove"
                         ><i class="material-icons">close</i></a
                       >
@@ -118,6 +124,7 @@
                   type="address"
                   [(ngModel)]="_addr"
                   class="form-control"
+                  autocomplete="off"
                   name="mAddr"
                   id="cus_addr"
                 />
@@ -154,8 +161,9 @@
               type="submit"
               class="btn btn-fill btn-rose btn-block"
               (click)="customerSubmitClicked()"
+              [disabled]="button_pressed"
             >
-              Submit
+              {{button_pressed ? 'Please wait...' : 'Submit'}}
             </button>
             <button
               mat-raised-button
@@ -167,6 +175,10 @@
             </button>
           </div>
           <br />
+          <div style="display: none;">
+            <p id="madd"></p>
+            <p id="mgeo"></p>
+          </div>
         </div>
       </div>
     </div>

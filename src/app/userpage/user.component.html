@@ -7,47 +7,49 @@
             <div class="card-icon">
               <i class="material-icons">perm_identity</i>
             </div>
-            <h4 class="card-title">Edit Profile -
-              <small class="category">Complete your profile</small>
+            <h4 class="card-title">Profile
+              <!-- <small class="category">Complete your profile</small> this.id=this._Activatedroute.snapshot.paramMap.get("id");  -->
             </h4>
           </div>
           <div class="card-body">
             <form>
               <div class="row">
-                <div class="col-md-5">
+                <!-- <div class="col-md-5">
                   <div class="form-group">
                     <label class="bmd-label-floating">Company (disabled)</label>
                     <input type="text" class="form-control" disabled>
                   </div>
-                </div>
-                <div class="col-md-3">
+                </div> -->
+                <div class="col-md-6">
                   <div class="form-group">
                     <label class="bmd-label-floating">Username</label>
-                    <input type="text" class="form-control">
+                    <input type="text" class="form-control" name="username" [(ngModel)]="username"
+                      [disabled]="disabled">
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="form-group">
                     <label class="bmd-label-floating">Email address</label>
-                    <input type="email" class="form-control">
+                    <input type="email" class="form-control" name="email" [(ngModel)]="email" disabled>
                   </div>
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label class="bmd-label-floating">Fist Name</label>
-                    <input type="text" class="form-control">
+                    <label class="bmd-label-floating">Position</label>
+                    <input type="text" class="form-control" name="position" [(ngModel)]="position"
+                      [disabled]="disabled">
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label class="bmd-label-floating">Last Name</label>
-                    <input type="text" class="form-control">
+                    <label class="bmd-label-floating">Role</label>
+                    <input type="text" class="form-control" name="role" [(ngModel)]="role" disabled>
                   </div>
                 </div>
               </div>
-              <div class="row">
+              <!-- <div class="row">
                 <div class="col-md-12">
                   <div class="form-group">
                     <label class="bmd-label-floating">Adress</label>
@@ -74,19 +76,20 @@
                     <input type="text" class="form-control">
                   </div>
                 </div>
-              </div>
+              </div> -->
               <div class="row">
                 <div class="col-md-12">
                   <div class="form-group">
-                    <label>About Me</label>
+                    <label>Access Levels</label>
                     <div class="form-group">
-                      <label class="bmd-label-floating"> Lamborghini Mercy, Your chick she so thirsty, I'm in that two seat Lambo.</label>
-                      <textarea class="form-control" rows="5"></textarea>
+                      <!-- <label class="bmd-label-floating"> Lamborghini Mercy, Your chick she so thirsty, I'm in that two seat Lambo.</label> -->
+                      <textarea class="form-control" rows="5" name="levels" [(ngModel)]="levels" disabled></textarea>
                     </div>
                   </div>
                 </div>
               </div>
-              <button mat-raised-button type="submit" class="btn btn-rose pull-right">Update Profile</button>
+              <button mat-raised-button type="submit" class="btn btn-rose pull-right" (click)="updateProfile()">Update
+                Profile</button>
               <div class="clearfix"></div>
             </form>
           </div>
@@ -94,18 +97,34 @@
       </div>
       <div class="col-md-4">
         <div class="card card-profile">
-          <div class="card-avatar">
-            <a href="#pablo">
-              <img class="img" src="./assets/img/faces/marc.jpg" />
+          <div class="card-avatar" *ngIf="disabled">
+            <a href="javascript:void(0)">
+              <img class="img" src="{{dp}}" />
             </a>
           </div>
+          <div class="fileinput fileinput-new text-center" data-provides="fileinput" *ngIf="!disabled">
+            <div class="fileinput-new thumbnail img-circle">
+              <img src="{{dp}}" alt="...">
+            </div>
+            <div class="fileinput-preview fileinput-exists thumbnail img-circle"></div>
+            <div>
+              <span class="btn btn-round btn-rose btn-file">
+                <span class="fileinput-new">Add Photo</span>
+                <span class="fileinput-exists">Change</span>
+                <input type="file" name="..." />
+              </span>
+              <br />
+              <a href="javascript:void(0)" class="btn btn-danger btn-round fileinput-exists" data-dismiss="fileinput"><i
+                  class="fa fa-times"></i> Remove</a>
+            </div>
+          </div>
           <div class="card-body">
-            <h6 class="card-category text-gray">CEO / Co-Founder</h6>
-            <h4 class="card-title">Alec Thompson</h4>
+            <h6 class="card-category text-gray">{{position}}</h6>
+            <h4 class="card-title">{{username}}</h4>
             <p class="card-description">
-              Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...
+              TAC - The online messenger gift shop
             </p>
-            <a href="#pablo" class="btn btn-rose btn-round">Follow</a>
+            <a href="javascript:void(0)" class="btn btn-danger btn-round" (click)="logout()">Logout</a>
           </div>
         </div>
       </div>
