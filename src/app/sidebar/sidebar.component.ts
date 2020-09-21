@@ -65,6 +65,13 @@ export const ROUTES: RouteInfo[] = [{
     icontype: 'work',
     access: false
 },
+{
+    path: '/logs',
+    title: 'Logs',
+    type: 'link',
+    icontype: 'apps',
+    access: false
+},
 // {
 //     path: '/components',
 //     title: 'Components',

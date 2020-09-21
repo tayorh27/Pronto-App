@@ -16,13 +16,14 @@ import { MainCustomer } from '../model/customer';
 import { Jobs } from '../model/jobs';
 import { ProgressSpinnerComponent } from '../progress-spinner/progress-spinner.module';
 import { OverlayService } from '../overlay/overlay.module';
+import { JobActivity } from '../model/activity';
 
 declare var google: any;
 let map: any;
 let marker: any = {}
 const options = {
   enableHighAccuracy: true,
-  timeout: 5000,
+  timeout: 60000,
   maximumAge: 0
 };
 let infowindow: any;
@@ -68,7 +69,7 @@ export class MyNewTicketComponent implements OnInit {
         infowindow.open(map, marker['current']);
       });
     }, (error) => {
-      console.log(error);
+      this.config.displayMessage(`${error.message}. Refresh this page.`, false);
     }, options);
   }
 
@@ -107,14 +108,22 @@ export class MyNewTicketComponent implements OnInit {
         <label>Status: ${tech['status']}</label><br>
         </div>
         <div class="card-footer">
-        <button mat-raised-button type="button" id="assignBtn" class="btn btn-fill btn-rose btn-block"
-              (click)="assignClicked('hello')">
+        <button mat-raised-button type="button" id="${_id}" class="btn btn-fill btn-rose btn-block"
+              >
               Assign
             </button>
         </div>
       </div>
-      </div>`);
-      infowindow.open(map, marker[_id]);
+      </div>`)//(click)="assignClicked('hello')"
+      infowindow.open(map, marker[_id])
+
+      setTimeout(() => {
+        //listen for onclick
+        document.getElementById(_id).addEventListener('click', () => {
+          document.getElementById('assign-id').innerText = _id
+          document.getElementById('assignBtnClick').click()
+        })
+      }, 500)
     });
   }
 
@@ -127,6 +136,7 @@ export class MyNewTicketComponent implements OnInit {
   categories: MainCategory[] = []
   technicians: any[] = []
   _cat: string[] = []
+  _addr = ''
   radius = 10
 
   selectedCustomer: MainCustomer
@@ -145,6 +155,10 @@ export class MyNewTicketComponent implements OnInit {
     this.getCategories()
   }
 
+  /**
+   * get the customer data from firebase provided the email is given
+   * @param email string
+   */
   async getCustomerByEmail(email: string) {
     const query = await firebase.firestore().collection('customers').doc(email.toLowerCase()).get()
     if (!query.exists) {
@@ -153,6 +167,11 @@ export class MyNewTicketComponent implements OnInit {
       return
     }
     this.selectedCustomer = <MainCustomer>query.data()
+    this._addr = this.selectedCustomer.address
+    setTimeout(() => {
+      document.getElementById('madd').innerHTML = this.selectedCustomer.address
+      document.getElementById('mgeo').innerHTML = JSON.stringify(this.selectedCustomer.position.geopoint)
+    }, 3000)
   }
 
   /**
@@ -209,8 +228,8 @@ export class MyNewTicketComponent implements OnInit {
   }
 
   /**
-   * perform search on firebase
-   */
+   * perform search on firebase using geofirex library
+  */
   async searchForTechnicians() {
     this.button_pressed = true
 
@@ -223,7 +242,7 @@ export class MyNewTicketComponent implements OnInit {
     //get the geopoint from the input address
     const geopoint = JSON.parse(document.getElementById('mgeo').innerHTML)
 
-    const center = GeoFirestore.point(geopoint['lat'], geopoint['lng'])
+    const center = (geopoint['lat'] === undefined) ? GeoFirestore.point(geopoint['latitude'], geopoint['longitude']) : GeoFirestore.point(geopoint['lat'], geopoint['lng'])
 
     // Create a GeoQuery based on a location
     GeoFirestore.query(geocollection).within(center, this.radius, 'position').subscribe(query => {
@@ -236,6 +255,7 @@ export class MyNewTicketComponent implements OnInit {
       }
 
       this.technicians = []
+      // map.marke
       query.forEach(tech => {
         this.technicians.push(tech)
         const coords = tech['position']
@@ -247,8 +267,9 @@ export class MyNewTicketComponent implements OnInit {
 
   }
 
-  assignClicked(id: string) {
+  assignClicked() {
     this.previewProgressSpinner.open({ hasBackdrop: true }, ProgressSpinnerComponent)
+    const id = document.getElementById('assign-id').innerText//goto line 46 in the html file
     const findTech = this.technicians.find((val, ind, arr) => {
       return val['id'] === id
     })
@@ -280,13 +301,29 @@ export class MyNewTicketComponent implements OnInit {
     }
 
     firebase.firestore().collection('jobs').doc(key).set(job).then(d => {
-      this.previewProgressSpinner.close()
-      this.config.logActivity(`${current_name}|${current_email} created this job for : ${this.selectedCustomer.name} assigned to ${technician.name}`)
-      this.config.displayMessage('Successfully created', true)
+      //create activity collection
+      const id = firebase.database().ref().push().key
+      const act: JobActivity = {
+        id: id,
+        comment: `This job was created for : ${this.selectedCustomer.name} assigned to ${technician.name}`,
+        created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }
+      firebase.firestore().collection('jobs').doc(key).collection('activities').doc(id).set(act).then(d => {
+        this.previewProgressSpinner.close()
+        this.config.logActivity(`${current_name}|${current_email} created this job for : ${this.selectedCustomer.name} assigned to ${technician.name}`)
+        this.config.displayMessage('Successfully created', true)
+      }).catch(err => {
+        this.previewProgressSpinner.close()
+        this.config.displayMessage(`${err}`, false)
+      })
     }).catch(err => {
       this.previewProgressSpinner.close()
       this.config.displayMessage(`${err}`, false)
     })
   }
+
+  //update technician status to assign and send sms to both customer and technician
+  
 
 }

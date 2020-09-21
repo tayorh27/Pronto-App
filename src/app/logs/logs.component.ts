@@ -35,7 +35,7 @@ export class LogsComponent implements OnInit {
     }
 
     getLogs() {
-        firebase.firestore().collection('db').doc('tacadmin').collection('logs').onSnapshot(query => {
+        firebase.firestore().collection('logs').onSnapshot(query => {
             this.data = []
             var index = 1
             query.forEach(data => {
