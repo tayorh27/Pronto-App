@@ -48,6 +48,11 @@ export const AppRoutes: Routes = [
         loadChildren: './settings/setttings.module#SettingsModule'
       },
       {
+        path: 'logs',
+        canActivate: [RouteGuard],
+        loadChildren: './logs/logs.module#LogsModule'
+      },
+      {
         path: 'forms',
         loadChildren: './forms/forms.module#Forms',
       },
