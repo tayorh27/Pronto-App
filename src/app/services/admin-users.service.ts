@@ -17,7 +17,7 @@ export class AdminUsersService {
     }
 
     public isAllowedAccess(access_level: string, menu: string) {
-        if(access_level.includes(menu)){
+        if(access_level.toLowerCase().split(',').includes(menu.toLowerCase())){
             return true;
         }else {
             return false;

@@ -68,7 +68,7 @@
                         ><i class="material-icons">edit</i></a
                       >
                       <a
-                        href="javascript:void(0)"
+                      *ngIf="role === 'Administrator'" href="javascript:void(0)"
                         (click)="deleteTechClick(row[0], row[4])"
                         class="btn btn-link btn-danger btn-just-icon remove"
                         ><i class="material-icons">close</i></a

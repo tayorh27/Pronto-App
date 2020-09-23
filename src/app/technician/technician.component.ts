@@ -1,7 +1,7 @@
 import { MainTechnician } from './../model/technician';
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import * as firebase from 'firebase/app';
-import * as geofirex from 'geofirex'; 
+import * as geofirex from 'geofirex';
 import 'firebase/firestore';
 import 'firebase/database';
 import * as $ from 'jquery';
@@ -11,6 +11,7 @@ import { AppConfig } from '../services/global.service';
 import { AdminUsers } from '../model/admin.users';
 import { MainCategory } from '../model/category';
 import swal from 'sweetalert2';
+import { AdminUsersService } from '../services/admin-users.service';
 
 
 declare interface DataTable {
@@ -44,6 +45,9 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
   button_pressed = false
 
   user_blocked = 'no'
+
+  service = new AdminUsersService();
+  role = ''
 
   ngOnDestroy() {
 
@@ -116,8 +120,12 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.getCategories()
-    this.getTechnicians()
+    const email = localStorage.getItem('email');
+    this.service.getUserData(email).then(user => {
+      this.role = user.role
+      this.getCategories()
+      this.getTechnicians()
+    })
   }
 
   addTech() {
@@ -140,38 +148,38 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
   _email = ''
   _cat = []
 
-  deleteTechClick(id: string, email:string) {
+  deleteTechClick(id: string, email: string) {
     swal({
-        title: 'Delete Alert',
-        text: 'Are you sure about deleting this technician?',
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, keep it',
-        confirmButtonClass: "btn btn-success",
-        cancelButtonClass: "btn btn-danger",
-        buttonsStyling: false
+      title: 'Delete Alert',
+      text: 'Are you sure about deleting this technician?',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it',
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
     }).then((result) => {
-        if (result.value) {
-            firebase.firestore().collection('users').doc(email).delete().then(del => {
-                const current_email = localStorage.getItem('email')
-                const current_name = localStorage.getItem('name')
-                this.config.logActivity(`${current_name}|${current_email} deleted this technician: ${email}`)
-                this.config.displayMessage("Successfully deleted", true);
-            }).catch(err => {
-                this.config.displayMessage(`${err}`, false);
-            })
-        } else {
-            swal({
-                title: 'Cancelled',
-                text: 'Deletion not successful',
-                type: 'error',
-                confirmButtonClass: "btn btn-info",
-                buttonsStyling: false
-            }).catch(swal.noop)
-        }
+      if (result.value) {
+        firebase.firestore().collection('users').doc(email).delete().then(del => {
+          const current_email = localStorage.getItem('email')
+          const current_name = localStorage.getItem('name')
+          this.config.logActivity(`${current_name}|${current_email} deleted this technician: ${email}`)
+          this.config.displayMessage("Successfully deleted", true);
+        }).catch(err => {
+          this.config.displayMessage(`${err}`, false);
+        })
+      } else {
+        swal({
+          title: 'Cancelled',
+          text: 'Deletion not successful',
+          type: 'error',
+          confirmButtonClass: "btn btn-info",
+          buttonsStyling: false
+        }).catch(swal.noop)
+      }
     })
-}
+  }
 
   editTechClick(tech: any) {
     this.editTech = true

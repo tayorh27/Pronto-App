@@ -5,6 +5,7 @@ export interface AdminUsers {
     user_position?: string
     image?: string
     role?: string
+    access_levels?: string
     blocked: boolean
 
 

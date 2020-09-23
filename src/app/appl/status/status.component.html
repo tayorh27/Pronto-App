@@ -1,0 +1,94 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12" *ngIf="!isAddEdit">
+                <div class="card">
+                    <div class="card-header card-header-rose card-header-icon">
+                        <div class="card-icon">
+                            <i class="material-icons">assignment</i>
+                        </div>
+                        <h4 class="card-title">Status Settings</h4>
+                        <button mat-raised-button class="btn btn-primary" (click)="addStatus()">
+                            add status
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">{{ tableData.headerRow[0] }}</th>
+                                        <th>{{ tableData.headerRow[1] }}</th>
+                                        <th>{{ tableData.headerRow[2] }}</th>
+                                        <th>{{ tableData.headerRow[3] }}</th>
+                                        <th class="text-right">{{ tableData.headerRow[4] }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of tableData.dataRows">
+                                        <td class="text-center">{{row[1]}}</td>
+                                        <td>
+                                            <div [ngStyle]="getStyle(row[2])"></div>
+                                        </td>
+                                        <td>{{row[3]}}</td>
+                                        <td>{{row[4]}}</td>
+                                        <td class="td-actions text-right">
+                                            <a href="javascript:void(0)" (click)="editStatus(row[0])"
+                                                class="btn btn-link btn-warning btn-just-icon edit"><i
+                                                    class="material-icons">edit</i></a>
+                                            <a *ngIf="role === 'Administrator'" href="javascript:void(0)" (click)="deleteStatus(row)"
+                                                class="btn btn-link btn-danger btn-just-icon remove"><i
+                                                    class="material-icons">close</i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row" *ngIf="isAddEdit">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header card-header-rose card-header-icon">
+                        <div class="card-icon">
+                            <i class="material-icons">mail_outline</i>
+                        </div>
+                        <h4 class="card-title">{{isAdding ? 'New Status' : 'Edit Status'}}</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="#" action="#">
+                            <mat-form-field class="example-full-width">
+                                <input matInput [(ngModel)]="st_name" placeholder="Status Name" name="mMame" type="text"
+                                    class="form-control" id="cus_name" />
+                            </mat-form-field>
+                            <label>Status Color</label>
+                            <mat-form-field class="example-full-width">
+                                <input matInput [(colorPicker)]="st_color" [cpPosition]="'bottom-left'"
+                                    [style.background]="st_color" [cpOKButton]="true" />
+                            </mat-form-field>
+                        </form>
+                    </div>
+                    <div class="card-footer">
+                        <button mat-raised-button type="submit" class="btn btn-fill btn-rose btn-block"
+                            (click)="submitStatus()" [disabled]="button_pressed">
+                            {{button_pressed ? 'Please wait...' : 'Submit'}}
+                        </button>
+                        <button mat-raised-button type="submit" class="btn btn-fill btn-block btn-danger"
+                            (click)="cancelStatus()">
+                            Cancel
+                        </button>
+                    </div>
+                    <br />
+                    <div style="display: none;">
+                        <p id="madd"></p>
+                        <p id="mgeo"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

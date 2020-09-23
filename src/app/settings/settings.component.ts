@@ -108,7 +108,10 @@ export class SettingsComponent implements OnInit {
     { value: 'Customer', viewValue: 'Customer' },
     { value: 'Category', viewValue: 'Category' },
     { value: 'Technician', viewValue: 'Technician' },
-    { value: 'New Ticket', viewValue: 'New Ticket' },
+    { value: 'New-Ticket', viewValue: 'New-Ticket' },
+    { value: 'Jobs', viewValue: 'Jobs' },
+    { value: 'App-Settings', viewValue: 'App-Settings' },
+    { value: 'Assigned-Jobs', viewValue: 'Assigned-Jobs' },
     { value: 'Logs', viewValue: 'Logs' }
   ];
 

@@ -9,6 +9,7 @@ import 'datatables.net';
 import 'datatables.net-bs4';
 import { AppConfig } from '../services/global.service';
 import swal from 'sweetalert2';
+import { AdminUsersService } from '../services/admin-users.service';
 
 
 // declare const $: any;
@@ -40,6 +41,9 @@ export class MyCustomerComponent implements OnInit {
   config = new AppConfig()
 
   button_pressed = false
+
+  service = new AdminUsersService();
+  role = ''
 
   initAutoComplete() {
 
@@ -100,7 +104,11 @@ export class MyCustomerComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getCustomers()
+    const email = localStorage.getItem('email');
+        this.service.getUserData(email).then(user => {
+            this.role = user.role
+            this.getCustomers()
+        })
   }
 
   addCus() {

@@ -17,7 +17,7 @@ export interface RouteInfo {
     title: string;
     type: string;
     icontype: string;
-    access: boolean;
+    access?: boolean;
     collapse?: string;
     children?: ChildrenItems[];
 }
@@ -73,10 +73,28 @@ export const ROUTES: RouteInfo[] = [{
     access: false
 },
 {
+    path: '/app-settings',
+    title: 'App Settings',
+    type: 'sub',
+    icontype: 'settings',
+    access: false,
+    collapse: 'appsettings',
+    children: [
+        { path: 'status', title: 'Status', ab: 'S' },
+    ]
+},
+{
     path: '/logs',
     title: 'Logs',
     type: 'link',
     icontype: 'apps',
+    access: false
+},
+{
+    path: '/assigned-jobs',
+    title: 'Assigned Jobs',
+    type: 'link',
+    icontype: 'work',
     access: false
 },
     // {
@@ -132,14 +150,15 @@ export const ROUTES: RouteInfo[] = [{
     //         { path: 'vector', title: 'Vector Map', ab: 'VM' }
     //     ],
     //     access: false
-    // }, {
+    // }, 
+    // {
     //     path: '/widgets',
     //     title: 'Widgets',
     //     type: 'link',
-    //     icontype: 'widgets',
-    //     access: false
+    //     icontype: 'widgets'
 
-    // }, {
+    // },
+    //  {
     //     path: '/charts',
     //     title: 'Charts',
     //     type: 'link',
@@ -241,7 +260,7 @@ export class SidebarComponent implements OnInit {
                     this.menuItems.push(menuItem);
                 } else {
                     //console.log(`Access to ${menuItem.title} is ${this.service.isAllowedAccess(this.access_level, menuItem.title)}`)
-                    menuItem.access = this.service.isAllowedAccess(this.access_level.toLowerCase(), menuItem.title.toLowerCase());
+                    menuItem.access = this.service.isAllowedAccess(this.access_level.toLowerCase(), menuItem.title.replace(' ','-').toLowerCase());
                     this.menuItems.push(menuItem);
                 }
             }
@@ -305,10 +324,20 @@ export class SidebarComponent implements OnInit {
     }
 
     gotoLink(menu_path, child_path) {
-        if (this.role == 'Administrator') {
-            this.router.navigate([`${menu_path}/${child_path}`])
-        } else {
-            location.href = `${menu_path}/${child_path}`
-        }
+        this.router.navigate([`${menu_path}/${child_path}`])
+        // if (this.role == 'Administrator') {
+        //     this.router.navigate([`${menu_path}/${child_path}`])
+        // } else {
+        //     location.href = `/${menu_path}/${child_path}`
+        // }
+    }
+
+    gotoSingleLink(menu_path:string) {
+        this.router.navigate([`${menu_path}`])
+        // if (this.role == 'Administrator') {
+        //     this.router.navigate([`${menu_path}`])
+        // } else {
+        //     location.href = `${menu_path}`
+        // }
     }
 }

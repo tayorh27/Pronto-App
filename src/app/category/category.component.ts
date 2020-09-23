@@ -8,6 +8,7 @@ import 'datatables.net';
 import 'datatables.net-bs4';
 import { AppConfig } from '../services/global.service';
 import swal from 'sweetalert2';
+import { AdminUsersService } from '../services/admin-users.service';
 
 
 // declare const $: any;
@@ -41,6 +42,9 @@ export class MyCategoryComponent implements OnInit {
   modal_geo = ''
   button_pressed = false
 
+  service = new AdminUsersService();
+  role = ''
+
   constructor() { }
 
   getCategories() {
@@ -64,7 +68,11 @@ export class MyCategoryComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getCategories()
+    const email = localStorage.getItem('email');
+    this.service.getUserData(email).then(user => {
+      this.role = user.role
+      this.getCategories()
+    })
   }
 
   addCat() {
@@ -147,6 +155,7 @@ export class MyCategoryComponent implements OnInit {
       const category: MainCategory = {
         id: key,
         name: name,
+        created_by: `${current_name}|${current_email}`,
         created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
         modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()

@@ -53,7 +53,11 @@ export const AppRoutes: Routes = [
         canActivate: [RouteGuard],
         loadChildren: './settings/setttings.module#SettingsModule'
       },
-
+      {
+        path: 'app-settings',
+        canActivate: [RouteGuard],
+        loadChildren: './appl/appl.module#AppSettingsModule'
+      },
       {
         path: 'logs',
         canActivate: [RouteGuard],

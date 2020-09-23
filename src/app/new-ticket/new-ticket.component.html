@@ -12,7 +12,7 @@
           <form>
             <div class="form-group mx-sm-3 mb-2">
               <mat-form-field>
-                <mat-select multiple placeholder="Category" [(ngModel)]="_cat" name="plumber" ariaLabel="Techies[0]"
+                <mat-select multiple placeholder="Category*" [(ngModel)]="_cat" name="plumber" ariaLabel="Techies[0]"
                   id="tech_cat">
                   <mat-option *ngFor="let tech of categories" [value]="tech.id">
                     {{ tech.name }}
@@ -22,13 +22,19 @@
             </div>
             <div class="form-group mx-sm-3 mb-2">
               <mat-form-field class="example-full-width">
-                <input matInput type="address" [(ngModel)]="_addr" [ngModelOptions]="{standalone: true}" class="form-control" id="formGroupExampleInput2" placeholder="Address" />
+                <input matInput type="address" [(ngModel)]="_addr" [ngModelOptions]="{standalone: true}" class="form-control" id="formGroupExampleInput2" placeholder="Address*" />
               </mat-form-field>
             </div>
             <div class="form-group mx-sm-3 mb-2">
               <mat-form-field class="example-full-width">
-                <input matInput placeholder="Radius in Km" [(ngModel)]="radius" name="mRadius" type="number"
+                <input matInput placeholder="Radius in Km*" [(ngModel)]="radius" name="mRadius" type="number"
                   class="form-control" id="tech_rad" />
+              </mat-form-field>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+              <mat-form-field class="example-full-width">
+                <textarea matInput placeholder="Additional Comment" [(ngModel)]="_note" name="nt"
+                  class="form-control" id="idnt"></textarea>
               </mat-form-field>
             </div>
             <div class="card-footer">
