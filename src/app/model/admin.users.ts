@@ -5,12 +5,12 @@ export interface AdminUsers {
     user_position?: string
     image?: string
     role?: string
-    access_levels?: string
     blocked: boolean
+
 
     user_type?: string//admin | technician
     address?: string
-    position?:any
+    position?: any
     phone?: string
     category?: string[]
     status?: string

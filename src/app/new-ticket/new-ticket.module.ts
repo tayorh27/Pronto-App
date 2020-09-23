@@ -11,19 +11,19 @@ import { AgmCoreModule } from '@agm/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 @NgModule({
-    imports: [
-      CommonModule,
-      RouterModule.forChild(NewTicketRoutes),
-      FormsModule,
-      MdModule,
-      MaterialModule,
-      AgmCoreModule.forRoot({
-        apiKey: 'YOUR-API-KEY-HERE',
-        libraries: ['places']
-      })
-    ],
-    declarations: [
-      MyNewTicketComponent
-    ],
-  })
-  export class NewTicketModule { }
+  imports: [
+    CommonModule,
+    RouterModule.forChild(NewTicketRoutes),
+    FormsModule,
+    MdModule,
+    MaterialModule,
+    AgmCoreModule.forRoot({
+      apiKey: 'YOUR-API-KEY-HERE',
+      libraries: ['places']
+    })
+  ],
+  declarations: [
+    MyNewTicketComponent
+  ],
+})
+export class NewTicketModule { }

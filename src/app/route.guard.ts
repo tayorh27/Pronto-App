@@ -17,9 +17,9 @@ export class RouteGuard implements CanActivate {
             const levels = p.access_levels.toLowerCase()
             const current_menu = window.location.href.toLowerCase().split("/")[3]
 
-            if(p.role == 'Administrator'){
+            if (p.role == 'Administrator') {
                 return true
-            }else{
+            } else {
                 //console.log(`from route allow = ${this.service.isAllowedAccess(levels, current_menu)}`)
                 return this.service.isAllowedAccess(levels, current_menu)
             }

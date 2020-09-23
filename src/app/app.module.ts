@@ -3,7 +3,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { APP_BASE_HREF } from '@angular/common';
-import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -50,6 +50,9 @@ import { AppRoutes } from './app.routing';
 import { RouteGuard, LoginRouteGuard } from './route.guard';
 import { AppOverlayModule } from './overlay/overlay.module';
 import { ProgressSpinnerModule, ProgressSpinnerComponent } from './progress-spinner/progress-spinner.module';
+
+// // import { AddJobComponent } from './add-job/add-job.component';
+
 // import { GooglePlaceModule } from "ngx-google-places-autocomplete";
 // import { NewTickectComponent } from './new-tickect/new-tickect.component';
 // import { NewTicketComponent } from './new-ticket/new-ticket.component';
@@ -117,7 +120,7 @@ export class MaterialModule { }
   ],
   entryComponents: [ProgressSpinnerComponent],
   declarations: [AppComponent, AdminLayoutComponent, AuthLayoutComponent],
-  providers: [MatNativeDateModule,RouteGuard, LoginRouteGuard],
+  providers: [MatNativeDateModule, RouteGuard, LoginRouteGuard],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

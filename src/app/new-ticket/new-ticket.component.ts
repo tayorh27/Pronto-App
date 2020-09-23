@@ -324,6 +324,6 @@ export class MyNewTicketComponent implements OnInit {
   }
 
   //update technician status to assign and send sms to both customer and technician
-  
+
 
 }
