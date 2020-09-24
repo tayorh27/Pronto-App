@@ -2,12 +2,13 @@ import swal from "sweetalert2";
 import * as firebase from "firebase/app";
 import 'firebase/firestore'
 import 'firebase/database'
+import * as Twilio from 'twilio'
+import { environment } from "src/environments/environment";
 
-const twilio = require('twilio');
-const accountSid = firebase.firestore.config().twilio.sid
-const authToken = firebase.firestore.config().twilio.token
-const client = new twilio(accountSid, authToken);
-const twilioNumber = '(279) 205-4373'
+const accountSid = environment.twilioSID
+const authToken = environment.twilioTOKEN
+const client = Twilio(accountSid, authToken)
+const twilioNumber = '(218) 506-5155'//+12185065155
 
 
 export class AppConfig {
@@ -48,30 +49,25 @@ export class AppConfig {
             }
         }
     }
-    validE164(num) {
+    validE164(num: string) {
         return /^\*?[1-9]\d{1, 14}$/.test(num)
     }
-    exports.textStatus = firebase.database.ref('/orders/{orderKey}/status').onUpdate(event => {
-        const orderKey = event.params.orderKey
 
-        return admin.database().ref(`/orders/${orderKey}`).once("value").then(snapshot => snapshot.val()).then(order => {
-            const stauts = order.stauts
-            const phoneNumber = order.phoneNumber
+    sendSMS(phoneNumber: string) {
 
+        if (!this.validE164(phoneNumber)) {
+            throw new Error('number must be E164 format!')
+        }
 
-            if (!validE164(phoneNumber)) {
-                throw new Error('number must be E164 format!')
-            }
+        const textMessage = {
+            body: `Current order status: ${status}`,
+            to: phoneNumber,
+            from: twilioNumber
+        }
 
-            const textMessage = {
-                body: `Current order status: ${status}`,
-                to: phoneNumber,
-                from: twilioNumber
-            }
-
-            return client.messages.create(textMessage)
-        }).then(Message => console.log(message.sid, 'succes'))
-            .catch(err => console.log(err))
-    });
+        return client.messages.create(textMessage)
+        // .then(message => console.log(message.sid, 'succes'))
+        //     .catch (err => console.log(err))
+    }
 
 }
