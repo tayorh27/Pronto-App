@@ -9,19 +9,27 @@
             </div>
             <h4 class="card-title">Jobs</h4>
             <!-- <button mat-raised-button class="btn btn-primary">Add Job</button> -->
+            <div class="dropdown pull-left">
+              <button mat-raised-button type="button" class="btn btn-round btn-info dropdown-toggle"
+                data-toggle="dropdown">
+                <i class="material-icons">build</i>
+                <span class="caret">Toggle Job Status</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                <li><a href="javascript:void(0)" (click)="displayJobsByStatus('All')">All</a></li>
+                <li *ngFor="let st of statuses">
+                  <a href="javascript:void(0)" (click)="displayJobsByStatus(st.name)">{{ st.name }}</a>
+                </li>
+              </ul>
+            </div>
           </div>
           <div class="card-body">
             <div class="toolbar">
               <!--        Here you can write extra buttons/actions for the toolbar              -->
             </div>
-            <div class="material-datatables">
-              <table
-                id="datatables"
-                class="table table-striped table-no-bordered table-hover"
-                cellspacing="0"
-                width="100%"
-                style="width: 100%"
-              >
+            <div class="material-datatables" *ngIf="dataTable">
+              <table id="datatables" class="table table-striped table-no-bordered table-hover" cellspacing="0"
+                width="100%" style="width: 100%">
                 <thead>
                   <tr>
                     <th>{{ dataTable.headerRow[0] }}</th>
@@ -61,25 +69,12 @@
                     <td>{{ row[6] }}</td>
                     <td>{{ row[7] }}</td>
                     <td class="text-right">
-                      <a
-                        href="javascript:void(0)"
-                        (click)="reassignJob(row)"
-                        class="btn btn-link btn-warning btn-just-icon refresh"
-                        ><i class="material-icons">refresh</i></a
-                      >
-                      <a
-                        href="javascript:void(0)"
-                        (click)="editJob(row)"
-                        class="btn btn-link btn-warning btn-just-icon edit"
-                        ><i class="material-icons">edit</i></a
-                      >
-                      <a
-                        *ngIf="role === 'Administrator'"
-                        (click)="deleteJob(row)"
-                        href="javascript:void(0)"
-                        class="btn btn-link btn-danger btn-just-icon remove"
-                        ><i class="material-icons">close</i></a
-                      >
+                      <a href="javascript:void(0)" (click)="reassignJob(row)"
+                        class="btn btn-link btn-warning btn-just-icon refresh"><i class="material-icons">refresh</i></a>
+                      <a href="javascript:void(0)" (click)="editJob(row)"
+                        class="btn btn-link btn-warning btn-just-icon edit"><i class="material-icons">edit</i></a>
+                      <a *ngIf="role === 'Administrator'" (click)="deleteJob(row)" href="javascript:void(0)"
+                        class="btn btn-link btn-danger btn-just-icon remove"><i class="material-icons">close</i></a>
                     </td>
                   </tr>
                 </tbody>
@@ -93,161 +88,193 @@
       </div>
       <!-- end col-md-12 -->
     </div>
-    <h5>totalRows:{{ totalRows.row}}</h5>
     <!-- end row -->
 
     <div class="row" *ngIf="viewJob">
-      <div class="col-md-12">
-        <button
-          mat-raised-button
-          type="button"
-          class="btn btn-round btn-danger"
-          (click)="cancelViewJob()"
-        >
-          Cancel
-        </button>
-        <ul class="timeline timeline-simple">
-          <li class="timeline-inverted">
-            <div class="timeline-badge info">
-              <i class="material-icons">work</i>
-            </div>
-            <div class="timeline-panel">
-              <div class="timeline-heading">
-                <span class="badge badge-info">JOB REQUEST</span>
-              </div>
-              <div class="timeline-body">
-                <p>
-                  Comment: <br /><strong>{{ selectedJob.note }}</strong>
-                </p>
-                <br />
-                <p id="stat">
-                  Status: <br /><strong>{{ selectedJob.status }}</strong>
-                </p>
-                <br />
-                <p>Request:</p>
-                <div
-                  [innerHTML]="displayHTMLCategories(selectedJob.category)"
-                ></div>
-                <hr />
-                <div class="dropdown pull-left">
-                  <button
-                    mat-raised-button
-                    type="button"
-                    class="btn btn-round btn-info dropdown-toggle"
-                    data-toggle="dropdown"
-                  >
-                    <i class="material-icons">build</i>
-                    <span class="caret">Update Job Status</span>
-                  </button>
-                  <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                    <li *ngFor="let st of statuses">
-                      <a
-                        href="javascript:void(0)"
-                        (click)="updateStatus(st.name)"
-                        >{{ st.name }}</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-                <div class="dropdown pull-right">
-                  <button
-                    mat-raised-button
-                    type="button"
-                    class="btn btn-round btn-primary"
-                    (click)="
+      <div class="col-lg-12">
+        <p class="h2">Gift Card Settings</p>
+        <ngb-tabset [justify]="'center'" class="custom-tab-content flex-column flex-md-row" type="pills">
+          <ngb-tab title="INFORMATION">
+            <ng-template ngbTabContent>
+              <div class="col-md-12">
+                <button mat-raised-button type="button" class="btn btn-round btn-danger" (click)="cancelViewJob()">
+                  Cancel
+                </button>
+                <ul class="timeline timeline-simple">
+                  <li class="timeline-inverted">
+                    <div class="timeline-badge info">
+                      <i class="material-icons">work</i>
+                    </div>
+                    <div class="timeline-panel">
+                      <div class="timeline-heading">
+                        <span class="badge badge-info">JOB REQUEST</span>
+                      </div>
+                      <div class="timeline-body">
+                        <p>
+                          Comment: <br /><strong>{{ selectedJob.note }}</strong>
+                        </p>
+                        <br />
+                        <p id="stat">
+                          Status: <br /><strong>{{ selectedJob.status }}</strong>
+                        </p>
+                        <br />
+                        <p>Request:</p>
+                        <div [innerHTML]="displayHTMLCategories(selectedJob.category)"></div>
+                        <hr />
+                        <div class="dropdown pull-left">
+                          <button mat-raised-button type="button" class="btn btn-round btn-info dropdown-toggle"
+                            data-toggle="dropdown">
+                            <i class="material-icons">build</i>
+                            <span class="caret">Update Job Status</span>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                            <li *ngFor="let st of statuses">
+                              <a href="javascript:void(0)" (click)="updateStatus(st.name)">{{ st.name }}</a>
+                            </li>
+                          </ul>
+                        </div>
+                        <div class="dropdown pull-right">
+                          <button mat-raised-button type="button" class="btn btn-round btn-primary" (click)="
                       reassignJob([
                         selectedJob.id,
                         '',
                         '',
                         selectedJob.customer.email
                       ])
-                    "
-                  >
-                    Re-Assign Job
-                  </button>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="timeline-inverted">
-            <div class="timeline-badge success">
-              <i class="material-icons">handyman</i>
-            </div>
-            <div class="timeline-panel">
-              <div class="timeline-heading">
-                <span class="badge badge-success">TECHNICIAN INFO</span>
-              </div>
-              <div class="timeline-body">
-                <div class="col-md-4">
-                  <div class="card card-profile">
-                    <div class="card-avatar">
-                      <a href="javascript:void(0)">
-                        <img class="img" src="assets/img/default-avatar.png" />
-                      </a>
+                    ">
+                            Re-Assign Job
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="card-category text-gray">
-                        {{ selectedJob.assigned_to.email }}
+                  </li>
+                  <li class="timeline-inverted">
+                    <div class="timeline-badge success">
+                      <i class="material-icons">handyman</i>
+                    </div>
+                    <div class="timeline-panel">
+                      <div class="timeline-heading">
+                        <span class="badge badge-success">TECHNICIAN INFO</span>
+                      </div>
+                      <div class="timeline-body">
+                        <div class="col-md-4">
+                          <div class="card card-profile">
+                            <div class="card-avatar">
+                              <a href="javascript:void(0)">
+                                <img class="img" src="assets/img/default-avatar.png" />
+                              </a>
+                            </div>
+                            <div class="card-body">
+                              <h6 class="card-category text-gray">
+                                {{ selectedJob.assigned_to.email }}
+                              </h6>
+                              <h4 class="card-title">
+                                {{ selectedJob.assigned_to.phone }}
+                              </h4>
+                              <p class="card-description">
+                                {{ selectedJob.assigned_to.address }}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <h6>
+                        <i class="ti-time"></i> {{ selectedJob.assigned_to.name }} -
+                        {{ selectedJob.assigned_to.status }}
                       </h6>
-                      <h4 class="card-title">
-                        {{ selectedJob.assigned_to.phone }}
-                      </h4>
-                      <p class="card-description">
-                        {{ selectedJob.assigned_to.address }}
-                      </p>
                     </div>
+                  </li>
+                  <li class="timeline-inverted">
+                    <div class="timeline-badge danger">
+                      <i class="material-icons">people</i>
+                    </div>
+                    <div class="timeline-panel">
+                      <div class="timeline-heading">
+                        <span class="badge badge-danger">CUSTOMER INFO</span>
+                      </div>
+                      <div class="timeline-body">
+                        <div class="col-md-4">
+                          <div class="card card-profile">
+                            <div class="card-avatar">
+                              <a href="javascript:void(0)">
+                                <img class="img" src="assets/img/default-avatar.png" />
+                              </a>
+                            </div>
+                            <div class="card-body">
+                              <h6 class="card-category text-gray">
+                                {{ selectedJob.customer.email }}
+                              </h6>
+                              <h4 class="card-title">
+                                {{ selectedJob.customer.phone }}
+                              </h4>
+                              <p class="card-description">
+                                {{ selectedJob.customer.address }}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <h6><i class="ti-time"></i> {{ selectedJob.customer.name }}</h6>
+                    </div>
+                  </li>
+                </ul>
+                <br />
+                <button mat-raised-button type="button" class="btn btn-round btn-danger" (click)="cancelViewJob()">
+                  Cancel
+                </button>
+              </div>
+            </ng-template>
+          </ngb-tab>
+          <ngb-tab title="ACTIVITIES">
+            <ng-template ngbTabContent>
+              <div class="col-md-12">
+                <div class="card-body">
+                  <div class="toolbar">
+                    <!--        Here you can write extra buttons/actions for the toolbar              -->
+                  </div>
+                  <div class="material-datatables">
+                    <table id="datatables2" class="table table-striped table-no-bordered table-hover" cellspacing="0"
+                      width="100%" style="width: 100%">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>COMMENT</th>
+                          <th>CREATED DATE</th>
+                          <!-- <th class="disabled-sorting text-right">
+                            {{ dataTable.headerRow[7] }}
+                          </th> -->
+                        </tr>
+                      </thead>
+                      <tfoot>
+                        <tr>
+                          <th>ID</th>
+                          <th>COMMENT</th>
+                          <th>CREATED DATE</th>
+                          <!-- <th class="text-right">{{ dataTable.footerRow[7] }}</th> -->
+                        </tr>
+                      </tfoot>
+                      <tbody>
+                        <tr *ngFor="let row of activities; index as i;">
+                          <td>{{ (i+1) }}</td>
+                          <td>{{ row.comment }}</td>
+                          <td>{{ row.created_date }}</td>
+                          <!-- <td class="text-right">
+                            <a href="javascript:void(0)" (click)="reassignJob(row)"
+                              class="btn btn-link btn-warning btn-just-icon refresh"><i class="material-icons">refresh</i></a>
+                            <a href="javascript:void(0)" (click)="editJob(row)"
+                              class="btn btn-link btn-warning btn-just-icon edit"><i class="material-icons">edit</i></a>
+                            <a *ngIf="role === 'Administrator'" (click)="deleteJob(row)" href="javascript:void(0)"
+                              class="btn btn-link btn-danger btn-just-icon remove"><i class="material-icons">close</i></a>
+                          </td> -->
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
-              <h6>
-                <i class="ti-time"></i> {{ selectedJob.assigned_to.name }} -
-                {{ selectedJob.assigned_to.status }}
-              </h6>
-            </div>
-          </li>
-          <li class="timeline-inverted">
-            <div class="timeline-badge danger">
-              <i class="material-icons">people</i>
-            </div>
-            <div class="timeline-panel">
-              <div class="timeline-heading">
-                <span class="badge badge-danger">CUSTOMER INFO</span>
-              </div>
-              <div class="timeline-body">
-                <div class="col-md-4">
-                  <div class="card card-profile">
-                    <div class="card-avatar">
-                      <a href="javascript:void(0)">
-                        <img class="img" src="assets/img/default-avatar.png" />
-                      </a>
-                    </div>
-                    <div class="card-body">
-                      <h6 class="card-category text-gray">
-                        {{ selectedJob.customer.email }}
-                      </h6>
-                      <h4 class="card-title">
-                        {{ selectedJob.customer.phone }}
-                      </h4>
-                      <p class="card-description">
-                        {{ selectedJob.customer.address }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <h6><i class="ti-time"></i> {{ selectedJob.customer.name }}</h6>
-            </div>
-          </li>
-        </ul>
-        <br />
-        <button
-          mat-raised-button
-          type="button"
-          class="btn btn-round btn-danger"
-          (click)="cancelViewJob()"
-        >
-          Cancel
-        </button>
+            </ng-template>
+          </ngb-tab>
+        </ngb-tabset>
       </div>
     </div>
   </div>

@@ -11,6 +11,7 @@ import swal from 'sweetalert2';
 import { AdminUsersService } from '../services/admin-users.service';
 import { Statuses } from '../model/status';
 import { MainCategory } from '../model/category';
+import { JobActivity } from '../model/activity';
 
 
 
@@ -32,6 +33,7 @@ export class AddJobComponent implements OnInit {
   jobs: Jobs[] = []
   statuses: Statuses[] = []
   categories: MainCategory[] = []
+  activities: JobActivity[] = []
 
   currentJobRow: any
 
@@ -46,6 +48,34 @@ export class AddJobComponent implements OnInit {
   role = ''
 
   constructor() {
+  }
+
+  getJobByStatus(status: string) {
+    firebase.firestore().collection('jobs').where('status', '==', status).orderBy('timestamp', 'desc').onSnapshot(query => {
+      this.data = []
+      this.jobs = []
+      var index = 0
+      query.forEach(data => {
+        const job = <Jobs>data.data()
+        this.jobs.push(job)
+        this.data.push([job.id, job.assigned_to.name, job.customer.name, job.customer.email, job.status, job.created_by, job.created_date, job.modified_date, this.displayHTMLCategories(job.category), 'btn-link'])
+        index = index + 1
+      })
+
+      this.dataTable = {
+        headerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created By', 'Created Date', 'Modified Date', 'Actions'],
+        footerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created By', 'Created Date', 'Modified Date', 'Actions'],
+        dataRows: this.data
+      }
+    })
+  }
+
+  displayJobsByStatus(status: string) {
+    if (status === 'All') {
+      this.getJob()
+      return
+    }
+    this.getJobByStatus(status)
   }
 
   getJob() {
@@ -77,13 +107,12 @@ export class AddJobComponent implements OnInit {
       query.forEach(data => {
         const status = <Statuses>data.data()
         this.statuses.push(status)
-
       })
     })
   }
 
-  getStatusColorByName(name:string) {
-    return this.statuses.find((val,ind,arr)=>{
+  getStatusColorByName(name: string) {
+    return this.statuses.find((val, ind, arr) => {
       return val.name === name
     }).color
   }
@@ -95,11 +124,19 @@ export class AddJobComponent implements OnInit {
         const category = <MainCategory>data.data()
         this.categories.push(category)
       })
+
+      //check if url has search parameter
+      if(location.search !== ''){
+        const stat = location.search.substring(3)
+        this.getJobByStatus(stat)
+        // console.log(stat)
+        return
+      }
       this.getJob()
     })
   }
 
-  getStyle(name:any) {
+  getStyle(name: any) {
     const getStatusName = this.getStatusColorByName(name)
     let st = {
       'background': `${getStatusName}`,
@@ -108,7 +145,7 @@ export class AddJobComponent implements OnInit {
       'border-radius': '10px'
     }
     return st
-}
+  }
 
   ngOnInit() {
     const email = localStorage.getItem('email');
@@ -119,13 +156,13 @@ export class AddJobComponent implements OnInit {
     })
   }
 
-  getCategoryNameById(id:string) {
-    return this.categories.find((val,ind,arr)=>{
+  getCategoryNameById(id: string) {
+    return this.categories.find((val, ind, arr) => {
       return val.id === id
     }).name
   }
 
-  displayHTMLCategories(cats:string[]) {
+  displayHTMLCategories(cats: string[]) {
     var html = '<ul>'
     cats.forEach(c => {
       const getCatName = this.getCategoryNameById(c)
@@ -135,11 +172,22 @@ export class AddJobComponent implements OnInit {
     return html
   }
 
-  editJob(job:any) {
-    this.selectedJob = this.jobs.find((val,ind,arr)=>{
+  editJob(job: any) {
+    this.selectedJob = this.jobs.find((val, ind, arr) => {
       return val.id === job[0]
     })
     this.viewJob = true
+    this.getJobActivities()
+  }
+
+  getJobActivities() {
+    firebase.firestore().collection('jobs').doc(this.selectedJob.id).collection('activities').orderBy('timestamp', 'desc').onSnapshot(query => {
+      this.activities = []
+      query.forEach(dt => {
+        const act = <JobActivity>dt.data()
+        this.activities.push(act)
+      })
+    })
   }
 
   cancelViewJob() {
@@ -181,12 +229,28 @@ export class AddJobComponent implements OnInit {
     })
   }
 
-  updateStatus(name:string){
+  updateStatus(name: string) {
+    const current_email = localStorage.getItem('email')
+    const current_name = localStorage.getItem('name')
+
     firebase.firestore().collection('jobs').doc(this.selectedJob.id).update({
       'status': name
     }).then(d => {
       document.getElementById('stat').innerHTML = `Status: <br><strong>${name}</strong>`
-      this.config.displayMessage('Status updated successfully', true)
+      //add job activity
+      const id = firebase.database().ref().push().key
+      const act: JobActivity = {
+        id: id,
+        comment: `This job status was changed to : ${name}`,
+        created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }
+      firebase.firestore().collection('jobs').doc(this.selectedJob.id).collection('activities').doc(id).set(act).then(d => {
+        this.config.logActivity(`${current_name}|${current_email} updated job status to : ${name}`)
+        this.config.displayMessage('Status updated successfully', true)
+      }).catch(err => {
+        this.config.displayMessage(`${err}`, false)
+      })
     }).catch(err => {
       this.config.displayMessage(`${err}`, false)
     })

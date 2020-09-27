@@ -120,8 +120,8 @@
           </div>
           <div class="card-footer">
             <div class="stats">
-              <!-- <i class="material-icons text-danger">warning</i>
-              <a href="#pablo">Get More Space...</a> -->
+              <i class="material-icons text-danger">warning</i>
+              <a href="javascript:void(0)" [routerLink]="['/customers']">View</a>
             </div>
           </div>
         </div>
@@ -137,8 +137,8 @@
           </div>
           <div class="card-footer">
             <div class="stats">
-              <!-- <i class="material-icons">local_offer</i> Tracked from Google -->
-              <!-- Analytics -->
+              <i class="material-icons">local_offer</i>
+              <a href="javascript:void(0)" [routerLink]="['/technician']">View</a>
             </div>
           </div>
         </div>
@@ -154,7 +154,8 @@
           </div>
           <div class="card-footer">
             <div class="stats">
-              <!-- <i class="material-icons">date_range</i> Last 24 Hours -->
+              <i class="material-icons">date_range</i>
+              <a href="javascript:void(0)" [routerLink]="['/jobs']">View</a>
             </div>
           </div>
         </div>
@@ -170,7 +171,8 @@
           </div>
           <div class="card-footer">
             <div class="stats">
-              <!-- <i class="material-icons">update</i> Just Updated -->
+              <i class="material-icons">update</i>
+              <a href="/jobs?s={{j.status}}">View</a>
             </div>
           </div>
         </div>

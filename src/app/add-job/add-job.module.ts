@@ -8,6 +8,7 @@ import { MaterialModule } from './../app.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { AddJobRoutes } from './add-job.routing';
 
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
     imports: [
         CommonModule,
@@ -15,7 +16,7 @@ import { AddJobRoutes } from './add-job.routing';
         FormsModule,
         MdModule,
         MaterialModule,
-
+        NgbModule
     ],
     declarations: [
         AddJobComponent
