@@ -67,6 +67,9 @@ export class AddJobComponent implements OnInit {
       };
     });
   }
+  get totalRows(): number {
+    return this.getJob.length;
+  }
 
   getStatus() {
     firebase.firestore().collection('status').orderBy('name', 'desc').get().then(query => {

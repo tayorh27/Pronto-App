@@ -1,7 +1,8 @@
+import { DataService } from './../services/data.services';
 import { MainCustomer } from './../model/customer';
-import { Component, OnInit, AfterViewInit, OnDestroy, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input } from '@angular/core';
 import * as firebase from 'firebase/app';
-import * as geofirex from 'geofirex'; 
+import * as geofirex from 'geofirex';
 import 'firebase/firestore';
 import 'firebase/database';
 import * as $ from 'jquery';
@@ -79,7 +80,7 @@ export class MyCustomerComponent implements OnInit {
     });
   }
 
-  constructor() { }
+
 
   getCustomers() {
     firebase.firestore().collection('customers').orderBy('timestamp', 'desc').onSnapshot(query => {
@@ -103,12 +104,34 @@ export class MyCustomerComponent implements OnInit {
     });
   }
 
+
+  // getCustomers() {
+  //   // firebase.firestore().collection('customers').onSnapshot(snap => {
+  //   //   // res.status(200).send({length: snap.size});
+  //   //   console.log(snap.size);
+
+  //   // });
+  //   firebase.firestore().collection('customers').get().then(snap => {
+  //     console.log(snap.size, 'collection size')
+  //   });
+  // }
+
+  //   firebase.firestore.collection('...').get().then(snap => {
+  //     res.status(200).send({length: snap.size});
+  // });
+  
+  // constructor(private datas: DataService) { }
+  // get totalRows(): number {
+  //   return this.getCustomers.length;
+  // }
+
   ngOnInit() {
     const email = localStorage.getItem('email');
-        this.service.getUserData(email).then(user => {
-            this.role = user.role
-            this.getCustomers()
-        })
+    this.service.getUserData(email).then(user => {
+      this.role = user.role
+      this.getCustomers()
+    })
+    // this.datas.setMessage(this.totalRows)
   }
 
   addCus() {
@@ -130,38 +153,38 @@ export class MyCustomerComponent implements OnInit {
   _phone = ''
   _email = ''
 
-  deleteCusClick(id: string, email:string) {
+  deleteCusClick(id: string, email: string) {
     swal({
-        title: 'Delete Alert',
-        text: 'Are you sure about deleting this customer?',
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, keep it',
-        confirmButtonClass: "btn btn-success",
-        cancelButtonClass: "btn btn-danger",
-        buttonsStyling: false
+      title: 'Delete Alert',
+      text: 'Are you sure about deleting this customer?',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it',
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
     }).then((result) => {
-        if (result.value) {
-            firebase.firestore().collection('customers').doc(id).delete().then(del => {
-                const current_email = localStorage.getItem('email')
-                const current_name = localStorage.getItem('name')
-                this.config.logActivity(`${current_name}|${current_email} deleted this customer: ${email}`)
-                this.config.displayMessage("Successfully deleted", true);
-            }).catch(err => {
-                this.config.displayMessage(`${err}`, false);
-            })
-        } else {
-            swal({
-                title: 'Cancelled',
-                text: 'Deletion not successful',
-                type: 'error',
-                confirmButtonClass: "btn btn-info",
-                buttonsStyling: false
-            }).catch(swal.noop)
-        }
+      if (result.value) {
+        firebase.firestore().collection('customers').doc(id).delete().then(del => {
+          const current_email = localStorage.getItem('email')
+          const current_name = localStorage.getItem('name')
+          this.config.logActivity(`${current_name}|${current_email} deleted this customer: ${email}`)
+          this.config.displayMessage("Successfully deleted", true);
+        }).catch(err => {
+          this.config.displayMessage(`${err}`, false);
+        })
+      } else {
+        swal({
+          title: 'Cancelled',
+          text: 'Deletion not successful',
+          type: 'error',
+          confirmButtonClass: "btn btn-info",
+          buttonsStyling: false
+        }).catch(swal.noop)
+      }
     })
-}
+  }
 
   editCusClick(cus: any) {
     this.editCus = true
@@ -181,7 +204,7 @@ export class MyCustomerComponent implements OnInit {
 
   }
 
-  ticketCusClick(email:string) {
+  ticketCusClick(email: string) {
     location.href = `/new-ticket?customer=${email}`
   }
 

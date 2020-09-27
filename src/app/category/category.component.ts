@@ -66,6 +66,21 @@ export class MyCategoryComponent implements OnInit {
       };
     });
   }
+  totalCategory(){
+    
+  }
+  // get totalRows(): number {
+  //   return this.getCategories.length;
+  // }
+  // totalRows() {
+  //   for (let index = 0; index < this.data.length; index++) {
+  //     if (index > 0) {
+  //       return index
+  //     }
+  //     else { return 0 }
+  //   }
+  // }
+
 
   ngOnInit() {
     const email = localStorage.getItem('email');

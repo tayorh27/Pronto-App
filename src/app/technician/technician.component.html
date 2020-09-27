@@ -68,7 +68,8 @@
                         ><i class="material-icons">edit</i></a
                       >
                       <a
-                      *ngIf="role === 'Administrator'" href="javascript:void(0)"
+                        *ngIf="role === 'Administrator'"
+                        href="javascript:void(0)"
                         (click)="deleteTechClick(row[0], row[4])"
                         class="btn btn-link btn-danger btn-just-icon remove"
                         ><i class="material-icons">close</i></a
@@ -190,7 +191,7 @@
               (click)="technicianSubmitClicked()"
               [disabled]="button_pressed"
             >
-            {{button_pressed ? 'Please wait...' : 'Submit'}}
+              {{ button_pressed ? 'Please wait...' : 'Submit' }}
             </button>
             <button
               mat-raised-button
@@ -202,7 +203,7 @@
             </button>
           </div>
           <br />
-          <div style="display: none;">
+          <div style="display: none">
             <p id="madd"></p>
             <p id="mgeo"></p>
           </div>

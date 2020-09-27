@@ -2,13 +2,14 @@ import swal from "sweetalert2";
 import * as firebase from "firebase/app";
 import 'firebase/firestore'
 import 'firebase/database'
-import * as Twilio from 'twilio'
+// import * as Twilio from 'twilio'
 import { environment } from "src/environments/environment";
 
-const accountSid = environment.twilioSID
-const authToken = environment.twilioTOKEN
-const client = Twilio(accountSid, authToken)
-const twilioNumber = '(218) 506-5155'//+12185065155
+// const accountSid = environment.twilioSID
+// const authToken = environment.twilioTOKEN
+// const client = Twilio(accountSid, authToken)
+// const twilioNumber = '(218) 506-5155'
+//+12185065155
 
 
 export class AppConfig {
@@ -49,25 +50,25 @@ export class AppConfig {
             }
         }
     }
-    validE164(num: string) {
-        return /^\*?[1-9]\d{1, 14}$/.test(num)
-    }
+    // validE164(num: string) {
+    //     return /^\*?[1-9]\d{1, 14}$/.test(num)
+    // }
 
-    sendSMS(phoneNumber: string) {
+    // sendSMS(phoneNumber: string) {
 
-        if (!this.validE164(phoneNumber)) {
-            throw new Error('number must be E164 format!')
-        }
+    //     if (!this.validE164(phoneNumber)) {
+    //         throw new Error('number must be E164 format!')
+    //     }
 
-        const textMessage = {
-            body: `Current order status: ${status}`,
-            to: phoneNumber,
-            from: twilioNumber
-        }
+    //     const textMessage = {
+    //         body: `Current order status: ${status}`,
+    //         to: phoneNumber,
+    //         from: twilioNumber
+    //     }
 
-        return client.messages.create(textMessage)
-        // .then(message => console.log(message.sid, 'succes'))
-        //     .catch (err => console.log(err))
-    }
+    //     return client.messages.create(textMessage)
+    // .then(message => console.log(message.sid, 'succes'))
+    //     .catch (err => console.log(err))
+    // }
 
 }

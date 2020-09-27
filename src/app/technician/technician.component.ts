@@ -1,5 +1,6 @@
+import { DataService } from './../services/data.services';
 import { MainTechnician } from './../model/technician';
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Output } from '@angular/core';
 import * as firebase from 'firebase/app';
 import * as geofirex from 'geofirex';
 import 'firebase/firestore';
@@ -12,6 +13,8 @@ import { AdminUsers } from '../model/admin.users';
 import { MainCategory } from '../model/category';
 import swal from 'sweetalert2';
 import { AdminUsersService } from '../services/admin-users.service';
+import { EventEmitter } from '@angular/core';
+
 
 
 declare interface DataTable {
@@ -29,6 +32,8 @@ declare interface DataTable {
 })
 
 export class MyTechnicianComponent implements OnInit, OnDestroy {
+
+  // @Output() public found = new EventEmitter<any>();
 
   public dataTable: DataTable;
   data: string[][] = []
@@ -53,7 +58,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
 
   }
 
-  constructor() { }
+
 
   getCategories() {
     firebase.firestore().collection('categories').orderBy('name', 'asc').get().then(query => {
@@ -64,6 +69,10 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       })
     });
   }
+
+  
+
+
 
   getTechnicians() {// db/categories/main-categories
     firebase.firestore().collection('users').where('user_type', '==', 'technician').orderBy('timestamp', 'desc').onSnapshot(query => {
@@ -83,6 +92,27 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       };
     });
   }
+
+
+  
+  
+
+  // totalNumber: number
+  // constructor(private datas: DataService) { }
+  // get totalRows(): number {
+  //   return this.getTechnicians.length;
+  // }
+  // doCount(): any {
+  //   this.datas.getMeTech(this.totalNumber).then((data: any) => {
+  //     for (var i = 0; i < data.Results.length; i++) {
+  //       let searchObj = new SearchResults(data.Results[i]);
+
+  //       this.found.emit(searchObj);
+
+  //     }
+  //   });
+
+  // }
 
   initAutoComplete() {
 
@@ -126,6 +156,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       this.getCategories()
       this.getTechnicians()
     })
+    // this.datas.setMessage(this.totalRows)
   }
 
   addTech() {
