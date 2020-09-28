@@ -36,14 +36,14 @@ export class UserComponent implements OnInit{
                     this.dp = q.image;
                     this.role = q.role;
                     this.levels = q.access_levels;
-                    this.position = q.position;
+                    this.position = q.user_position;
                 })
             } else {
                 this.username = p.name;
                 this.dp = p.image;
                 this.role = p.role;
                 this.levels = p.access_levels;
-                this.position = p.position;
+                this.position = p.user_position;
             }
         })
         this._Activatedroute.params.subscribe(p => {

@@ -17,6 +17,7 @@ import { Jobs } from '../model/jobs';
 import { ProgressSpinnerComponent } from '../progress-spinner/progress-spinner.module';
 import { OverlayService } from '../overlay/overlay.module';
 import { JobActivity } from '../model/activity';
+import { AdminUsersService } from '../services/admin-users.service';
 
 declare var google: any;
 let map: any;
@@ -90,10 +91,13 @@ export class MyNewTicketComponent implements OnInit {
 
   createMarker(latitude: any, longitude: any, _id: any, tech: any) {
     const isReassign = this.isReassign
+    const stat = tech['status'] //status of technician: offline, online
+    const display = (stat === 'online') ? 'block' : 'none'
+
     marker[_id] = new google.maps.Marker({
       map,
       position: { lat: latitude, lng: longitude },
-      icon: iconBase + 'green-dot.png'
+      icon: (stat === 'online') ? iconBase + 'green-dot.png' : iconBase + 'red-dot.png'
     });
 
     google.maps.event.addListener(marker[_id], 'click', function () {
@@ -109,10 +113,9 @@ export class MyNewTicketComponent implements OnInit {
         <label>Status: ${tech['status']}</label><br>
         </div>
         <div class="card-footer">
-        <button mat-raised-button type="button" id="${_id}" class="btn btn-fill btn-rose btn-block"
-              >
+        <button style="display: ${display};" mat-raised-button type="button" id="${_id}" class="btn btn-fill btn-rose btn-block">
               ${(isReassign) ? 'Re-Assign' : 'Assign'}
-            </button>
+        </button>
         </div>
       </div>
       </div>`)//(click)="assignClicked('hello')"
@@ -134,6 +137,7 @@ export class MyNewTicketComponent implements OnInit {
   }
 
   config = new AppConfig()
+  service = new AdminUsersService()
   categories: MainCategory[] = []
   technicians: any[] = []
   _cat: string[] = []
@@ -142,6 +146,7 @@ export class MyNewTicketComponent implements OnInit {
   _note = ''
 
   selectedCustomer: MainCustomer
+  currentUser:AdminUsers
 
   button_pressed = false
 
@@ -166,6 +171,10 @@ export class MyNewTicketComponent implements OnInit {
     }
     this.initAutoComplete()
     this.getCategories()
+    const email = localStorage.getItem('email');
+    this.service.getUserData(email).then(user => {
+      this.currentUser = user
+    })
   }
 
   /**
@@ -325,9 +334,12 @@ export class MyNewTicketComponent implements OnInit {
     if (!this.isReassign) {//add new job
       const job: Jobs = {
         id: key,
+        job_id: this.config.randomInt(0,9999999999),
         customer: this.selectedCustomer,
         assigned_to: technician,
+        agent: this.currentUser,
         status: 'Pending',//will be changed later
+        back_end_status: 'active',
         category: this._cat,
         note: this._note,
         created_by: `${current_name}|${current_email}`,
@@ -361,7 +373,8 @@ export class MyNewTicketComponent implements OnInit {
       const job: Jobs = {
         customer: this.selectedCustomer,
         assigned_to: technician,
-        status: this.selectedJob.status,//
+        agent:this.currentUser,
+        status: 'Pending',//this.selectedJob.status,//
         category: this._cat,
         note: this._note,
         modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,

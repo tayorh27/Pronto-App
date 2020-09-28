@@ -22,11 +22,11 @@ declare interface DataTable {
   dataRows: string[][];
 }
 @Component({
-  selector: 'app-add-job',
-  templateUrl: './add-job.component.html',
-  styleUrls: ['./add-job.component.css']
+  selector: 'app-tech-job',
+  templateUrl: './tech-job.component.html',
+  styleUrls: ['./tech-job.component.css']
 })
-export class AddJobComponent implements OnInit {
+export class TechJobComponent implements OnInit {
 
   public dataTable: DataTable;
   data: string[][] = []
@@ -47,11 +47,13 @@ export class AddJobComponent implements OnInit {
   service = new AdminUsersService();
   role = ''
 
+  techEmail = localStorage.getItem('email')
+
   constructor() {
   }
 
   getJobByStatus(status: string) {
-    firebase.firestore().collection('jobs').where('status', '==', status).orderBy('timestamp', 'desc').onSnapshot(query => {
+    firebase.firestore().collection('jobs').where('assigned_to.email','==',this.techEmail).where('status', '==', status).orderBy('timestamp', 'desc').onSnapshot(query => {
       this.data = []
       this.jobs = []
       var index = 0
@@ -63,8 +65,8 @@ export class AddJobComponent implements OnInit {
       })
 
       this.dataTable = {
-        headerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created By', 'Created Date', 'Modified Date', 'Actions', 'ID'],
-        footerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created By', 'Created Date', 'Modified Date', 'Actions', 'ID'],
+        headerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created Date', 'Modified Date', 'Actions', 'ID'],
+        footerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created Date', 'Modified Date', 'Actions', 'ID'],
         dataRows: this.data
       }
     })
@@ -79,7 +81,7 @@ export class AddJobComponent implements OnInit {
   }
 
   getJob() {
-    firebase.firestore().collection('jobs').orderBy('timestamp', 'desc').onSnapshot(query => {
+    firebase.firestore().collection('jobs').where('assigned_to.email','==',this.techEmail).orderBy('timestamp', 'desc').onSnapshot(query => {
       this.data = []
       this.jobs = []
       var index = 0
@@ -91,8 +93,8 @@ export class AddJobComponent implements OnInit {
       })
 
       this.dataTable = {
-        headerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created By', 'Created Date', 'Modified Date', 'Actions', 'ID'],
-        footerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created By', 'Created Date', 'Modified Date', 'Actions', 'ID'],
+        headerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created Date', 'Modified Date', 'Actions', 'ID'],
+        footerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created Date', 'Modified Date', 'Actions', 'ID'],
         dataRows: this.data
       };
     });
@@ -126,7 +128,7 @@ export class AddJobComponent implements OnInit {
       })
 
       //check if url has search parameter
-      if (location.search !== '') {
+      if(location.search !== ''){
         const stat = location.search.substring(3)
         this.getJobByStatus(stat)
         // console.log(stat)
@@ -193,82 +195,6 @@ export class AddJobComponent implements OnInit {
   cancelViewJob() {
     this.viewJob = false
     this.selectedJob = null
-  }
-
-  deleteJob(job: any) {
-    const id = job[0]
-    swal({
-      title: 'Delete Alert',
-      text: 'Are you sure about deleting this job?',
-      type: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, keep it',
-      confirmButtonClass: "btn btn-success",
-      cancelButtonClass: "btn btn-danger",
-      buttonsStyling: false
-    }).then((result) => {
-      if (result.value) {
-        firebase.firestore().collection('jobs').doc(id).delete().then(del => {
-          const current_email = localStorage.getItem('email')
-          const current_name = localStorage.getItem('name')
-          this.config.logActivity(`${current_name}|${current_email} deleted a job`)
-          this.config.displayMessage("Successfully deleted", true);
-        }).catch(err => {
-          this.config.displayMessage(`${err}`, false);
-        })
-      } else {
-        swal({
-          title: 'Cancelled',
-          text: 'Deletion not successful',
-          type: 'error',
-          confirmButtonClass: "btn btn-info",
-          buttonsStyling: false
-        }).catch(swal.noop)
-      }
-    })
-  }
-
-  updateStatus(name: string) {
-    const current_email = localStorage.getItem('email')
-    const current_name = localStorage.getItem('name')
-
-    firebase.firestore().collection('jobs').doc(this.selectedJob.id).update({
-      'status': name
-    }).then(async d => {
-      document.getElementById('stat').innerHTML = `Status: <br><strong>${name}</strong>`
-      await this.backEndJobUpdate(name)
-      //add job activity
-      const id = firebase.database().ref().push().key
-      const act: JobActivity = {
-        id: id,
-        comment: `This job status was changed to : ${name}`,
-        created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }
-      firebase.firestore().collection('jobs').doc(this.selectedJob.id).collection('activities').doc(id).set(act).then(d => {
-        this.config.logActivity(`${current_name}|${current_email} updated job status to : ${name}`)
-        this.config.displayMessage('Status updated successfully', true)
-      }).catch(err => {
-        this.config.displayMessage(`${err}`, false)
-      })
-    }).catch(err => {
-      this.config.displayMessage(`${err}`, false)
-    })
-  }
-
-  reassignJob(row: any) {
-    location.href = `/new-ticket?customer=${row[3]}&jobid=${row[0]}`
-  }
-
-  async backEndJobUpdate(status: string) {
-    const current_email = localStorage.getItem('email')
-    await firebase.firestore().collection('jobs').doc(this.selectedJob.id).update({
-      'back_end_status': (status.toLowerCase() === 'completed' || status.toLowerCase() === 'canceled' || status.toLowerCase() === 'cancelled') ? 'inactive' : 'active'
-    })
-    if(status.toLowerCase() === 'completed' || status.toLowerCase() === 'canceled' || status.toLowerCase() === 'cancelled'){
-      this.config.updateTechnicianStatus(current_email, 'online')
-    }
   }
 
   ngAfterViewInit() {

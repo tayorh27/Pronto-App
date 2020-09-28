@@ -175,7 +175,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
 
   _name = ''
   _addr = ''
-  _phone = ''
+  _phone = '+234'
   _email = ''
   _cat = []
 
@@ -240,6 +240,11 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     const addr = document.getElementById('madd').innerHTML
     if (name === '' || phone === '' || addr === '' || email === '' || this._cat.length === 0) {
       this.config.displayMessage('Please fill all fields and use google autocomplete for address.', false)
+      return
+    }
+
+    if(!phone.startsWith('+234')){
+      this.config.displayMessage('Please input correct address. Must start with +234', false)
       return
     }
 

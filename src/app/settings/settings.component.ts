@@ -149,9 +149,15 @@ export class SettingsComponent implements OnInit {
     const name = (<HTMLInputElement>document.getElementById("account_name")).value;
     const email = (<HTMLInputElement>document.getElementById("email")).value;
     const position = (<HTMLInputElement>document.getElementById("position")).value;
+    const phone = (<HTMLInputElement>document.getElementById("phone")).value;
+
     const ar = this.accountRole
-    if (name == '' || email == '' || position == '' || this.accountRole == '') {
+    if (name == '' || email == '' || position == '' || phone == '' || this.accountRole == '') {
       this.config.displayMessage("Please enter all fields", false)
+      return
+    }
+    if(!phone.startsWith('+234')){
+      this.config.displayMessage('Please input correct address. Must start with +234', false)
       return
     }
     // if(email.search('@tac.ng') < 0){
@@ -171,6 +177,7 @@ export class SettingsComponent implements OnInit {
       image: './assets/img/default-avatar.png',
       name: name,
       user_position: position,
+      phone: phone,
       role: this.accountRole,
       user_type: 'admin'
     }

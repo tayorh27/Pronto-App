@@ -32,30 +32,28 @@
                 width="100%" style="width: 100%">
                 <thead>
                   <tr>
-                    <th>{{ dataTable.headerRow[8] }}</th>
+                    <th>{{ dataTable.headerRow[7] }}</th>
                     <th>{{ dataTable.headerRow[0] }}</th>
                     <th>{{ dataTable.headerRow[1] }}</th>
                     <th>{{ dataTable.headerRow[2] }}</th>
                     <th>{{ dataTable.headerRow[3] }}</th>
                     <th>{{ dataTable.headerRow[4] }}</th>
                     <th>{{ dataTable.headerRow[5] }}</th>
-                    <th>{{ dataTable.headerRow[6] }}</th>
                     <th class="disabled-sorting text-right">
-                      {{ dataTable.headerRow[7] }}
+                      {{ dataTable.headerRow[6] }}
                     </th>
                   </tr>
                 </thead>
                 <tfoot>
                   <tr>
-                    <th>{{ dataTable.footerRow[8] }}</th>
+                    <th>{{ dataTable.footerRow[7] }}</th>
                     <th>{{ dataTable.footerRow[0] }}</th>
                     <th>{{ dataTable.footerRow[1] }}</th>
                     <th>{{ dataTable.footerRow[2] }}</th>
                     <th>{{ dataTable.footerRow[3] }}</th>
                     <th>{{ dataTable.footerRow[4] }}</th>
                     <th>{{ dataTable.footerRow[5] }}</th>
-                    <th>{{ dataTable.footerRow[6] }}</th>
-                    <th class="text-right">{{ dataTable.footerRow[7] }}</th>
+                    <th class="text-right">{{ dataTable.footerRow[6] }}</th>
                   </tr>
                 </tfoot>
                 <tbody>
@@ -68,16 +66,11 @@
                       <div [ngStyle]="getStyle(row[4])"></div>
                       {{ row[4] }}
                     </td>
-                    <td>{{ row[5] }}</td>
                     <td>{{ row[6] }}</td>
                     <td>{{ row[7] }}</td>
                     <td class="text-right">
-                      <a href="javascript:void(0)" (click)="reassignJob(row)"
-                        class="btn btn-link btn-warning btn-just-icon refresh"><i class="material-icons">refresh</i></a>
                       <a href="javascript:void(0)" (click)="editJob(row)"
                         class="btn btn-link btn-warning btn-just-icon edit"><i class="material-icons">edit</i></a>
-                      <a *ngIf="role === 'Administrator'" (click)="deleteJob(row)" href="javascript:void(0)"
-                        class="btn btn-link btn-danger btn-just-icon remove"><i class="material-icons">close</i></a>
                     </td>
                   </tr>
                 </tbody>
@@ -123,31 +116,6 @@
                         <br />
                         <p>Request:</p>
                         <div [innerHTML]="displayHTMLCategories(selectedJob.category)"></div>
-                        <hr />
-                        <div class="dropdown pull-left">
-                          <button mat-raised-button type="button" class="btn btn-round btn-info dropdown-toggle"
-                            data-toggle="dropdown">
-                            <i class="material-icons">build</i>
-                            <span class="caret">Update Job Status</span>
-                          </button>
-                          <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                            <li *ngFor="let st of statuses">
-                              <a href="javascript:void(0)" (click)="updateStatus(st.name)">{{ st.name }}</a>
-                            </li>
-                          </ul>
-                        </div>
-                        <div class="dropdown pull-right">
-                          <button mat-raised-button type="button" class="btn btn-round btn-primary" (click)="
-                      reassignJob([
-                        selectedJob.id,
-                        '',
-                        '',
-                        selectedJob.customer.email
-                      ])
-                    ">
-                            Re-Assign Job
-                          </button>
-                        </div>
                       </div>
                     </div>
                   </li>
@@ -242,7 +210,6 @@
                         <tr>
                           <th>ID</th>
                           <th>COMMENT</th>
-                          <th>REASONS</th>
                           <th>CREATED DATE</th>
                           <!-- <th class="disabled-sorting text-right">
                             {{ dataTable.headerRow[7] }}
@@ -253,7 +220,6 @@
                         <tr>
                           <th>ID</th>
                           <th>COMMENT</th>
-                          <th>REASONS</th>
                           <th>CREATED DATE</th>
                           <!-- <th class="text-right">{{ dataTable.footerRow[7] }}</th> -->
                         </tr>
@@ -262,7 +228,6 @@
                         <tr *ngFor="let row of activities; index as i;">
                           <td>{{ (i+1) }}</td>
                           <td>{{ row.comment }}</td>
-                          <td>{{ row.action }}</td>
                           <td>{{ row.created_date }}</td>
                           <!-- <td class="text-right">
                             <a href="javascript:void(0)" (click)="reassignJob(row)"

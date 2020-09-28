@@ -216,8 +216,10 @@ export class SidebarComponent implements OnInit {
     getProfile() {
         const email = localStorage.getItem('email');
         this.service.getUserData(email).then(async p => {
+            this.user = p
             if (p == null) {
                 this.service.getUserData(email).then(async q => {
+                    this.user = q
                     this.name = q.name;
                     this.image = q.image;
                     this.role = q.role;
@@ -333,11 +335,11 @@ export class SidebarComponent implements OnInit {
     }
 
     gotoSingleLink(menu_path:string) {
-        this.router.navigate([`${menu_path}`])
-        // if (this.role == 'Administrator') {
-        //     this.router.navigate([`${menu_path}`])
-        // } else {
-        //     location.href = `${menu_path}`
-        // }
+        // this.router.navigate([`${menu_path}`])
+        if (this.user.user_type == 'admin') {
+            this.router.navigate([`${menu_path}`])
+        } else {
+            location.href = `${menu_path}`
+        }
     }
 }

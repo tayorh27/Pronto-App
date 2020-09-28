@@ -108,7 +108,7 @@
           </div>
         </div>
       </div> -->
-    <div class="row">
+    <div class="row" *ngIf="user_type === 'admin'">
       <div class="col-lg-3 col-md-6 col-sm-6">
         <div class="card card-stats">
           <div class="card-header card-header-warning card-header-icon">
@@ -160,7 +160,7 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 col-sm-6" *ngFor="let j of jobStatus" >
+      <div class="col-lg-3 col-md-6 col-sm-6" *ngFor="let j of jobStatus">
         <div class="card card-stats">
           <div class="card-header card-header-info card-header-icon">
             <div class="card-icon">
@@ -178,6 +178,7 @@
         </div>
       </div>
     </div>
+    <app-technician-dashboard *ngIf="user_type === 'technician'"></app-technician-dashboard>
     <!-- <h3>Manage Listings</h3>
       <br> -->
     <!-- <div class="row">

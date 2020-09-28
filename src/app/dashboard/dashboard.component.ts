@@ -4,6 +4,10 @@ import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 import 'firebase/firestore';
 import 'firebase/database';
 import * as firebase from 'firebase/app';
+import { quiz } from '../model/docs';
+import { health } from '../model/health';
+import { social } from '../model/socio';
+import { AdminUsersService } from '../services/admin-users.service';
 
 
 // import { LegendItem, ChartType } from '../md/md-chart/md-chart.component';
@@ -22,10 +26,14 @@ declare interface JobStatus {
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
 
+  service = new AdminUsersService()
+
   totalCustomer = 0
   totalTechnician = 0
   totalJob = 0
-  jobStatus: JobStatus[]=[]
+  jobStatus: JobStatus[] = []
+
+  user_type = ''
 
   // constructor(private datas: DataService) { }
 
@@ -35,53 +43,96 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     })
 
   }
-  getTechnicians(){
-    firebase.firestore().collection('users').where('user_type', '==', 'technician').get().then(query =>{
+
+  getTechnicians() {
+    firebase.firestore().collection('users').where('user_type', '==', 'technician').get().then(query => {
       this.totalTechnician = query.size
     })
   }
-  getJobs(){
-    firebase.firestore().collection('jobs').get().then(query =>{
+
+  getJobs() {
+    firebase.firestore().collection('jobs').get().then(query => {
       this.totalJob = query.size
-      query.forEach(data =>{
+      query.forEach(data => {
         const job = <Jobs>data.data()
         const check = this.checkIfExsit(job.status)
-        if(check.e){
+        if (check.e) {
           const len = check.l
           this.jobStatus.splice(check.i, 1)
-          this.jobStatus.push({status:job.status, length:len+1})
+          this.jobStatus.push({ status: job.status, length: len + 1 })
         }
-        else{
-          this.jobStatus.push({status:job.status, length:1})
+        else {
+          this.jobStatus.push({ status: job.status, length: 1 })
         }
       })
     })
   }
 
-  checkIfExsit(status:string){
+  checkIfExsit(status: string) {
     var index = 0
     var found = false
     var length = 0
     for (let i = 0; i < this.jobStatus.length; i++) {
-      
-      if(this.jobStatus[i].status == status){
+
+      if (this.jobStatus[i].status == status) {
         index = i
         found = true
         length = this.jobStatus[i].length
       }
     }
-    return {i:index, e:found, l:length}
+    return { i: index, e: found, l: length }
   }
   ngOnInit() {
     // this.totalRows = this.datas.getMessage()
     // console.log(this.totalRows);
-    this.getCustomer()
-    this.getTechnicians()
-    this.getJobs()
+    const email = localStorage.getItem('email')
+    this.service.getUserData(email).then(user => {
+      this.user_type = user.user_type
+      if (user.user_type === 'admin') {
+        this.getCustomer()
+        this.getTechnicians()
+        this.getJobs()
+      } else {
+
+      }
+    })
 
   }
 
-  ngAfterViewInit() { }
+  ngAfterViewInit() {
+    // this.workQuiz()
+  }
+
+  workQuiz() {
+    var reply = `Quiz(
+      id: "2",
+      articleId: "",
+      name: 'Socio-Economic',
+      description: 'How Well Do You Know Your Socio-Economic?',
+      color: MyColors.apple_color,
+      questions: [`
+    const questions = social.split('|')
+    questions.forEach((quest, index) => {
+      var questLine = ""
+      const q = quest.split('\n')
+      questLine += `Questions(
+        id: "${index}",
+        question: "${q[1]}",
+        answer: "",
+        options: [`
+      const arr = []
+      for (let i = 2; i < q.length; i++) {
+        if (q[i].length > 0) {
+          arr.push(`"${q[i]}"`)
+        }
+      }
+      questLine += arr.join(',')
+      questLine += `]),`
+      reply += questLine
+    })
+    reply += `])`
+    console.log(reply)
+  }
 
 
 

@@ -119,7 +119,7 @@ export class MyCustomerComponent implements OnInit {
   //   firebase.firestore.collection('...').get().then(snap => {
   //     res.status(200).send({length: snap.size});
   // });
-  
+
   // constructor(private datas: DataService) { }
   // get totalRows(): number {
   //   return this.getCustomers.length;
@@ -150,7 +150,7 @@ export class MyCustomerComponent implements OnInit {
 
   _name = ''
   _addr = ''
-  _phone = ''
+  _phone = '+234'
   _email = ''
 
   deleteCusClick(id: string, email: string) {
@@ -218,6 +218,11 @@ export class MyCustomerComponent implements OnInit {
 
     if (name === '' || phone === '' || addr === '' || email === '') {
       this.config.displayMessage('Please fill all fields and use google autocomplete for address.', false)
+      return
+    }
+
+    if (!phone.startsWith('+234')) {
+      this.config.displayMessage('Please input correct address. Must start with +234', false)
       return
     }
 

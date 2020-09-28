@@ -47,7 +47,11 @@ export const AppRoutes: Routes = [
         loadChildren: './add-job/add-job.module#AddJobModule',
         canActivate: [RouteGuard]
       },
-
+      {
+        path: 'assigned-jobs',
+        loadChildren: './tech-job/tech-job.module#TechJobModule',
+        canActivate: [RouteGuard]
+      },
       {
         path: 'settings',
         canActivate: [RouteGuard],
