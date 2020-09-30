@@ -104,7 +104,7 @@ export class TechJobComponent implements OnInit {
   }
 
   getStatus() {
-    firebase.firestore().collection('status').orderBy('name', 'desc').get().then(query => {
+    firebase.firestore().collection('status').orderBy('name', 'asc').get().then(query => {
       this.statuses = []
       query.forEach(data => {
         const status = <Statuses>data.data()

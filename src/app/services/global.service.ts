@@ -65,7 +65,7 @@ export class AppConfig {
     // }
 
     sendSMS(http: HttpClient, phoneNumber: string, boddy: string) {
-        return http.get(``).toPromise()
+        return http.get(`/sendSMS`).toPromise()
     }
 
     async updateJobStatus(http: HttpClient, status: string, reasons: string, selectedJob: Jobs) {
@@ -85,15 +85,15 @@ export class AppConfig {
             const id = firebase.database().ref().push().key
             const act: JobActivity = {
                 id: id,
-                comment: `This job status was changed to : ${status} by the technician.`,
+                comment: `This job status was changed from ${selectedJob.status} to : ${status} by the technician.`,
                 action: reasons,
                 created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }
             firebase.firestore().collection('jobs').doc(selectedJob.id).collection('activities').doc(id).set(act).then(d => {
-                this.logActivity(`${current_name}|${current_email} updated job status to : ${status}`)
+                this.logActivity(`${current_name}|${current_email} updated job status from ${selectedJob.status} to : ${status}`)
                 // this.displayMessage('Status updated successfully', true)
-                this.sendSMS(http, selectedJob.agent.phone, `This job status was changed to : ${status} by the technician for job id - ${selectedJob.job_id}`).then(d => {
+                this.sendSMS(http, selectedJob.agent.phone, `This job status was changed from ${selectedJob.status} to : ${status} by the technician for job id - ${selectedJob.job_id}`).then(d => {
 
                     if (status.toLowerCase() === 'completed' || status.toLowerCase() === 'canceled' || status.toLowerCase() === 'cancelled') {
                         location.href = '/dashboard'

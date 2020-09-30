@@ -18,6 +18,7 @@ import { ProgressSpinnerComponent } from '../progress-spinner/progress-spinner.m
 import { OverlayService } from '../overlay/overlay.module';
 import { JobActivity } from '../model/activity';
 import { AdminUsersService } from '../services/admin-users.service';
+import { HttpClient } from '@angular/common/http';
 
 declare var google: any;
 let map: any;
@@ -132,7 +133,7 @@ export class MyNewTicketComponent implements OnInit {
   }
 
 
-  constructor(private previewProgressSpinner: OverlayService) {
+  constructor(private http:HttpClient, private previewProgressSpinner: OverlayService) {
     this.initMap();
   }
 
@@ -360,6 +361,7 @@ export class MyNewTicketComponent implements OnInit {
         firebase.firestore().collection('jobs').doc(key).collection('activities').doc(id).set(act).then(d => {
           this.previewProgressSpinner.close()
           this.config.logActivity(`${current_name}|${current_email} created this job for : ${this.selectedCustomer.name} and assigned to ${technician.name}`)
+          this.sendSMS(findTech['name'], findTech['phone'])
           this.config.displayMessage('Successfully created', true)
         }).catch(err => {
           this.previewProgressSpinner.close()
@@ -391,6 +393,7 @@ export class MyNewTicketComponent implements OnInit {
         firebase.firestore().collection('jobs').doc(this.selectedJob.id).collection('activities').doc(id).set(act).then(d => {
           this.previewProgressSpinner.close()
           this.config.logActivity(`${current_name}|${current_email} updated this job for : ${this.selectedCustomer.name} and reassigned to ${technician.name}`)
+          this.sendSMS(findTech['name'], findTech['phone'])
           this.config.displayMessage('Successfully created', true)
         }).catch(err => {
           this.previewProgressSpinner.close()
@@ -401,6 +404,14 @@ export class MyNewTicketComponent implements OnInit {
         this.config.displayMessage(`${err}`, false)
       })
     }
+  }
+
+  async sendSMS(tech_name:string, tech_number:string) {
+    const techSMS = `You have been assigned a job. Please login to Pronto to accept the job and to view customer details.`
+    const cusSMS = `A technician will be with you shortly. \nName: ${tech_name}\nPhone: ${tech_number}`
+
+    await this.config.sendSMS(this.http, tech_number, techSMS)
+    await this.config.sendSMS(this.http, this.selectedCustomer.phone, cusSMS)
   }
 
   //update technician status to assign and send sms to both customer and technician
