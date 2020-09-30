@@ -171,6 +171,11 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     this.addNewTech = false
     this.editTech = false
     this.button_pressed = false
+    this._name = ''
+    this._addr = ''
+    this._phone = '+234'
+    this._email = ''
+    this._cat = []
   }
 
   _name = ''

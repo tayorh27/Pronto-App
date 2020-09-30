@@ -146,6 +146,10 @@ export class MyCustomerComponent implements OnInit {
     this.addNewCus = false
     this.editCus = false
     this.button_pressed = false
+    this._name = ''
+    this._addr = ''
+    this._phone = '+234'
+    this._email = ''
   }
 
   _name = ''

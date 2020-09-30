@@ -6,7 +6,7 @@ import * as Twilio from 'twilio'
 const token = 'e7345006e1b1d5b2c8cc5c225c19af1f'//functions.config().twilio.token
 const sid = 'ACbba7700d9e323157f85057848904a325'//functions.config().twilio.sid
 
-const client = Twilio(token, sid)
+const client = Twilio(sid, token)
 
 const twilioNumber = '+12185065155' //'(218) 506-5155'
 
@@ -69,10 +69,10 @@ function getDateDiff(dateString: string) {
     var expiry = new Date(dateString)
     return today.getTime() - expiry.getTime()
 }
+//*/30 * * * *
+export const CheckJobsStatus = functions.pubsub.schedule('every 30 minutes').onRun(context => {
 
-export const CheckJobsStatus = functions.pubsub.schedule('').timeZone('').onRun(context => {
-
-    admin.firestore().collection('jobs').where('back_end_status', '==', 'active').where('status', '==', 'Pending')
+    return admin.firestore().collection('jobs').where('back_end_status', '==', 'active').where('status', '==', 'Pending')
         .where('status', '==', 'Assigned').get().then(query => {
 
             if (query.empty) {
@@ -104,7 +104,7 @@ export const CheckJobsStatus = functions.pubsub.schedule('').timeZone('').onRun(
                 }
             })
 
-            batch.commit().then(d => {
+            return batch.commit().then(d => {
                 sms.forEach(s => {
                     const message = `This job with job id - ${s.id} has been changed from ${s.status} to OverDue since the assigned technician (${s.technician}) has not performed any action.`
                     _sendSMS(s.number, message)

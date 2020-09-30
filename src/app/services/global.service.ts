@@ -65,7 +65,7 @@ export class AppConfig {
     // }
 
     sendSMS(http: HttpClient, phoneNumber: string, boddy: string) {
-        return http.get(`/sendSMS`).toPromise()
+        return http.get(`https://us-central1-prontoappl.cloudfunctions.net/sendSMS`).toPromise()
     }
 
     async updateJobStatus(http: HttpClient, status: string, reasons: string, selectedJob: Jobs) {

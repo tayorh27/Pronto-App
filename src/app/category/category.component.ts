@@ -99,6 +99,7 @@ export class MyCategoryComponent implements OnInit {
     this.addNewCat = false
     this.editCat = false
     this.button_pressed = false
+    this._name = ''
   }
 
   _name = ''

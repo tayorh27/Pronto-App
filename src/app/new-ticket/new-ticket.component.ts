@@ -92,7 +92,7 @@ export class MyNewTicketComponent implements OnInit {
 
   createMarker(latitude: any, longitude: any, _id: any, tech: any) {
     const isReassign = this.isReassign
-    const stat = tech['status'] //status of technician: offline, online
+    const stat = `${tech['status']}` //status of technician: offline, online
     const display = (stat === 'online') ? 'block' : 'none'
 
     marker[_id] = new google.maps.Marker({
