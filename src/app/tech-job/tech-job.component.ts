@@ -28,7 +28,7 @@ declare interface DataTable {
 })
 export class TechJobComponent implements OnInit {
 
-  public dataTable: DataTable;
+  public dataTable: DataTable
   data: string[][] = []
   jobs: Jobs[] = []
   statuses: Statuses[] = []
@@ -53,7 +53,7 @@ export class TechJobComponent implements OnInit {
   }
 
   getJobByStatus(status: string) {
-    firebase.firestore().collection('jobs').where('assigned_to.email','==',this.techEmail).where('status', '==', status).orderBy('timestamp', 'desc').onSnapshot(query => {
+    firebase.firestore().collection('jobs').where('assigned_to.email', '==', this.techEmail).where('status', '==', status).orderBy('timestamp', 'desc').onSnapshot(query => {
       this.data = []
       this.jobs = []
       var index = 0
@@ -81,7 +81,7 @@ export class TechJobComponent implements OnInit {
   }
 
   getJob() {
-    firebase.firestore().collection('jobs').where('assigned_to.email','==',this.techEmail).orderBy('timestamp', 'desc').onSnapshot(query => {
+    firebase.firestore().collection('jobs').where('assigned_to.email', '==', this.techEmail).orderBy('timestamp', 'desc').onSnapshot(query => {
       this.data = []
       this.jobs = []
       var index = 0
@@ -97,8 +97,11 @@ export class TechJobComponent implements OnInit {
         footerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created Date', 'Modified Date', 'Actions', 'ID'],
         dataRows: this.data
       };
+
+      // this.tableSearch()
     });
   }
+
   get totalRows(): number {
     return this.getJob.length;
   }
@@ -128,7 +131,7 @@ export class TechJobComponent implements OnInit {
       })
 
       //check if url has search parameter
-      if(location.search !== ''){
+      if (location.search !== '') {
         const stat = location.search.substring(3)
         this.getJobByStatus(stat)
         // console.log(stat)
@@ -199,6 +202,10 @@ export class TechJobComponent implements OnInit {
 
   ngAfterViewInit() {
     //$.noConflict();
+    this.tableSearch()
+  }
+
+  tableSearch() {
     (<any>$('#datatables')).DataTable({
       "pagingType": "full_numbers",
       "lengthMenu": [

@@ -178,7 +178,7 @@
               </h6>
             </div>
           </li> -->
-          <li class="timeline-inverted">
+          <li class="timeline-inverted" *ngIf="selectedJob !== 'Pending' || selectedJob !== 'Canceled'">
             <div class="timeline-badge danger">
               <i class="material-icons">people</i>
             </div>

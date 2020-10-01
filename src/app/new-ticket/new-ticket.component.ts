@@ -377,6 +377,7 @@ export class MyNewTicketComponent implements OnInit {
         assigned_to: technician,
         agent:this.currentUser,
         status: 'Pending',//this.selectedJob.status,//
+        back_end_status: 'active',
         category: this._cat,
         note: this._note,
         modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,

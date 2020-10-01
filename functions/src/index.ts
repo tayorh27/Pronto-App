@@ -19,10 +19,15 @@ admin.initializeApp()
 
 export const sendSMS = functions.https.onRequest((request, response) => {
 
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Credentials", "true");
+    response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    response.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Authorization, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+
     const phoneNumber = `${request.query.number}`
     const smsText = `${request.query.text}`
 
-    const sms = _sendSMS(phoneNumber, smsText)
+    const sms = _sendSMS(`+${phoneNumber}`, smsText)
 
     if (sms !== undefined) {
         response.send(sms)
@@ -31,12 +36,12 @@ export const sendSMS = functions.https.onRequest((request, response) => {
 });
 
 function _sendSMS(phoneNumber: string, smsText: string) {
-    if (!validE164(phoneNumber)) {
-        return JSON.stringify({
-            'type': 'error',
-            'message': 'Invalid phone number'
-        })
-    }
+    // if (!validE164(phoneNumber)) {
+    //     return JSON.stringify({
+    //         'type': 'error',
+    //         'message': 'Invalid phone number'
+    //     })
+    // }
 
     const textMessage = {
         body: smsText,
@@ -47,12 +52,14 @@ function _sendSMS(phoneNumber: string, smsText: string) {
     client.messages.create(textMessage)
         .then(message => {
             return JSON.stringify({
+                'num':phoneNumber,
                 'type': 'success',
                 'message': message.toJSON()
             })
         })
         .catch(err => {
             return JSON.stringify({
+                'num':phoneNumber,
                 'type': 'error',
                 'message': `${err}`
             })
@@ -60,9 +67,9 @@ function _sendSMS(phoneNumber: string, smsText: string) {
     return null
 }
 
-function validE164(num: string) {
-    return /^\*?[1-9]\d{1, 14}$/.test(num)
-}
+// function validE164(num: string) {
+//     return /^\*?[1-9]\d{1, 14}$/.test(num)
+// }
 
 function getDateDiff(dateString: string) {
     var today = new Date();

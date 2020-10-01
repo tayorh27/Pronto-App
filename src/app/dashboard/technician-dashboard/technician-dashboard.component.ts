@@ -51,6 +51,7 @@ export class TechnicianDashboardComponent implements OnInit {
   }
 
   ngOnInit() {
+    // this.config.sendSMS(this.http, '+2348100865962', 'Testing one two')
     const email = localStorage.getItem('email')
     this.service.getUserData(email).then(user => {
       this.techStatus = user.status === 'online'
