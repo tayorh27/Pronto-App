@@ -117,7 +117,7 @@ export class MyCategoryComponent implements OnInit {
   deleteCategory(id: string, name: string) {
     swal({
       title: 'Delete Alert',
-      text: 'Are you sure about deleting this category?',
+      text: 'Are you sure about deleting this skill-set?',
       type: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, delete it!',
@@ -130,7 +130,7 @@ export class MyCategoryComponent implements OnInit {
         firebase.firestore().collection('categories').doc(id).delete().then(del => {
           const current_email = localStorage.getItem('email')
           const current_name = localStorage.getItem('name')
-          this.config.logActivity(`${current_name}|${current_email} deleted this category: ${name}`)
+          this.config.logActivity(`${current_name}|${current_email} deleted this skill-set: ${name}`)
           this.config.displayMessage("Successfully deleted", true);
         }).catch(err => {
           this.config.displayMessage(`${err}`, false);
@@ -178,7 +178,7 @@ export class MyCategoryComponent implements OnInit {
       }
 
       firebase.firestore().collection('categories').doc(key).set(category).then(d => {
-        this.config.logActivity(`${current_name}|${current_email} created this category: ${name}`)
+        this.config.logActivity(`${current_name}|${current_email} created this skill-set: ${name}`)
         this.cancelAddCat()
         this.config.displayMessage('Successfully created', true)
       }).catch(err => {
@@ -195,7 +195,7 @@ export class MyCategoryComponent implements OnInit {
       }
 
       firebase.firestore().collection('categories').doc(this.selectedCategory.id).update(category).then(d => {
-        this.config.logActivity(`${current_name}|${current_email} updated this category: ${name}`)
+        this.config.logActivity(`${current_name}|${current_email} updated this skill-set: ${name}`)
         this.cancelAddCat()
         this.config.displayMessage('Successfully updated', true)
       }).catch(err => {

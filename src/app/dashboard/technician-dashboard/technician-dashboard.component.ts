@@ -163,6 +163,6 @@ export class TechnicianDashboardComponent implements OnInit {
   }
 
   completeJob() {
-    this.config.updateJobStatus(this.http, 'Awaiting Completion', '',this.selectedJob)
+    this.config.updateJobStatus(this.http, 'Pending Approval', '',this.selectedJob)
   }
 }

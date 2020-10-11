@@ -3,6 +3,8 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin'
 import * as Twilio from 'twilio'
 
+import axios from 'axios'
+
 const token = 'e7345006e1b1d5b2c8cc5c225c19af1f'//functions.config().twilio.token
 const sid = 'ACbba7700d9e323157f85057848904a325'//functions.config().twilio.sid
 
@@ -16,6 +18,30 @@ admin.initializeApp()
 // // https://firebase.google.com/docs/functions/typescript
 //
 
+export const cloudpbx = functions.https.onRequest(async (request, response) => {
+
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Credentials", "true");
+    response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    response.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Authorization, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+
+    const getBody = request.body
+
+    const _header = {
+        "Content-Type": "application/json",
+        "x-auth-token": "mzFxYakJRhZ8e6nEqMnhvLBVsVpFVj"
+    }
+
+    return axios.post('https://9mobile.nativetalk.com.ng/api/signup', getBody, { headers: _header }).then(res => {
+        // console.log(res.data)
+        response.send(res.data);
+    }).catch(err => {
+        // console.log(err)
+        response.send(err);
+    })
+
+
+});
 
 export const sendSMS = functions.https.onRequest((request, response) => {
 
@@ -52,14 +78,14 @@ function _sendSMS(phoneNumber: string, smsText: string) {
     client.messages.create(textMessage)
         .then(message => {
             return JSON.stringify({
-                'num':phoneNumber,
+                'num': phoneNumber,
                 'type': 'success',
                 'message': message.toJSON()
             })
         })
         .catch(err => {
             return JSON.stringify({
-                'num':phoneNumber,
+                'num': phoneNumber,
                 'type': 'error',
                 'message': `${err}`
             })

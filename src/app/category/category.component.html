@@ -7,13 +7,13 @@
             <div class="card-icon">
               <i class="material-icons">assignment</i>
             </div>
-            <h4 class="card-title">Categories : {{ totalRows }}</h4>
+            <h4 class="card-title">Skill-Sets</h4>
             <button
               mat-raised-button
               class="btn btn-primary"
               (click)="addCat()"
             >
-              Add New Category
+              Add New Skill-set
             </button>
           </div>
           <div class="card-body">
@@ -91,7 +91,7 @@
             <div class="card-icon">
               <i class="material-icons">mail_outline</i>
             </div>
-            <h4 class="card-title">New Category</h4>
+            <h4 class="card-title">New Skill Set</h4>
           </div>
           <div class="card-body">
             <form method="#" action="#">
@@ -99,7 +99,7 @@
                 <input
                   matInput
                   [(ngModel)]="_name"
-                  placeholder="Name"
+                  placeholder="Skill-set Name"
                   name="mname"
                   type="text"
                   class="form-control"

@@ -91,8 +91,8 @@ export class AddJobComponent implements OnInit {
       })
 
       this.dataTable = {
-        headerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created By', 'Created Date', 'Modified Date', 'Actions', 'ID'],
-        footerRow: ['Assigned To', 'Customer', 'Job Request', 'Status', 'Created By', 'Created Date', 'Modified Date', 'Actions', 'ID'],
+        headerRow: ['Assigned To', 'Customer', 'Skill-Set', 'Status', 'Created By', 'Created Date', 'Modified Date', 'Actions', 'ID'],
+        footerRow: ['Assigned To', 'Customer', 'Skill-Set', 'Status', 'Created By', 'Created Date', 'Modified Date', 'Actions', 'ID'],
         dataRows: this.data
       };
     });

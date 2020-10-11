@@ -5,6 +5,7 @@ import * as firebase from 'firebase/app';
 import * as geofirex from 'geofirex';
 import 'firebase/firestore';
 import 'firebase/database';
+import 'firebase/storage'
 import * as $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-bs4';
@@ -50,6 +51,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
   button_pressed = false
 
   user_blocked = 'no'
+  user_verified = 'yes'
 
   service = new AdminUsersService();
   role = ''
@@ -70,7 +72,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     });
   }
 
-  
+
 
 
 
@@ -94,8 +96,8 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
   }
 
 
-  
-  
+
+
 
   // totalNumber: number
   // constructor(private datas: DataService) { }
@@ -175,6 +177,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     this._addr = ''
     this._phone = '+234'
     this._email = ''
+    this._image = './assets/img/default-avatar.png'
     this._cat = []
   }
 
@@ -182,6 +185,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
   _addr = ''
   _phone = '+234'
   _email = ''
+  _image = './assets/img/default-avatar.png'
   _cat = []
 
   deleteTechClick(id: string, email: string) {
@@ -227,8 +231,10 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     this._addr = this.selectedTechnician.address
     this._phone = this.selectedTechnician.phone
     this._email = this.selectedTechnician.email
+    this._image = this.selectedTechnician.image
     this._cat = this.selectedTechnician.category
     this.user_blocked = this.selectedTechnician.blocked ? 'yes' : 'no'
+    this.user_verified = this.selectedTechnician.verified ? 'yes' : 'no'
     setTimeout(() => {
       document.getElementById('madd').innerHTML = this.selectedTechnician.address
       document.getElementById('mgeo').innerHTML = JSON.stringify(this.selectedTechnician.position.geopoint)
@@ -237,6 +243,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
   }
 
   async technicianSubmitClicked() {
+    const image = (<HTMLInputElement>document.getElementById("pro_images")).files
     const name = (<HTMLInputElement>document.getElementById("tech_name")).value;
     // const address = (<HTMLInputElement>document.getElementById("tech_addr")).value;
     const phone = (<HTMLInputElement>document.getElementById("tech_phone")).value;
@@ -248,7 +255,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       return
     }
 
-    if(!phone.startsWith('+234')){
+    if (!phone.startsWith('+234')) {
       this.config.displayMessage('Please input correct address. Must start with +234', false)
       return
     }
@@ -264,12 +271,25 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
 
     if (!this.editTech) {
       //determin if email exists
+      if (image.length == 0) {
+        this.button_pressed = false
+        this.config.displayMessage("Please upload an image for this gift basket", false)
+        return
+      }
       const query = await firebase.firestore().collection('users').where('email', '==', email).get()
       if (query.size > 0) {
+        this.button_pressed = false
         this.config.displayMessage('technician already exists', false)
         return
       }
       const position = geoPoint.point(geo['lat'], geo['lng'])
+
+      const url = await this.uploadImage(image)
+      if(url === undefined){
+        this.button_pressed = false
+        return
+      }
+
       const technician: AdminUsers = {
         id: key,
         name: name,
@@ -284,9 +304,10 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
         role: 'Technician',
         access_levels: '',
         blocked: (this.user_blocked === 'no') ? false : true,
+        verified: (this.user_verified === 'no') ? false : true,
         status: 'offline',
         user_type: 'technician',
-        image: './assets/img/default-avatar.png',
+        image: url,
         user_position: 'Technician',
         created_by: `${current_name}|${current_email}`,
         created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
@@ -303,9 +324,18 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       })
     } else {//you are to perform update operattion here
       const position = (geo['lat'] === undefined) ? geoPoint.point(geo['latitude'], geo['longitude']) : geoPoint.point(geo['lat'], geo['lng'])
+      if(image.length > 0) {
+        const url = await this.uploadImage(image)
+        if(url === undefined){
+          this.button_pressed = false
+          return
+        }
+        this._image = url
+      }
       const technician: AdminUsers = {
         name: name,
         blocked: (this.user_blocked === 'no') ? false : true,
+        verified: (this.user_verified === 'no') ? false : true,
         address: addr,
         position: {
           geohash: position.geohash,
@@ -314,6 +344,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
         // coordinates: (geo['lat'] === undefined) ? new firebase.firestore.GeoPoint(geo['latitude'], geo['longitude']) : new firebase.firestore.GeoPoint(geo['lat'], geo['lng']),
         phone: phone,
         email: email,
+        image: this._image,
         category: this._cat,
         modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`
       }
@@ -327,6 +358,26 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       })
     }
 
+  }
+
+  async uploadImage(image:FileList) {
+    const type = image.item(0).name.substring(image.item(0).name.lastIndexOf('.'))
+    console.log(type)
+    const size = image.item(0).size
+    if (size > 204800) {
+      this.config.displayMessage(`Validation Error: File size must not be greater than 200KB`, false);
+      return
+    }
+    const ext = ['.jpg', '.jpeg', '.png']
+    if (!ext.includes(type)) {
+      this.config.displayMessage(`Validation Error: Incorrect file extension. Allowed extensions are: .jpg, .jpeg, .png`, false);
+      return
+    }
+    const key = firebase.database().ref().push().key
+    const upload_task = firebase.storage().ref("technicians").child(`${key}.jpg`)
+    await upload_task.put(image.item(0))
+    const url = await upload_task.getDownloadURL()
+    return url
   }
 
   ngAfterViewInit() {

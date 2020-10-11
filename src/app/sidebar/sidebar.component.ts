@@ -46,21 +46,21 @@ export const ROUTES: RouteInfo[] = [{
 },
 {
     path: '/customer',
-    title: 'Customer',
+    title: 'Pronto Customer',
     type: 'link',
     icontype: 'people',
     access: false
 },
 {
     path: '/category',
-    title: 'Category',
+    title: 'Skill-Sets',
     type: 'link',
     icontype: 'link',
     access: false
 },
 {
     path: '/technician',
-    title: 'Technician',
+    title: 'Pronto Technician',
     type: 'link',
     icontype: 'handyman',
     access: false
@@ -97,23 +97,24 @@ export const ROUTES: RouteInfo[] = [{
     icontype: 'work',
     access: false
 },
+    {
+        path: '/components',
+        title: 'Components',
+        type: 'sub',
+        icontype: 'apps',
+        access: false,
+        collapse: 'components',
+        children: [
+            { path: 'buttons', title: 'Buttons', ab: 'B' },
+            { path: 'grid', title: 'Grid System', ab: 'GS' },
+            { path: 'panels', title: 'Panels', ab: 'P' },
+            { path: 'sweet-alert', title: 'Sweet Alert', ab: 'SA' },
+            { path: 'notifications', title: 'Notifications', ab: 'N' },
+            { path: 'icons', title: 'Icons', ab: 'I' },
+            { path: 'typography', title: 'Typography', ab: 'T' }
+        ]
+    }, 
     // {
-    //     path: '/components',
-    //     title: 'Components',
-    //     type: 'sub',
-    //     icontype: 'apps',
-    //     access: false,
-    //     collapse: 'components',
-    //     children: [
-    //         { path: 'buttons', title: 'Buttons', ab: 'B' },
-    //         { path: 'grid', title: 'Grid System', ab: 'GS' },
-    //         { path: 'panels', title: 'Panels', ab: 'P' },
-    //         { path: 'sweet-alert', title: 'Sweet Alert', ab: 'SA' },
-    //         { path: 'notifications', title: 'Notifications', ab: 'N' },
-    //         { path: 'icons', title: 'Icons', ab: 'I' },
-    //         { path: 'typography', title: 'Typography', ab: 'T' }
-    //     ]
-    // }, {
     //     path: '/forms',
     //     title: 'Forms',
     //     type: 'sub',
@@ -126,7 +127,8 @@ export const ROUTES: RouteInfo[] = [{
     //         { path: 'validation', title: 'Validation Forms', ab: 'VF' },
     //         { path: 'wizard', title: 'Wizard', ab: 'W' }
     //     ]
-    // }, {
+    // }, 
+    //{
     //     path: '/tables',
     //     title: 'Tables',
     //     type: 'sub',
@@ -151,13 +153,13 @@ export const ROUTES: RouteInfo[] = [{
     //     ],
     //     access: false
     // }, 
-    // {
-    //     path: '/widgets',
-    //     title: 'Widgets',
-    //     type: 'link',
-    //     icontype: 'widgets'
+    {
+        path: '/widgets',
+        title: 'Widgets',
+        type: 'link',
+        icontype: 'widgets'
 
-    // },
+    },
     //  {
     //     path: '/charts',
     //     title: 'Charts',

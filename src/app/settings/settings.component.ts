@@ -106,7 +106,7 @@ export class SettingsComponent implements OnInit {
   selectTheme = 'primary';
   levels = [
     { value: 'Customer', viewValue: 'Customer' },
-    { value: 'Category', viewValue: 'Category' },
+    { value: 'Skill-Sets', viewValue: 'Skill-Sets' },
     { value: 'Technician', viewValue: 'Technician' },
     { value: 'New-Ticket', viewValue: 'New-Ticket' },
     { value: 'Jobs', viewValue: 'Jobs' },
