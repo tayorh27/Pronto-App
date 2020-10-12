@@ -19,9 +19,11 @@ import { OverlayService } from '../overlay/overlay.module';
 import { JobActivity } from '../model/activity';
 import { AdminUsersService } from '../services/admin-users.service';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { startWith, map } from 'rxjs/operators';
 
 declare var google: any;
-let map: any;
+let _map: any;
 let marker: any = {}
 const options = {
   enableHighAccuracy: true,
@@ -42,9 +44,11 @@ export class MyNewTicketComponent implements OnInit {
 
   @ViewChild('map', { static: false }) mapElement: ElementRef;
 
+  markerPan:any
+
   initMap() {
     navigator.geolocation.getCurrentPosition((location) => {
-      map = new google.maps.Map(this.mapElement.nativeElement, {
+      _map = new google.maps.Map(this.mapElement.nativeElement, {
         center: { lat: location.coords.latitude, lng: location.coords.longitude },
         zoom: 10
       });
@@ -54,21 +58,23 @@ export class MyNewTicketComponent implements OnInit {
 
       marker['current'] = new google.maps.Marker({
         position: { lat: location.coords.latitude, lng: location.coords.longitude },
-        map,
+        _map,
         title: 'Click to zoom',
         // icon: iconBase + 'blue-dot.png'
       });
 
-      map.addListener('center_changed', () => {
+      this.markerPan = marker['current']
+
+      _map.addListener('center_changed', () => {
         window.setTimeout(() => {
-          map.panTo(marker['current'].getPosition());
+          _map.panTo(this.markerPan.getPosition());
         }, 3000);
       });
 
       marker['current'].addListener('click', (event: any) => {
         infowindow.setPosition(event.latLng);
         infowindow.setContent(`Current location`);// +'<h3><a href="/add-donor/' + marker.getPosition().lat() + '/' + marker.getPosition().lng() + '">Register Here</a></h3>
-        infowindow.open(map, marker['current']);
+        infowindow.open(_map, marker['current']);
       });
     }, (error) => {
       this.config.displayMessage(`${error.message}. Refresh this page.`, false);
@@ -96,10 +102,12 @@ export class MyNewTicketComponent implements OnInit {
     const display = (stat === 'online') ? 'block' : 'none'
 
     marker[_id] = new google.maps.Marker({
-      map,
+      _map,
       position: { lat: latitude, lng: longitude },
       icon: (stat === 'online') ? iconBase + 'green-dot.png' : iconBase + 'red-dot.png'
     });
+
+    this.markerPan = marker[_id]
 
     google.maps.event.addListener(marker[_id], 'click', function () {
       infowindow.setContent(`<div class="card">
@@ -120,7 +128,7 @@ export class MyNewTicketComponent implements OnInit {
         </div>
       </div>
       </div>`)//(click)="assignClicked('hello')"
-      infowindow.open(map, marker[_id])
+      infowindow.open(_map, marker[_id])
 
       setTimeout(() => {
         //listen for onclick
@@ -133,8 +141,8 @@ export class MyNewTicketComponent implements OnInit {
   }
 
 
-  constructor(private http:HttpClient, private previewProgressSpinner: OverlayService) {
-    this.initMap();
+  constructor(private http: HttpClient, private previewProgressSpinner: OverlayService) {
+    // this.initMap();
   }
 
   config = new AppConfig()
@@ -146,31 +154,150 @@ export class MyNewTicketComponent implements OnInit {
   radius = 10
   _note = ''
 
+  customers: MainCustomer[] = []
+  myControl = new FormControl();
+  filteredOptions: Observable<MainCustomer[]>;
+
   selectedCustomer: MainCustomer
-  currentUser:AdminUsers
+  currentUser: AdminUsers
 
   button_pressed = false
 
   isReassign = false
   selectedJob: Jobs
 
-  ngOnInit() {
-    if (location.search === '') {
-      this.config.displayMessage('Please select a customer for this ticket.', false)
-      setTimeout(() => {
-        location.href = '/customer'}, 2000
-      )
+  hasURLQuery = false
+  isAddNewCus = false
+
+  //for adding new customers
+  _name = ''
+  _cus_addr = ''
+  _phone = '+234'
+  _email = ''
+
+  getCustomers() {
+    firebase.firestore().collection('customers').orderBy('name', 'asc').get().then(query => {
+      this.customers = []
+      query.forEach(data => {
+        const customer = <MainCustomer>data.data()
+        this.customers.push(customer)
+      })
+      this.filteredOptions = this.myControl.valueChanges
+        .pipe(
+          startWith(''),
+          map(value => this._filter(value))
+        );
+    })
+  }
+
+  private _filter(value: string): MainCustomer[] {
+    const filterValue = value.toLowerCase();
+
+    return this.customers.filter(option => option.name.toLowerCase().includes(filterValue));
+  }
+
+  onCustomerSelect(evt: any) {
+    this.previewProgressSpinner.open({ hasBackdrop: true }, ProgressSpinnerComponent)
+    const email = evt.option.value
+    this.isAddNewCus = false
+    this.hasURLQuery = true
+    this.getCustomerByEmail(email).then(d => {
+      this.previewProgressSpinner.close()
+      this.myControl.setValue('')
+      this.initMap()
+      this.initAutoComplete()
+    })
+  }
+
+  AddCus() {
+    this.isAddNewCus = true
+    setTimeout(()=>{
+      this.initAutoComplete()
+    },2000)
+  }
+
+  async customerSubmitClicked() {
+    const name = (<HTMLInputElement>document.getElementById("cus_name")).value;
+    // const address = (<HTMLInputElement>document.getElementById("cus_addr")).value;
+    const phone = (<HTMLInputElement>document.getElementById("cus_phone")).value;
+    const email = (<HTMLInputElement>document.getElementById("cus_email")).value;
+
+    const addr = document.getElementById('madd').innerHTML
+
+    if (name === '' || phone === '' || addr === '' || email === '') {
+      this.config.displayMessage('Please fill all fields and use google autocomplete for address.', false)
       return
     }
-    const customerEmail = this.config.getUrlParameter('customer')
-    const job_id = this.config.getUrlParameter('jobid')
-    // console.log(customerEmail, job_id)
-    this.getCustomerByEmail(customerEmail)
-    if(job_id !== undefined){
-      this.isReassign = true
-      this.getJobDataById(job_id)
+
+    if (!phone.startsWith('+234')) {
+      this.config.displayMessage('Please input correct address. Must start with +234', false)
+      return
     }
-    this.initAutoComplete()
+
+    const geo = JSON.parse(document.getElementById('mgeo').innerHTML)
+    this.button_pressed = true
+
+    const key = firebase.database().ref().push().key
+    const current_email = localStorage.getItem('email')
+    const current_name = localStorage.getItem('name')
+    const geoPoint = geofirex.init(firebase);
+
+    const query = await firebase.firestore().collection('customers').where('email', '==', email).get()
+    if (query.size > 0) {
+      this.button_pressed = false
+      this.config.displayMessage('customer already exists', false)
+      return
+    }
+    const position = geoPoint.point(geo['lat'], geo['lng'])
+    const customer: MainCustomer = {
+      id: key,
+      name: name,
+      address: addr,
+      position: {
+        geohash: position.geohash,
+        geopoint: position.geopoint
+      },
+      phone: phone,
+      email: email,
+      created_by: `${current_name}|${current_email}`,
+      created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
+      modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }
+    firebase.firestore().collection('customers').doc(email.toLowerCase()).set(customer).then(d => {
+      this.button_pressed = false
+      this.config.logActivity(`${current_name}|${current_email} created this customer: ${email}`)
+      this.onCustomerSelect({option: {value: email}})
+    }).catch(err => {
+      this.button_pressed = false
+      this.config.displayMessage(`${err}`, false)
+    })
+  }
+
+  gotoSearch() {
+    this.hasURLQuery = false
+  }
+
+  ngOnInit() {
+    if (location.search !== '') {
+      this.hasURLQuery = true
+      // this.config.displayMessage('Please select a customer for this ticket.', false)
+      // setTimeout(() => {
+      //   location.href = '/customer'}, 2000
+      // )
+      // return
+      const customerEmail = this.config.getUrlParameter('customer')
+      const job_id = this.config.getUrlParameter('jobid')
+      // console.log(customerEmail, job_id)
+      this.getCustomerByEmail(customerEmail)
+      if (job_id !== undefined) {
+        this.isReassign = true
+        this.getJobDataById(job_id)
+      }
+      this.initMap()
+      this.initAutoComplete()
+    }
+    this.getCustomers()
     this.getCategories()
     const email = localStorage.getItem('email');
     this.service.getUserData(email).then(user => {
@@ -181,13 +308,14 @@ export class MyNewTicketComponent implements OnInit {
   /**
    * get the customer data from firebase provided the email is given
    * @param email string
-   */
+  */
   async getCustomerByEmail(email: string) {
     const query = await firebase.firestore().collection('customers').doc(email.toLowerCase()).get()
     if (!query.exists) {
       this.config.displayMessage('Invalid customer.', false)
       setTimeout(() => {
-        location.href = '/customer'}, 2000
+        location.href = '/customer'
+      }, 2000
       )
       return
     }
@@ -208,7 +336,8 @@ export class MyNewTicketComponent implements OnInit {
     if (!query.exists) {
       this.config.displayMessage('Invalid job ID.', false)
       setTimeout(() => {
-        location.href = '/customer'}, 2000
+        location.href = '/customer'
+      }, 2000
       )
       return
     }
@@ -231,7 +360,7 @@ export class MyNewTicketComponent implements OnInit {
   }
 
   initAutoComplete() {
-    const locationInput = (<HTMLInputElement>document.getElementById("formGroupExampleInput2"));
+    const locationInput = (this.isAddNewCus) ? (<HTMLInputElement>document.getElementById("cus_addr")) : (<HTMLInputElement>document.getElementById("formGroupExampleInput2"))
     var autocomplete = new google.maps.places.Autocomplete(locationInput);
     // Set the data fields to return when the user selects a place.
     autocomplete.setFields(['address_components', 'geometry', 'icon', 'name']);
@@ -335,7 +464,7 @@ export class MyNewTicketComponent implements OnInit {
     if (!this.isReassign) {//add new job
       const job: Jobs = {
         id: key,
-        job_id: this.config.randomInt(0,9999999999),
+        job_id: this.config.randomInt(0, 9999999999),
         customer: this.selectedCustomer,
         assigned_to: technician,
         agent: this.currentUser,
@@ -363,6 +492,9 @@ export class MyNewTicketComponent implements OnInit {
           this.config.logActivity(`${current_name}|${current_email} created this job for : ${this.selectedCustomer.name} and assigned to ${technician.name}`)
           this.sendSMS(findTech['name'], findTech['phone'])
           this.config.displayMessage('Successfully created', true)
+          setTimeout(()=>{
+            location.href = '/jobs'
+          },2000)
         }).catch(err => {
           this.previewProgressSpinner.close()
           this.config.displayMessage(`${err}`, false)
@@ -375,7 +507,7 @@ export class MyNewTicketComponent implements OnInit {
       const job: Jobs = {
         customer: this.selectedCustomer,
         assigned_to: technician,
-        agent:this.currentUser,
+        agent: this.currentUser,
         status: 'Pending',//this.selectedJob.status,//
         back_end_status: 'active',
         category: this._cat,
@@ -407,12 +539,12 @@ export class MyNewTicketComponent implements OnInit {
     }
   }
 
-  async sendSMS(tech_name:string, tech_number:string) {
+  sendSMS(tech_name: string, tech_number: string) {
     const techSMS = `You have been assigned a job. Please login to Pronto to accept the job and to view customer details.`
     const cusSMS = `A technician will be with you shortly. \nName: ${tech_name}\nPhone: ${tech_number}`
 
-    await this.config.sendSMS(this.http, tech_number, techSMS)
-    await this.config.sendSMS(this.http, this.selectedCustomer.phone, cusSMS)
+    // this.config.sendSMS(this.http, tech_number, techSMS)
+    this.config.sendSMS(this.http, this.selectedCustomer.phone, cusSMS)
   }
 
   //update technician status to assign and send sms to both customer and technician

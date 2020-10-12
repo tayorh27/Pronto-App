@@ -9,6 +9,8 @@ import { MainCategory } from 'src/app/model/category';
 import swal from 'sweetalert2';
 import { AppConfig } from 'src/app/services/global.service';
 import { HttpClient } from '@angular/common/http';
+import { ProgressSpinnerComponent } from '../../progress-spinner/progress-spinner.module';
+import { OverlayService } from '../../overlay/overlay.module';
 
 declare const $: any
 
@@ -34,8 +36,8 @@ export class TechnicianDashboardComponent implements OnInit {
 
   _note = ''
 
-  constructor(private http:HttpClient) {
-    
+  constructor(private http: HttpClient, private previewProgressSpinner: OverlayService) {
+
   }
 
   getCurrentJob() {
@@ -43,7 +45,7 @@ export class TechnicianDashboardComponent implements OnInit {
       // query.forEach(data => {
       //   const job = <Jobs>data.data()
       // })
-      if(query.size === 0){
+      if (query.size === 0) {
         return
       }
       this.selectedJob = <Jobs>query.docs[0].data()
@@ -117,7 +119,10 @@ export class TechnicianDashboardComponent implements OnInit {
   }
 
   acceptPendingJob() {
-    this.config.updateJobStatus(this.http, 'Assigned', '',this.selectedJob)
+    this.previewProgressSpinner.open({ hasBackdrop: true }, ProgressSpinnerComponent)
+    this.config.updateJobStatus(this.http, 'Assigned', '', this.selectedJob).then(d => {
+      this.previewProgressSpinner.close()
+    })
   }
 
   submitCancelJob() {
@@ -133,11 +138,14 @@ export class TechnicianDashboardComponent implements OnInit {
       buttonsStyling: false
     }).then((result) => {
       if (result.value) {
-        if(this._note === ''){
+        if (this._note === '') {
           this.config.displayMessage('Enter your reasons', false)
           return
         }
-        this.config.updateJobStatus(this.http, 'Canceled', this._note, this.selectedJob)
+        this.previewProgressSpinner.open({ hasBackdrop: true }, ProgressSpinnerComponent)
+        this.config.updateJobStatus(this.http, 'Canceled', this._note, this.selectedJob).then(d => {
+          this.previewProgressSpinner.close()
+        })
       } else {
         swal({
           title: 'Cancelled',
@@ -155,7 +163,10 @@ export class TechnicianDashboardComponent implements OnInit {
   }
 
   acceptAssignedJob() {
-    this.config.updateJobStatus(this.http, 'In-Progress', '',this.selectedJob)
+    this.previewProgressSpinner.open({ hasBackdrop: true }, ProgressSpinnerComponent)
+    this.config.updateJobStatus(this.http, 'In-Progress', '', this.selectedJob).then(d => {
+      this.previewProgressSpinner.close()
+    })
   }
 
   cancelProgressJob() {
@@ -163,6 +174,9 @@ export class TechnicianDashboardComponent implements OnInit {
   }
 
   completeJob() {
-    this.config.updateJobStatus(this.http, 'Pending Approval', '',this.selectedJob)
+    this.previewProgressSpinner.open({ hasBackdrop: true }, ProgressSpinnerComponent)
+    this.config.updateJobStatus(this.http, 'Pending Approval', '', this.selectedJob).then(d => {
+      this.previewProgressSpinner.close()
+    })
   }
 }

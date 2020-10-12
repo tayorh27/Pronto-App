@@ -1,70 +1,231 @@
 <div class="main-content">
-  <div class="container-f luid">
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header card-header-text card-header-rose">
-            <div class="card-text">
-              <h4 class="card-title">New Ticket</h4>
-            </div>
-          </div>
-
-          <form>
-            <div class="form-group mx-sm-3 mb-2">
-              <mat-form-field>
-                <mat-select multiple placeholder="Category*" [(ngModel)]="_cat" name="plumber" ariaLabel="Techies[0]"
-                  id="tech_cat">
-                  <mat-option *ngFor="let tech of categories" [value]="tech.id">
-                    {{ tech.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-            <div class="form-group mx-sm-3 mb-2">
-              <mat-form-field class="example-full-width">
-                <input matInput type="address" [(ngModel)]="_addr" [ngModelOptions]="{standalone: true}" class="form-control" id="formGroupExampleInput2" placeholder="Address*" />
-              </mat-form-field>
-            </div>
-            <div class="form-group mx-sm-3 mb-2">
-              <mat-form-field class="example-full-width">
-                <input matInput placeholder="Radius in Km*" [(ngModel)]="radius" name="mRadius" type="number"
-                  class="form-control" id="tech_rad" />
-              </mat-form-field>
-            </div>
-            <div class="form-group mx-sm-3 mb-2">
-              <mat-form-field class="example-full-width">
-                <textarea matInput placeholder="Additional Comment" [(ngModel)]="_note" name="nt"
-                  class="form-control" id="idnt"></textarea>
-              </mat-form-field>
-            </div>
-            <div class="card-footer">
-              <button mat-raised-button type="submit" class="btn btn-fill btn-rose btn-block"
-                (click)="searchButtonClick()" [disabled]="button_pressed">
-                {{button_pressed ? 'Please wait...' : 'Search'}}
-              </button>
-              <div style="display: none;">
-                <p id="madd"></p>
-                <p id="mgeo"></p>
-                <button mat-raised-button type="submit" id="assignBtnClick" class="btn btn-fill btn-rose btn-block"
-                (click)="assignClicked()">
-                Assign
-              </button>
-              <p id="assign-id"></p>
+  <div class="container-fluid">
+    <div class="row" *ngIf="hasURLQuery">
+      <div class="col-md-12 ml-auto mr-auto">
+        <div class="page-categories">
+          <ul class="nav nav-pills nav-pills-warning nav-pills-icons justify-content-center" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" data-toggle="tab" href="#link7" role="tablist">
+                <i class="material-icons">create_new_folder</i> New Ticket
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#link8" role="tablist">
+                <i class="material-icons">people</i> Customer Information
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#link9" role="tablist">
+                <i class="material-icons">work</i> Jobs
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="javascript:void(0)" (click)="gotoSearch()" role="tablist">
+                <i class="material-icons">search</i> Go to Search
+              </a>
+            </li>
+          </ul>
+          <div class="tab-content tab-space tab-subcategories">
+            <!-- new ticket start #link10-->
+            <div class="tab-pane active" id="link7">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="card">
+                    <div class="card-header card-header-text card-header-rose">
+                      <div class="card-text">
+                        <h4 class="card-title">New Ticket</h4>
+                      </div>
+                    </div>
+          
+                    <form>
+                      <div class="form-group mx-sm-3 mb-2">
+                        <mat-form-field>
+                          <mat-select multiple placeholder="Category*" [(ngModel)]="_cat" name="plumber" ariaLabel="Techies[0]"
+                            id="tech_cat">
+                            <mat-option *ngFor="let tech of categories" [value]="tech.id">
+                              {{ tech.name }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div class="form-group mx-sm-3 mb-2">
+                        <mat-form-field class="example-full-width">
+                          <input matInput type="address" [(ngModel)]="_addr" [ngModelOptions]="{standalone: true}"
+                            class="form-control" id="formGroupExampleInput2" placeholder="Address*" />
+                        </mat-form-field>
+                      </div>
+                      <div class="form-group mx-sm-3 mb-2">
+                        <mat-form-field class="example-full-width">
+                          <input matInput placeholder="Radius in Km*" [(ngModel)]="radius" name="mRadius" type="number"
+                            class="form-control" id="tech_rad" />
+                        </mat-form-field>
+                      </div>
+                      <div class="form-group mx-sm-3 mb-2">
+                        <mat-form-field class="example-full-width">
+                          <textarea matInput placeholder="Additional Comment" [(ngModel)]="_note" name="nt" class="form-control"
+                            id="idnt"></textarea>
+                        </mat-form-field>
+                      </div>
+                      <div class="card-footer">
+                        <button mat-raised-button type="submit" class="btn btn-fill btn-rose btn-block"
+                          (click)="searchButtonClick()" [disabled]="button_pressed">
+                          {{button_pressed ? 'Please wait...' : 'Search'}}
+                        </button>
+                        <div style="display: none;">
+                          <p id="madd"></p>
+                          <p id="mgeo"></p>
+                          <button mat-raised-button type="submit" id="assignBtnClick" class="btn btn-fill btn-rose btn-block"
+                            (click)="assignClicked()">
+                            Assign
+                          </button>
+                          <p id="assign-id"></p>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+          
+                <div class="col-md-8">
+                  <div class="card">
+                    <div class="card-header card-header-text card-header-rose">
+                      <div class="card-text">
+                        <h4 class="card-title">Google Map</h4>
+                      </div>
+                    </div>
+                    <div class="card-content">
+                      <div #map id="map" class="mapSize"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </form>
+            <!-- new ticket end -->
+
+            <!-- customer info start -->
+            <div class="tab-pane" id="link8">
+              <ul class="timeline timeline-simple">
+                <li class="timeline-inverted" *ngIf="selectedCustomer">
+                  <div class="timeline-badge danger">
+                    <i class="material-icons">people</i>
+                  </div>
+                  <div class="timeline-panel">
+                    <div class="timeline-heading">
+                      <span class="badge badge-danger">CUSTOMER INFO</span>
+                    </div>
+                    <div class="timeline-body">
+                      <div class="col-md-4">
+                        <div class="card card-profile">
+                          <div class="card-avatar">
+                            <a href="javascript:void(0)">
+                              <img class="img" src="assets/img/default-avatar.png" />
+                            </a>
+                          </div>
+                          <div class="card-body">
+                            <h6 class="card-category text-gray">
+                              {{ selectedCustomer.email }}
+                            </h6>
+                            <h4 class="card-title">
+                              {{ selectedCustomer.phone }}
+                            </h4>
+                            <p class="card-description">
+                              {{ selectedCustomer.address }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <h6><i class="ti-time"></i> {{ selectedCustomer.name }}</h6>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <!-- customer info end -->
+
+
+            <!-- jobs info start -->
+            <div class="tab-pane" id="link9">
+              <app-add-job *ngIf="selectedCustomer" [cusEmail]="selectedCustomer.email"></app-add-job>
+            </div>
+            <!-- jobs info end -->
+          </div>
+
+
+
         </div>
       </div>
 
-      <div class="col-md-8">
+
+    </div>
+
+    <div class="row" *ngIf="!hasURLQuery">
+      <div class="col-md-4">
         <div class="card">
-          <div class="card-header card-header-text card-header-rose">
-            <div class="card-text">
-              <h4 class="card-title">Google Map</h4>
+          <div class="card-header card-header-rose card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">search</i>
             </div>
+            <h4 class="card-title">Search For Customer</h4>
           </div>
-          <div class="card-content">
-            <div #map id="map" class="mapSize"></div>
+          <div class="card-body ">
+            <form method="#" action="#">
+              <mat-form-field class="example-full-width">
+                <input type="text" placeholder="Enter Customer Name" [formControl]="myControl" aria-label="Name"
+                  matInput [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onCustomerSelect($event)">
+                  <mat-option *ngFor="let cus of filteredOptions | async" [value]="cus.email">
+                    {{cus.name}}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </form>
+          </div>
+          <div class="card-footer ">
+            <button mat-raised-button type="submit" (click)="AddCus()" class="btn btn-fill btn-rose">Add New
+              Customer</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8" *ngIf="isAddNewCus">
+        <div class="card">
+          <div class="card-header card-header-rose card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">mail_outline</i>
+            </div>
+            <h4 class="card-title">New Customer</h4>
+          </div>
+          <div class="card-body">
+            <form method="#" action="#">
+              <mat-form-field class="example-full-width">
+                <input matInput [(ngModel)]="_name" placeholder="Name" name="mMame" type="text" class="form-control"
+                  id="cus_name" />
+              </mat-form-field>
+
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder=" Address" type="address" [(ngModel)]="_cus_addr" class="form-control"
+                  autocomplete="off" name="mAddr" id="cus_addr" />
+              </mat-form-field>
+
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Phone Number" [(ngModel)]="_phone" name="mPhone" type="tel"
+                  class="form-control" id="cus_phone" />
+              </mat-form-field>
+
+              <mat-form-field class="example-full-width">
+                <input matInput [(ngModel)]="_email" name="memail" placeholder="Email" type="email" class="form-control"
+                  id="cus_email" />
+              </mat-form-field>
+            </form>
+          </div>
+          <div class="card-footer">
+            <button mat-raised-button type="submit" class="btn btn-fill btn-rose btn-block"
+              (click)="customerSubmitClicked()" [disabled]="button_pressed">
+              {{ button_pressed ? 'Please wait...' : 'Submit' }}
+            </button>
+          </div>
+          <br />
+          <div style="display: none">
+            <p id="madd"></p>
+            <p id="mgeo"></p>
           </div>
         </div>
       </div>

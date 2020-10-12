@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Jobs } from './../model/jobs';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -28,6 +28,8 @@ declare interface DataTable {
 })
 export class AddJobComponent implements OnInit {
 
+  @Input() cusEmail = ''
+
   public dataTable: DataTable;
   data: string[][] = []
   jobs: Jobs[] = []
@@ -51,7 +53,13 @@ export class AddJobComponent implements OnInit {
   }
 
   getJobByStatus(status: string) {
-    firebase.firestore().collection('jobs').where('status', '==', status).orderBy('timestamp', 'desc').onSnapshot(query => {
+    var query:firebase.firestore.Query<firebase.firestore.DocumentData> = null
+    if(this.cusEmail === ''){
+      query = firebase.firestore().collection('jobs').where('status', '==', status).orderBy('timestamp', 'desc')
+    }else {
+      query = firebase.firestore().collection('jobs').where('status', '==', status).where('customer.email', '==', this.cusEmail).orderBy('timestamp', 'desc')
+    }
+    query.onSnapshot(query => {
       this.data = []
       this.jobs = []
       var index = 0
@@ -79,7 +87,13 @@ export class AddJobComponent implements OnInit {
   }
 
   getJob() {
-    firebase.firestore().collection('jobs').orderBy('timestamp', 'desc').onSnapshot(query => {
+    var query:firebase.firestore.Query<firebase.firestore.DocumentData> = null
+    if(this.cusEmail === ''){
+      query = firebase.firestore().collection('jobs').orderBy('timestamp', 'desc')
+    }else {
+      query = firebase.firestore().collection('jobs').where('customer.email', '==', this.cusEmail).orderBy('timestamp', 'desc')
+    }
+    query.onSnapshot(query => {
       this.data = []
       this.jobs = []
       var index = 0
@@ -108,6 +122,7 @@ export class AddJobComponent implements OnInit {
         const status = <Statuses>data.data()
         this.statuses.push(status)
       })
+      this.getCategories()
     })
   }
 
@@ -151,7 +166,6 @@ export class AddJobComponent implements OnInit {
     const email = localStorage.getItem('email');
     this.service.getUserData(email).then(user => {
       this.role = user.role
-      this.getCategories()
       this.getStatus()
     })
   }
