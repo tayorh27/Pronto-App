@@ -80,7 +80,7 @@
           </div>
         </div>
 
-        <div class="card" *ngIf="selectedJob.status === 'In-Progress' || selectedJob.status === 'Awaiting Completion'">
+        <div class="card" *ngIf="selectedJob.status === 'In-Progress' || selectedJob.status === 'Pending Approval'">
           <div class="card-header card-header-primary card-header-icon">
             <div class="card-icon">
               <i class="material-icons">assignment</i>
@@ -90,7 +90,7 @@
           <div class="card-body">
             <div *ngIf="!cancelProgress">
               <br>
-              <p>Please click on the "Start Button" below when you are about to start the job.</p>
+              <p>Please click on the "Finish Job Button" below when you are done with the job.</p>
             </div>
             <div class="form-group mx-sm-3 mb-2" *ngIf="cancelProgress">
               <mat-form-field class="example-full-width">

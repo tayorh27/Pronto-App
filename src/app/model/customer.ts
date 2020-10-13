@@ -4,7 +4,8 @@ export interface MainCustomer{
     address:string
     position:any
     phone:string
-    email: string,
+    email: string
+    msgID?: string[]
     created_by?: string
     created_date?: string
     modified_date: string

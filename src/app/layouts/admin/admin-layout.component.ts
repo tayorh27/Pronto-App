@@ -157,6 +157,43 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
     })
   }
 
+  requestMessaging() {
+    const messaging = firebase.messaging()
+  }
+
+  // getStartToken() {
+  //   const messaging = firebase.messaging()
+  //   messaging.getToken().then((currentToken) => {
+  //     if (currentToken) {
+  //       sendTokenToServer(currentToken);
+  //     }
+  //     else {
+  //       // Show permission request.
+  //       RequestPermission();
+  //       setTokenSentToServer(false);
+  //     }
+  //   }).catch((err) => {
+  //     setTokenSentToServer(false);
+  //   });
+  // }
+  // RequestPermission() {
+  //   const messaging = firebase.messaging()
+  //   messaging.requestPermission()
+  //     .then(permission => {
+
+  //       if (permission === 'granted') {
+  //         console.log("have Permission");
+  //         //calls method again and to sent token to server
+  //         getStartToken();
+  //       }
+  //       else { console.log("Permission Denied"); }
+  //     })
+  //     .catch(err => {
+
+  //     })
+  // }
+
+
   requestMessagingPermissionAndGetToken(email: string) {
     const key = firebase.database().ref().push().key
     firebase.messaging().usePublicVapidKey("BPsDZQr2d7uTVo61hA6YRR1vvxwqB_hVsO1vbO14DH6dczeH4hJgHebN6egPv0zR5wDOdwYAal6XhwWSTyz7CbI")

@@ -36,12 +36,12 @@
                         <h4 class="card-title">New Ticket</h4>
                       </div>
                     </div>
-          
+
                     <form>
                       <div class="form-group mx-sm-3 mb-2">
                         <mat-form-field>
-                          <mat-select multiple placeholder="Category*" [(ngModel)]="_cat" name="plumber" ariaLabel="Techies[0]"
-                            id="tech_cat">
+                          <mat-select multiple placeholder="Category*" [(ngModel)]="_cat" name="plumber"
+                            ariaLabel="Techies[0]" id="tech_cat">
                             <mat-option *ngFor="let tech of categories" [value]="tech.id">
                               {{ tech.name }}
                             </mat-option>
@@ -62,8 +62,8 @@
                       </div>
                       <div class="form-group mx-sm-3 mb-2">
                         <mat-form-field class="example-full-width">
-                          <textarea matInput placeholder="Additional Comment" [(ngModel)]="_note" name="nt" class="form-control"
-                            id="idnt"></textarea>
+                          <textarea matInput placeholder="Additional Comment" [(ngModel)]="_note" name="nt"
+                            class="form-control" id="idnt"></textarea>
                         </mat-form-field>
                       </div>
                       <div class="card-footer">
@@ -74,8 +74,8 @@
                         <div style="display: none;">
                           <p id="madd"></p>
                           <p id="mgeo"></p>
-                          <button mat-raised-button type="submit" id="assignBtnClick" class="btn btn-fill btn-rose btn-block"
-                            (click)="assignClicked()">
+                          <button mat-raised-button type="submit" id="assignBtnClick"
+                            class="btn btn-fill btn-rose btn-block" (click)="assignClicked()">
                             Assign
                           </button>
                           <p id="assign-id"></p>
@@ -84,7 +84,7 @@
                     </form>
                   </div>
                 </div>
-          
+
                 <div class="col-md-8">
                   <div class="card">
                     <div class="card-header card-header-text card-header-rose">
@@ -159,31 +159,7 @@
 
     <div class="row" *ngIf="!hasURLQuery">
       <div class="col-md-4">
-        <div class="card">
-          <div class="card-header card-header-rose card-header-icon">
-            <div class="card-icon">
-              <i class="material-icons">search</i>
-            </div>
-            <h4 class="card-title">Search For Customer</h4>
-          </div>
-          <div class="card-body ">
-            <form method="#" action="#">
-              <mat-form-field class="example-full-width">
-                <input type="text" placeholder="Enter Customer Name" [formControl]="myControl" aria-label="Name"
-                  matInput [matAutocomplete]="auto">
-                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onCustomerSelect($event)">
-                  <mat-option *ngFor="let cus of filteredOptions | async" [value]="cus.email">
-                    {{cus.name}}
-                  </mat-option>
-                </mat-autocomplete>
-              </mat-form-field>
-            </form>
-          </div>
-          <div class="card-footer ">
-            <button mat-raised-button type="submit" (click)="AddCus()" class="btn btn-fill btn-rose">Add New
-              Customer</button>
-          </div>
-        </div>
+        <app-search-customer (_onCustomerSelect)="onCustomerSelect($event)" (_AddCus)="AddCus($event)"></app-search-customer>
       </div>
       <div class="col-md-8" *ngIf="isAddNewCus">
         <div class="card">

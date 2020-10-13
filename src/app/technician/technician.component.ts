@@ -270,7 +270,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     const geoPoint = geofirex.init(firebase);
 
     if (!this.editTech) {
-      //determin if email exists
+      //determine if email exists
       if (image.length == 0) {
         this.button_pressed = false
         this.config.displayMessage("Please upload an image for this gift basket", false)
@@ -298,6 +298,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
           geohash: position.geohash,
           geopoint: position.geopoint
         },//new firebase.firestore.GeoPoint(geo['lat'], geo['lng']),
+        msgID: [],
         phone: phone,
         email: email,
         category: this._cat,

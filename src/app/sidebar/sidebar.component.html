@@ -39,7 +39,7 @@
                                     <span class="sidebar-normal">Edit Profile</span>
                                 </a>
                             </li>
-                            <li class="nav-item" *ngIf="role == 'Administrator'">
+                            <li class="nav-item" *ngIf="role == 'Administrator' || role === 'SubAdmin'">
                                 <a href="javascript:void(0)" [routerLink]="['/settings']" class="nav-link">
                                     <span class="sidebar-mini">S</span>
                                     <span class="sidebar-normal">Settings</span>

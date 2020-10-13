@@ -74,7 +74,7 @@
                         ><i class="material-icons">edit</i></a
                       >
                       <a
-                        *ngIf="role === 'Administrator'"
+                        *ngIf="role === 'Administrator' || role === 'SubAdmin'"
                         href="javascript:void(0)"
                         (click)="deleteCusClick(row[0], row[4])"
                         class="btn btn-link btn-danger btn-just-icon remove"

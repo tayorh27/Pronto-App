@@ -43,7 +43,7 @@ export const cloudpbx = functions.https.onRequest(async (request, response) => {
 
 });
 
-export const sendSMS = functions.https.onRequest((request, response) => {
+export const sendSMS = functions.https.onRequest(async (request, response) => {
 
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -52,11 +52,34 @@ export const sendSMS = functions.https.onRequest((request, response) => {
 
     const phoneNumber = `${request.query.number}`
     const smsText = `${request.query.text}`
+    const type = `${request.query.type}`
 
-    const sms = _sendSMS(`+${phoneNumber}`, smsText)
+    var tokenMsg = request.header("tokenMsg")
+    if (tokenMsg === undefined) {
+        tokenMsg = ''
+    }
 
-    if (sms !== undefined) {
-        response.send(sms)
+    if (type === 'sms') {
+        const sms = _sendSMS(`+${phoneNumber}`, smsText)
+        if (sms !== undefined) {
+            response.send(sms)
+        }else {
+            response.send(JSON.stringify({"message":"failed"}))
+        }
+    } else if (type === 'notification') {
+        if(tokenMsg !== ''){
+            const res = await _sendNotification(tokenMsg, smsText)
+            response.send(res)
+        }else {
+            response.send(JSON.stringify({"message":"done"}))
+        }
+        
+    } else {
+        const sms = _sendSMS(`+${phoneNumber}`, smsText)
+        _sendNotification(tokenMsg, smsText)
+        if (sms !== undefined) {
+            response.send(sms)
+        }
     }
 
 });
@@ -91,6 +114,20 @@ function _sendSMS(phoneNumber: string, smsText: string) {
             })
         })
     return null
+}
+
+async function _sendNotification(token: string, smsText: string) {
+    const payload = {
+        notification: {
+            title: `Message from Pronto`,
+            body: smsText,
+            click_action: ''
+        }
+    }
+    const ids = token.split(',')
+    const res = await admin.messaging().sendToDevice(ids, payload)
+    console.log(res.results)
+    return JSON.stringify({"message":"sent"})
 }
 
 // function validE164(num: string) {

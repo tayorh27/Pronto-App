@@ -11,6 +11,7 @@ import { AgmCoreModule } from '@agm/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AddJobComponent } from "../add-job/add-job.component";
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { SearchCustomerComponent } from './search-customer/search-customer';
 
 @NgModule({
   imports: [
@@ -29,7 +30,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
   ],
   declarations: [
     MyNewTicketComponent,
-    AddJobComponent
+    AddJobComponent,
+    SearchCustomerComponent
   ],
 })
 export class NewTicketModule { }

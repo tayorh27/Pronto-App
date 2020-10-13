@@ -142,7 +142,7 @@ export class AddJobComponent implements OnInit {
 
       //check if url has search parameter
       if (location.search !== '') {
-        const stat = location.search.substring(3)
+        const stat = location.search.substring(3).replace('%20', ' ')
         this.getJobByStatus(stat)
         // console.log(stat)
         return

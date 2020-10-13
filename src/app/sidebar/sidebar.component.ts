@@ -328,12 +328,12 @@ export class SidebarComponent implements OnInit {
     }
 
     gotoLink(menu_path, child_path) {
-        this.router.navigate([`${menu_path}/${child_path}`])
-        // if (this.role == 'Administrator') {
-        //     this.router.navigate([`${menu_path}/${child_path}`])
-        // } else {
-        //     location.href = `/${menu_path}/${child_path}`
-        // }
+        // this.router.navigate([`${menu_path}/${child_path}`])
+        if (this.role == 'Administrator') {
+            this.router.navigate([`${menu_path}/${child_path}`])
+        } else {
+            location.href = `/${menu_path}/${child_path}`
+        }
     }
 
     gotoSingleLink(menu_path:string) {

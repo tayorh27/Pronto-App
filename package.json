@@ -46,7 +46,7 @@
     "datatables": "1.10.18",
     "datatables.net-bs4": "1.10.20",
     "datatables.net-responsive": "2.2.3",
-    "firebase": "^7.21.0",
+    "firebase": "^7.23.0",
     "fullcalendar": "3.10.1",
     "geofirestore": "^4.3.0",
     "geofirex": "^0.1.0",

@@ -4,7 +4,7 @@
       <div class="col-lg-12">
         <p class="h2">Administrative Settings</p>
         <ngb-tabset [justify]="'center'" class="custom-tab-content flex-column flex-md-row" type="pills">
-          <ngb-tab title="USER ROLES">
+          <ngb-tab *ngIf="_role === 'Administrator'" title="USER ROLES">
             <ng-template ngbTabContent>
               <div class="col-md-12">
                 <div class="card">
@@ -105,7 +105,7 @@
                                 (click)="editUser(row)">
                                 <i class="material-icons">edit</i>
                               </button>
-                              <button mat-raised-button type="button" class="btn btn-danger {{row[9]}}"
+                              <button *ngIf="_role === 'Administrator'" mat-raised-button type="button" class="btn btn-danger {{row[9]}}"
                                 (click)="deleteUser(row)">
                                 <i class="material-icons">close</i>
                               </button>

@@ -254,6 +254,7 @@ export class MyCustomerComponent implements OnInit {
           geohash: position.geohash,
           geopoint: position.geopoint
         },
+        msgID: [],
         phone: phone,
         email: email,
         created_by: `${current_name}|${current_email}`,

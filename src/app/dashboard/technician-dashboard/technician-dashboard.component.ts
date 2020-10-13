@@ -41,7 +41,8 @@ export class TechnicianDashboardComponent implements OnInit {
   }
 
   getCurrentJob() {
-    firebase.firestore().collection('jobs').where('back_end_status', '==', 'active').onSnapshot(query => {
+    const email = localStorage.getItem('email')
+    firebase.firestore().collection('jobs').where('assigned_to.email', '==', email).where('back_end_status', '==', 'active').onSnapshot(query => {
       // query.forEach(data => {
       //   const job = <Jobs>data.data()
       // })
@@ -49,6 +50,9 @@ export class TechnicianDashboardComponent implements OnInit {
         return
       }
       this.selectedJob = <Jobs>query.docs[0].data()
+      if (this.selectedJob.status === "Pending") {
+        this.playAudio()
+      }
     })
   }
 
@@ -178,5 +182,12 @@ export class TechnicianDashboardComponent implements OnInit {
     this.config.updateJobStatus(this.http, 'Pending Approval', '', this.selectedJob).then(d => {
       this.previewProgressSpinner.close()
     })
+  }
+
+  playAudio() {
+    let audio = new Audio();
+    audio.src = "assets/audio/alarm-clock-23772.mp3";
+    audio.load();
+    audio.play();
   }
 }

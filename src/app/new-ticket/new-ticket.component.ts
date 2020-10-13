@@ -19,11 +19,11 @@ import { OverlayService } from '../overlay/overlay.module';
 import { JobActivity } from '../model/activity';
 import { AdminUsersService } from '../services/admin-users.service';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { startWith, map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { startWith, } from 'rxjs/operators';
 
 declare var google: any;
-let _map: any;
+let map: any;
 let marker: any = {}
 const options = {
   enableHighAccuracy: true,
@@ -44,11 +44,11 @@ export class MyNewTicketComponent implements OnInit {
 
   @ViewChild('map', { static: false }) mapElement: ElementRef;
 
-  markerPan:any
+  markerPan: any
 
   initMap() {
     navigator.geolocation.getCurrentPosition((location) => {
-      _map = new google.maps.Map(this.mapElement.nativeElement, {
+      map = new google.maps.Map(this.mapElement.nativeElement, {
         center: { lat: location.coords.latitude, lng: location.coords.longitude },
         zoom: 10
       });
@@ -58,23 +58,23 @@ export class MyNewTicketComponent implements OnInit {
 
       marker['current'] = new google.maps.Marker({
         position: { lat: location.coords.latitude, lng: location.coords.longitude },
-        _map,
+        map,
         title: 'Click to zoom',
-        // icon: iconBase + 'blue-dot.png'
+        icon: iconBase + 'blue-dot.png'
       });
 
       this.markerPan = marker['current']
 
-      _map.addListener('center_changed', () => {
+      map.addListener('center_changed', () => {
         window.setTimeout(() => {
-          _map.panTo(this.markerPan.getPosition());
+          map.panTo(this.markerPan.getPosition());
         }, 3000);
       });
 
       marker['current'].addListener('click', (event: any) => {
         infowindow.setPosition(event.latLng);
         infowindow.setContent(`Current location`);// +'<h3><a href="/add-donor/' + marker.getPosition().lat() + '/' + marker.getPosition().lng() + '">Register Here</a></h3>
-        infowindow.open(_map, marker['current']);
+        infowindow.open(map, marker['current']);
       });
     }, (error) => {
       this.config.displayMessage(`${error.message}. Refresh this page.`, false);
@@ -102,7 +102,7 @@ export class MyNewTicketComponent implements OnInit {
     const display = (stat === 'online') ? 'block' : 'none'
 
     marker[_id] = new google.maps.Marker({
-      _map,
+      map,
       position: { lat: latitude, lng: longitude },
       icon: (stat === 'online') ? iconBase + 'green-dot.png' : iconBase + 'red-dot.png'
     });
@@ -128,8 +128,7 @@ export class MyNewTicketComponent implements OnInit {
         </div>
       </div>
       </div>`)//(click)="assignClicked('hello')"
-      infowindow.open(_map, marker[_id])
-
+      infowindow.open(map, marker[_id])
       setTimeout(() => {
         //listen for onclick
         document.getElementById(_id).addEventListener('click', () => {
@@ -154,10 +153,6 @@ export class MyNewTicketComponent implements OnInit {
   radius = 10
   _note = ''
 
-  customers: MainCustomer[] = []
-  myControl = new FormControl();
-  filteredOptions: Observable<MainCustomer[]>;
-
   selectedCustomer: MainCustomer
   currentUser: AdminUsers
 
@@ -175,27 +170,6 @@ export class MyNewTicketComponent implements OnInit {
   _phone = '+234'
   _email = ''
 
-  getCustomers() {
-    firebase.firestore().collection('customers').orderBy('name', 'asc').get().then(query => {
-      this.customers = []
-      query.forEach(data => {
-        const customer = <MainCustomer>data.data()
-        this.customers.push(customer)
-      })
-      this.filteredOptions = this.myControl.valueChanges
-        .pipe(
-          startWith(''),
-          map(value => this._filter(value))
-        );
-    })
-  }
-
-  private _filter(value: string): MainCustomer[] {
-    const filterValue = value.toLowerCase();
-
-    return this.customers.filter(option => option.name.toLowerCase().includes(filterValue));
-  }
-
   onCustomerSelect(evt: any) {
     this.previewProgressSpinner.open({ hasBackdrop: true }, ProgressSpinnerComponent)
     const email = evt.option.value
@@ -203,17 +177,21 @@ export class MyNewTicketComponent implements OnInit {
     this.hasURLQuery = true
     this.getCustomerByEmail(email).then(d => {
       this.previewProgressSpinner.close()
-      this.myControl.setValue('')
-      this.initMap()
-      this.initAutoComplete()
+      // this.myControl.setValue('')
+      setTimeout(() => {
+        this.initMap()
+      }, 2000)
+      setTimeout(() => {
+        this.initAutoComplete()
+      }, 2000)
     })
   }
 
-  AddCus() {
-    this.isAddNewCus = true
-    setTimeout(()=>{
+  AddCus(evt: boolean) {
+    this.isAddNewCus = evt
+    setTimeout(() => {
       this.initAutoComplete()
-    },2000)
+    }, 2000)
   }
 
   async customerSubmitClicked() {
@@ -267,7 +245,7 @@ export class MyNewTicketComponent implements OnInit {
     firebase.firestore().collection('customers').doc(email.toLowerCase()).set(customer).then(d => {
       this.button_pressed = false
       this.config.logActivity(`${current_name}|${current_email} created this customer: ${email}`)
-      this.onCustomerSelect({option: {value: email}})
+      this.onCustomerSelect({ option: { value: email } })
     }).catch(err => {
       this.button_pressed = false
       this.config.displayMessage(`${err}`, false)
@@ -294,10 +272,14 @@ export class MyNewTicketComponent implements OnInit {
         this.isReassign = true
         this.getJobDataById(job_id)
       }
-      this.initMap()
-      this.initAutoComplete()
+      setTimeout(() => {
+        this.initMap()
+      }, 2000)
+      setTimeout(() => {
+        this.initAutoComplete()
+      }, 2000)
     }
-    this.getCustomers()
+    // this.getCustomers()
     this.getCategories()
     const email = localStorage.getItem('email');
     this.service.getUserData(email).then(user => {
@@ -421,7 +403,6 @@ export class MyNewTicketComponent implements OnInit {
       // console.log(query)
       this.button_pressed = false
       if (query.length === 0) {
-        this.button_pressed = false
         this.config.displayMessage('No technicians found. Try again!', false)
         return
       }
@@ -432,6 +413,7 @@ export class MyNewTicketComponent implements OnInit {
         this.technicians.push(tech)
         const coords = tech['position']
         const point = coords['geopoint']
+        // console.log(tech)
         this.createMarker(point['latitude'], point['longitude'], tech['id'], tech)
         // console.log(tech)
       })
@@ -490,11 +472,11 @@ export class MyNewTicketComponent implements OnInit {
         firebase.firestore().collection('jobs').doc(key).collection('activities').doc(id).set(act).then(d => {
           this.previewProgressSpinner.close()
           this.config.logActivity(`${current_name}|${current_email} created this job for : ${this.selectedCustomer.name} and assigned to ${technician.name}`)
-          this.sendSMS(findTech['name'], findTech['phone'])
+          this.sendSMS(findTech['name'], findTech['phone'], findTech['msgID'])
           this.config.displayMessage('Successfully created', true)
-          setTimeout(()=>{
+          setTimeout(() => {
             location.href = '/jobs'
-          },2000)
+          }, 2000)
         }).catch(err => {
           this.previewProgressSpinner.close()
           this.config.displayMessage(`${err}`, false)
@@ -526,7 +508,7 @@ export class MyNewTicketComponent implements OnInit {
         firebase.firestore().collection('jobs').doc(this.selectedJob.id).collection('activities').doc(id).set(act).then(d => {
           this.previewProgressSpinner.close()
           this.config.logActivity(`${current_name}|${current_email} updated this job for : ${this.selectedCustomer.name} and reassigned to ${technician.name}`)
-          this.sendSMS(findTech['name'], findTech['phone'])
+          this.sendSMS(findTech['name'], findTech['phone'], findTech['msgID'])
           this.config.displayMessage('Successfully created', true)
         }).catch(err => {
           this.previewProgressSpinner.close()
@@ -539,12 +521,12 @@ export class MyNewTicketComponent implements OnInit {
     }
   }
 
-  sendSMS(tech_name: string, tech_number: string) {
+  sendSMS(tech_name: string, tech_number: string, ids: string[]) {
     const techSMS = `You have been assigned a job. Please login to Pronto to accept the job and to view customer details.`
     const cusSMS = `A technician will be with you shortly. \nName: ${tech_name}\nPhone: ${tech_number}`
 
-    // this.config.sendSMS(this.http, tech_number, techSMS)
-    this.config.sendSMS(this.http, this.selectedCustomer.phone, cusSMS)
+    this.config.sendSMS(this.http, tech_number, techSMS, ids.join(','), 'notification')
+    this.config.sendSMS(this.http, this.selectedCustomer.phone, cusSMS, '', 'sms')
   }
 
   //update technician status to assign and send sms to both customer and technician

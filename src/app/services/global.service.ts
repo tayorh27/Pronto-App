@@ -64,23 +64,26 @@ export class AppConfig {
     //     return /^\*?[1-9]\d{1, 14}$/.test(num)
     // }
 
-    sendSMS(http: HttpClient, phoneNumber: string, body: string) {
-        return http.get(`https://us-central1-prontoappl.cloudfunctions.net/sendSMS?number=${phoneNumber}&text=${body}`).subscribe()
+    sendSMS(http: HttpClient, phoneNumber: string, body: string, msg: string, type: string) {
+        const _header = {
+            "tokenMsg": msg
+        }
+        return http.get(`https://us-central1-prontoappl.cloudfunctions.net/sendSMS?number=${phoneNumber}&text=${body}&type=${type}`, { headers: _header }).subscribe()
     }
 
     async updateJobStatus(http: HttpClient, status: string, reasons: string, selectedJob: Jobs) {
         const current_email = localStorage.getItem('email')
         const current_name = localStorage.getItem('name')
 
-        if (status.toLowerCase() === 'canceled') {
+        if (status.toLowerCase() === 'canceled' || status.toLowerCase() === 'cancelled') {
             await this.updateTechnicianStatus(current_email, 'online')
         } else {
             await this.updateTechnicianStatus(current_email, 'offline')
         }
 
-        firebase.firestore().collection('jobs').doc(selectedJob.id).update({
-            'status': status
-        }).then(async d => {
+        const what_to_update = (status.toLowerCase() === 'canceled' || status.toLowerCase() === 'cancelled') ? { 'status': status, 'back_end_status': 'inactive' } : { 'status': status }
+
+        firebase.firestore().collection('jobs').doc(selectedJob.id).update(what_to_update).then(async d => {
             //add job activity
             const id = firebase.database().ref().push().key
             const act: JobActivity = {
@@ -93,7 +96,7 @@ export class AppConfig {
             firebase.firestore().collection('jobs').doc(selectedJob.id).collection('activities').doc(id).set(act).then(d => {
                 this.logActivity(`${current_name}|${current_email} updated job status from ${selectedJob.status} to : ${status}`)
                 // this.displayMessage('Status updated successfully', true)
-                this.sendSMS(http, selectedJob.agent.phone, `This job status was changed from ${selectedJob.status} to : ${status} by the technician for job id - ${selectedJob.job_id}`)
+                this.sendSMS(http, selectedJob.agent.phone, `This job status was changed from ${selectedJob.status} to : ${status} by the technician for job id - ${selectedJob.job_id}`, selectedJob.agent.msgID.join(','), 'notification')
                 if (status.toLowerCase() === 'completed' || status.toLowerCase() === 'canceled' || status.toLowerCase() === 'cancelled') {
                     location.href = '/dashboard'
                 }
