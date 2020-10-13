@@ -76,7 +76,7 @@ export const sendSMS = functions.https.onRequest(async (request, response) => {
         
     } else {
         const sms = _sendSMS(`+${phoneNumber}`, smsText)
-        _sendNotification(tokenMsg, smsText)
+        await _sendNotification(tokenMsg, smsText)
         if (sms !== undefined) {
             response.send(sms)
         }
@@ -116,7 +116,7 @@ function _sendSMS(phoneNumber: string, smsText: string) {
     return null
 }
 
-async function _sendNotification(token: string, smsText: string) {
+async function _sendNotification(_token: string, smsText: string) {
     const payload = {
         notification: {
             title: `Message from Pronto`,
@@ -124,7 +124,7 @@ async function _sendNotification(token: string, smsText: string) {
             click_action: ''
         }
     }
-    const ids = token.split(',')
+    const ids = _token.split(',')
     const res = await admin.messaging().sendToDevice(ids, payload)
     console.log(res.results)
     return JSON.stringify({"message":"sent"})
