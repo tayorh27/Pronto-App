@@ -57,14 +57,14 @@
                     <td class="text-right">
                       <!-- <a href="javascript:void(0)" class="btn btn-link btn-info btn-just-icon like"><i class="material-icons">favorite</i></a> -->
                       <a
-                        href="javascript:void(0)"
+                        href="javascript:void(0)" data-toggle="tooltip" title="edit" data-placement="bottom"
                         (click)="editCatClick(row[0])"
                         class="btn btn-link btn-warning btn-just-icon edit"
                         ><i class="material-icons">edit</i></a
                       >
                       <a
                         *ngIf="role === 'Administrator' || role === 'SubAdmin'"
-                        href="javascript:void(0)"
+                        href="javascript:void(0)" data-toggle="tooltip" title="delete" data-placement="bottom"
                         class="btn btn-link btn-danger btn-just-icon remove"
                         (click)="deleteCategory(row[0], row[1])"
                         ><i class="material-icons">close</i></a

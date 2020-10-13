@@ -72,11 +72,11 @@
                     <td>{{ row[6] }}</td>
                     <td>{{ row[7] }}</td>
                     <td class="text-right">
-                      <a href="javascript:void(0)" (click)="reassignJob(row)"
+                      <a href="javascript:void(0)" (click)="reassignJob(row)" data-toggle="tooltip" title="re-assign job" data-placement="bottom"
                         class="btn btn-link btn-warning btn-just-icon refresh"><i class="material-icons">refresh</i></a>
-                      <a href="javascript:void(0)" (click)="editJob(row)"
+                      <a href="javascript:void(0)" (click)="editJob(row)" data-toggle="tooltip" title="edit" data-placement="bottom"
                         class="btn btn-link btn-warning btn-just-icon edit"><i class="material-icons">edit</i></a>
-                      <a *ngIf="role === 'Administrator' || role === 'SubAdmin'" (click)="deleteJob(row)" href="javascript:void(0)"
+                      <a *ngIf="role === 'Administrator' || role === 'SubAdmin'" data-toggle="tooltip" title="delete" data-placement="bottom" (click)="deleteJob(row)" href="javascript:void(0)"
                         class="btn btn-link btn-danger btn-just-icon remove"><i class="material-icons">close</i></a>
                     </td>
                   </tr>

@@ -52,10 +52,10 @@
                     <td>{{ row[5] }}</td>
                     <td>{{ row[6] }}</td>
                     <td class="text-right">
-                      <a href="javascript:void(0)" (click)="editTechClick(row[0])"
+                      <a href="javascript:void(0)" (click)="editTechClick(row[0])" data-toggle="tooltip" title="edit" data-placement="bottom"
                         class="btn btn-link btn-warning btn-just-icon edit"><i class="material-icons">edit</i></a>
                       <a *ngIf="role === 'Administrator' || role === 'SubAdmin'" href="javascript:void(0)"
-                        (click)="deleteTechClick(row[0], row[4])"
+                        (click)="deleteTechClick(row[0], row[4])" data-toggle="tooltip" title="delete" data-placement="bottom"
                         class="btn btn-link btn-danger btn-just-icon remove"><i class="material-icons">close</i></a>
                     </td>
                   </tr>

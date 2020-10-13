@@ -37,11 +37,11 @@
                             <td>{{row[2]}}</td>
                             <td>{{row[3]}}</td>
                             <td class="td-actions text-right" *ngIf="row[2] != 'Administrator'">
-                              <button mat-raised-button type="button" class="btn btn-success {{row[4]}}"
+                              <button mat-raised-button type="button" data-toggle="tooltip" title="edit" data-placement="bottom" class="btn btn-success {{row[4]}}"
                                 (click)="editRole(row)">
                                 <i class="material-icons">edit</i>
                               </button>
-                              <button mat-raised-button type="button" class="btn btn-danger {{row[4]}}"
+                              <button mat-raised-button type="button" data-toggle="tooltip" title="delete" data-placement="bottom" class="btn btn-danger {{row[4]}}"
                                 (click)="deleteRole(row[1], row[2])">
                                 <i class="material-icons">close</i>
                               </button>
@@ -101,11 +101,11 @@
                             <td>{{row[6]}}</td>
                             <td class="text-right">{{row[8]}}</td>
                             <td class="td-actions text-right" *ngIf="row[6] != 'Administrator'">
-                              <button mat-raised-button type="button" class="btn btn-success {{row[9]}}"
+                              <button mat-raised-button type="button" class="btn btn-success {{row[9]}}" data-toggle="tooltip" title="edit" data-placement="bottom"
                                 (click)="editUser(row)">
                                 <i class="material-icons">edit</i>
                               </button>
-                              <button *ngIf="_role === 'Administrator'" mat-raised-button type="button" class="btn btn-danger {{row[9]}}"
+                              <button *ngIf="_role === 'Administrator'" mat-raised-button type="button" data-toggle="tooltip" title="delete" data-placement="bottom" class="btn btn-danger {{row[9]}}"
                                 (click)="deleteUser(row)">
                                 <i class="material-icons">close</i>
                               </button>
