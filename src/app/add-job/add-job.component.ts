@@ -87,6 +87,7 @@ export class AddJobComponent implements OnInit {
   }
 
   getJob() {
+    // console.log(this.cusEmail)
     var query:firebase.firestore.Query<firebase.firestore.DocumentData> = null
     if(this.cusEmail === ''){
       query = firebase.firestore().collection('jobs').orderBy('timestamp', 'desc')
