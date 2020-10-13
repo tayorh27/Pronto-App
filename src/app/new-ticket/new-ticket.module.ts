@@ -9,9 +9,16 @@ import { MaterialModule } from './../app.module'
 import { NewTicketRoutes } from './new-ticket.routing';
 import { AgmCoreModule } from '@agm/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { AddJobComponent } from "../add-job/add-job.component";
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { SearchCustomerComponent } from './search-customer/search-customer';
+import { TicketJobComponent } from './add-job/ticket-job.component';
+
+// @NgModule({
+//   exports: [
+//     AddJobModule
+//   ],
+// })
+
 
 @NgModule({
   imports: [
@@ -26,12 +33,17 @@ import { SearchCustomerComponent } from './search-customer/search-customer';
     AgmCoreModule.forRoot({
       apiKey: 'YOUR-API-KEY-HERE',
       libraries: ['places']
-    })
+    }),
   ],
   declarations: [
     MyNewTicketComponent,
-    AddJobComponent,
-    SearchCustomerComponent
+    // AddJobComponent,
+    SearchCustomerComponent,
+    TicketJobComponent
   ],
+  // exports: [
+  //   AddJobComponent
+  // ]
+
 })
 export class NewTicketModule { }
