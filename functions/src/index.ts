@@ -63,17 +63,17 @@ export const sendSMS = functions.https.onRequest(async (request, response) => {
         const sms = _sendSMS(`+${phoneNumber}`, smsText)
         if (sms !== undefined) {
             response.send(sms)
-        }else {
-            response.send(JSON.stringify({"message":"failed"}))
+        } else {
+            response.send(JSON.stringify({ "message": "failed" }))
         }
     } else if (type === 'notification') {
-        if(tokenMsg !== ''){
+        if (tokenMsg !== '') {
             const res = await _sendNotification(tokenMsg, smsText)
             response.send(res)
-        }else {
-            response.send(JSON.stringify({"message":"done"}))
+        } else {
+            response.send(JSON.stringify({ "message": "done" }))
         }
-        
+
     } else {
         const sms = _sendSMS(`+${phoneNumber}`, smsText)
         await _sendNotification(tokenMsg, smsText)
@@ -127,7 +127,7 @@ async function _sendNotification(_token: string, smsText: string) {
     const ids = _token.split(',')
     const res = await admin.messaging().sendToDevice(ids, payload)
     console.log(res.results)
-    return JSON.stringify({"message":"sent"})
+    return JSON.stringify({ "message": "sent" })
 }
 
 // function validE164(num: string) {
