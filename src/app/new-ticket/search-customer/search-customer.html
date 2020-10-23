@@ -1,0 +1,25 @@
+<div class="card">
+    <div class="card-header card-header-rose card-header-icon">
+        <div class="card-icon">
+            <i class="material-icons">search</i>
+        </div>
+        <h4 class="card-title">Search For Customer</h4>
+    </div>
+    <div class="card-body ">
+        <form method="#" action="#">
+            <mat-form-field class="example-full-width">
+                <input type="text" placeholder="Enter Customer Name" [formControl]="myControl" aria-label="Name"
+                    matInput [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onCustomerSelect($event)">
+                    <mat-option *ngFor="let cus of filteredOptions | async" [value]="cus.email">
+                        {{cus.name}}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+        </form>
+    </div>
+    <div class="card-footer ">
+        <button mat-raised-button type="submit" (click)="AddCus()" class="btn btn-fill btn-rose">Add New
+            Customer</button>
+    </div>
+</div>

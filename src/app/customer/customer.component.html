@@ -18,9 +18,9 @@
           </div>
           <div class="card-body">
             <div class="toolbar">
-              <!--        Here you can write extra buttons/actions for the toolbar              -->
+              <!--        *ngIf="dataTable"Here you can write extra buttons/actions for the toolbar              -->
             </div>
-            <div class="material-datatables">
+            <div class="material-datatables" >
               <table
                 id="datatables"
                 class="table table-striped table-no-bordered table-hover"
@@ -62,19 +62,20 @@
                     <td>{{ row[6] }}</td>
                     <td class="text-right">
                       <a
-                        href="javascript:void(0)"
+                        href="javascript:void(0)" data-toggle="tooltip" title="new ticket" data-placement="bottom"
                         (click)="ticketCusClick(row[4])"
                         class="btn btn-link btn-warning btn-just-icon create_new_folder"
                         ><i class="material-icons">create_new_folder</i></a
                       >
                       <a
-                        href="javascript:void(0)"
+                        href="javascript:void(0)" data-toggle="tooltip" title="edit" data-placement="bottom"
                         (click)="editCusClick(row[0])"
                         class="btn btn-link btn-warning btn-just-icon edit"
                         ><i class="material-icons">edit</i></a
                       >
                       <a
-                        href="javascript:void(0)"
+                        *ngIf="role === 'Administrator' || role === 'SubAdmin'"
+                        href="javascript:void(0)" data-toggle="tooltip" title="delete" data-placement="bottom"
                         (click)="deleteCusClick(row[0], row[4])"
                         class="btn btn-link btn-danger btn-just-icon remove"
                         ><i class="material-icons">close</i></a
@@ -163,7 +164,7 @@
               (click)="customerSubmitClicked()"
               [disabled]="button_pressed"
             >
-              {{button_pressed ? 'Please wait...' : 'Submit'}}
+              {{ button_pressed ? 'Please wait...' : 'Submit' }}
             </button>
             <button
               mat-raised-button
@@ -175,13 +176,17 @@
             </button>
           </div>
           <br />
-          <div style="display: none;">
+          <div style="display: none">
             <p id="madd"></p>
             <p id="mgeo"></p>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- <div>
+      <h2>Total rows: {{ totalRows }}</h2>
+    </div> -->
 
     <!-----FORM FIELDS-->
   </div>

@@ -42,6 +42,8 @@ export class SettingsComponent implements OnInit {
 
   button_pressed = false
 
+  _role = ''
+
   @ViewChild('role', { static: false }) private roleContainer: ElementRef;
   @ViewChild('user', { static: false }) private userContainer: ElementRef;
 
@@ -75,7 +77,7 @@ export class SettingsComponent implements OnInit {
   }
 
   getUsers() {
-    firebase.firestore().collection('users').where('user_type','==','admin').onSnapshot(query => {
+    firebase.firestore().collection('users').where('user_type', '==', 'admin').onSnapshot(query => {
       this.data2 = []
       var index = 0
       query.forEach(data => {
@@ -91,8 +93,16 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getRoles()
-    this.getUsers()
+    const email = localStorage.getItem('email')
+    this.services.getUserData(email).then(user => {
+      this._role = user.role
+      if (user.role === 'Administrator') {
+        this.getRoles()
+        this.getUsers()
+      } else {
+        this.getUsers()
+      }
+    })
   }
 
   selectedValue: string;
@@ -106,9 +116,12 @@ export class SettingsComponent implements OnInit {
   selectTheme = 'primary';
   levels = [
     { value: 'Customer', viewValue: 'Customer' },
-    { value: 'Category', viewValue: 'Category' },
+    { value: 'Skill-Sets', viewValue: 'Skill-Sets' },
     { value: 'Technician', viewValue: 'Technician' },
-    { value: 'New Ticket', viewValue: 'New Ticket' },
+    { value: 'New-Ticket', viewValue: 'New-Ticket' },
+    { value: 'Jobs', viewValue: 'Jobs' },
+    { value: 'App-Settings', viewValue: 'App-Settings' },
+    { value: 'Assigned-Jobs', viewValue: 'Assigned-Jobs' },
     { value: 'Logs', viewValue: 'Logs' }
   ];
 
@@ -146,9 +159,15 @@ export class SettingsComponent implements OnInit {
     const name = (<HTMLInputElement>document.getElementById("account_name")).value;
     const email = (<HTMLInputElement>document.getElementById("email")).value;
     const position = (<HTMLInputElement>document.getElementById("position")).value;
+    const phone = (<HTMLInputElement>document.getElementById("phone")).value;
+
     const ar = this.accountRole
-    if (name == '' || email == '' || position == '' || this.accountRole == '') {
+    if (name == '' || email == '' || position == '' || phone == '' || this.accountRole == '') {
       this.config.displayMessage("Please enter all fields", false)
+      return
+    }
+    if (!phone.startsWith('+234')) {
+      this.config.displayMessage('Please input correct address. Must start with +234', false)
       return
     }
     // if(email.search('@tac.ng') < 0){
@@ -168,6 +187,8 @@ export class SettingsComponent implements OnInit {
       image: './assets/img/default-avatar.png',
       name: name,
       user_position: position,
+      msgID: [],
+      phone: phone,
       role: this.accountRole,
       user_type: 'admin'
     }

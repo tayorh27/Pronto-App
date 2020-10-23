@@ -8,6 +8,7 @@ import 'datatables.net';
 import 'datatables.net-bs4';
 import { AppConfig } from '../services/global.service';
 import swal from 'sweetalert2';
+import { AdminUsersService } from '../services/admin-users.service';
 
 
 // declare const $: any;
@@ -41,6 +42,9 @@ export class MyCategoryComponent implements OnInit {
   modal_geo = ''
   button_pressed = false
 
+  service = new AdminUsersService();
+  role = ''
+
   constructor() { }
 
   getCategories() {
@@ -62,9 +66,28 @@ export class MyCategoryComponent implements OnInit {
       };
     });
   }
+  totalCategory(){
+    
+  }
+  // get totalRows(): number {
+  //   return this.getCategories.length;
+  // }
+  // totalRows() {
+  //   for (let index = 0; index < this.data.length; index++) {
+  //     if (index > 0) {
+  //       return index
+  //     }
+  //     else { return 0 }
+  //   }
+  // }
+
 
   ngOnInit() {
-    this.getCategories()
+    const email = localStorage.getItem('email');
+    this.service.getUserData(email).then(user => {
+      this.role = user.role
+      this.getCategories()
+    })
   }
 
   addCat() {
@@ -76,6 +99,7 @@ export class MyCategoryComponent implements OnInit {
     this.addNewCat = false
     this.editCat = false
     this.button_pressed = false
+    this._name = ''
   }
 
   _name = ''
@@ -93,7 +117,7 @@ export class MyCategoryComponent implements OnInit {
   deleteCategory(id: string, name: string) {
     swal({
       title: 'Delete Alert',
-      text: 'Are you sure about deleting this category?',
+      text: 'Are you sure about deleting this skill-set?',
       type: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, delete it!',
@@ -106,7 +130,7 @@ export class MyCategoryComponent implements OnInit {
         firebase.firestore().collection('categories').doc(id).delete().then(del => {
           const current_email = localStorage.getItem('email')
           const current_name = localStorage.getItem('name')
-          this.config.logActivity(`${current_name}|${current_email} deleted this category: ${name}`)
+          this.config.logActivity(`${current_name}|${current_email} deleted this skill-set: ${name}`)
           this.config.displayMessage("Successfully deleted", true);
         }).catch(err => {
           this.config.displayMessage(`${err}`, false);
@@ -147,13 +171,14 @@ export class MyCategoryComponent implements OnInit {
       const category: MainCategory = {
         id: key,
         name: name,
+        created_by: `${current_name}|${current_email}`,
         created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
         modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       }
 
       firebase.firestore().collection('categories').doc(key).set(category).then(d => {
-        this.config.logActivity(`${current_name}|${current_email} created this category: ${name}`)
+        this.config.logActivity(`${current_name}|${current_email} created this skill-set: ${name}`)
         this.cancelAddCat()
         this.config.displayMessage('Successfully created', true)
       }).catch(err => {
@@ -170,7 +195,7 @@ export class MyCategoryComponent implements OnInit {
       }
 
       firebase.firestore().collection('categories').doc(this.selectedCategory.id).update(category).then(d => {
-        this.config.logActivity(`${current_name}|${current_email} updated this category: ${name}`)
+        this.config.logActivity(`${current_name}|${current_email} updated this skill-set: ${name}`)
         this.cancelAddCat()
         this.config.displayMessage('Successfully updated', true)
       }).catch(err => {

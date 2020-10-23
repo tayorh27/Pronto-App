@@ -17,7 +17,7 @@ export interface RouteInfo {
     title: string;
     type: string;
     icontype: string;
-    access: boolean;
+    access?: boolean;
     collapse?: string;
     children?: ChildrenItems[];
 }
@@ -46,24 +46,42 @@ export const ROUTES: RouteInfo[] = [{
 },
 {
     path: '/customer',
-    title: 'Customer',
+    title: 'Pronto Customer',
     type: 'link',
     icontype: 'people',
     access: false
 },
 {
     path: '/category',
-    title: 'Category',
+    title: 'Skill-Sets',
     type: 'link',
     icontype: 'link',
     access: false
 },
 {
     path: '/technician',
-    title: 'Technician',
+    title: 'Pronto Technician',
+    type: 'link',
+    icontype: 'handyman',
+    access: false
+},
+{
+    path: '/jobs',
+    title: 'Jobs',
     type: 'link',
     icontype: 'work',
     access: false
+},
+{
+    path: '/app-settings',
+    title: 'App Settings',
+    type: 'sub',
+    icontype: 'settings',
+    access: false,
+    collapse: 'appsettings',
+    children: [
+        { path: 'status', title: 'Status', ab: 'S' },
+    ]
 },
 {
     path: '/logs',
@@ -72,95 +90,105 @@ export const ROUTES: RouteInfo[] = [{
     icontype: 'apps',
     access: false
 },
-// {
-//     path: '/components',
-//     title: 'Components',
-//     type: 'sub',
-//     icontype: 'apps',
-//     access: false,
-//     collapse: 'components',
-//     children: [
-//         { path: 'buttons', title: 'Buttons', ab: 'B' },
-//         { path: 'grid', title: 'Grid System', ab: 'GS' },
-//         { path: 'panels', title: 'Panels', ab: 'P' },
-//         { path: 'sweet-alert', title: 'Sweet Alert', ab: 'SA' },
-//         { path: 'notifications', title: 'Notifications', ab: 'N' },
-//         { path: 'icons', title: 'Icons', ab: 'I' },
-//         { path: 'typography', title: 'Typography', ab: 'T' }
-//     ]
-// }, {
-//     path: '/forms',
-//     title: 'Forms',
-//     type: 'sub',
-//     icontype: 'content_paste',
-//     collapse: 'forms',
-//     access: false,
-//     children: [
-//         { path: 'regular', title: 'Regular Forms', ab: 'RF' },
-//         { path: 'extended', title: 'Extended Forms', ab: 'EF' },
-//         { path: 'validation', title: 'Validation Forms', ab: 'VF' },
-//         { path: 'wizard', title: 'Wizard', ab: 'W' }
-//     ]
-// }, {
-//     path: '/tables',
-//     title: 'Tables',
-//     type: 'sub',
-//     icontype: 'grid_on',
-//     collapse: 'tables',
-//     children: [
-//         { path: 'regular', title: 'Regular Tables', ab: 'RT' },
-//         { path: 'extended', title: 'Extended Tables', ab: 'ET' },
-//         { path: 'datatables.net', title: 'Datatables.net', ab: 'DT' }
-//     ],
-//     access: false
-// }, {
-//     path: '/maps',
-//     title: 'Maps',
-//     type: 'sub',
-//     icontype: 'place',
-//     collapse: 'maps',
-//     children: [
-//         { path: 'google', title: 'Google Maps', ab: 'GM' },
-//         { path: 'fullscreen', title: 'Full Screen Map', ab: 'FSM' },
-//         { path: 'vector', title: 'Vector Map', ab: 'VM' }
-//     ],
-//     access: false
-// }, {
-//     path: '/widgets',
-//     title: 'Widgets',
-//     type: 'link',
-//     icontype: 'widgets',
-//     access: false
+{
+    path: '/assigned-jobs',
+    title: 'Assigned Jobs',
+    type: 'link',
+    icontype: 'work',
+    access: false
+},
+    // {
+    //     path: '/components',
+    //     title: 'Components',
+    //     type: 'sub',
+    //     icontype: 'apps',
+    //     access: false,
+    //     collapse: 'components',
+    //     children: [
+    //         { path: 'buttons', title: 'Buttons', ab: 'B' },
+    //         { path: 'grid', title: 'Grid System', ab: 'GS' },
+    //         { path: 'panels', title: 'Panels', ab: 'P' },
+    //         { path: 'sweet-alert', title: 'Sweet Alert', ab: 'SA' },
+    //         { path: 'notifications', title: 'Notifications', ab: 'N' },
+    //         { path: 'icons', title: 'Icons', ab: 'I' },
+    //         { path: 'typography', title: 'Typography', ab: 'T' }
+    //     ]
+    // }, 
+    // {
+    //     path: '/forms',
+    //     title: 'Forms',
+    //     type: 'sub',
+    //     icontype: 'content_paste',
+    //     collapse: 'forms',
+    //     access: false,
+    //     children: [
+    //         { path: 'regular', title: 'Regular Forms', ab: 'RF' },
+    //         { path: 'extended', title: 'Extended Forms', ab: 'EF' },
+    //         { path: 'validation', title: 'Validation Forms', ab: 'VF' },
+    //         { path: 'wizard', title: 'Wizard', ab: 'W' }
+    //     ]
+    // }, 
+    //{
+    //     path: '/tables',
+    //     title: 'Tables',
+    //     type: 'sub',
+    //     icontype: 'grid_on',
+    //     collapse: 'tables',
+    //     children: [
+    //         { path: 'regular', title: 'Regular Tables', ab: 'RT' },
+    //         { path: 'extended', title: 'Extended Tables', ab: 'ET' },
+    //         { path: 'datatables.net', title: 'Datatables.net', ab: 'DT' }
+    //     ],
+    //     access: false
+    // }, {
+    //     path: '/maps',
+    //     title: 'Maps',
+    //     type: 'sub',
+    //     icontype: 'place',
+    //     collapse: 'maps',
+    //     children: [
+    //         { path: 'google', title: 'Google Maps', ab: 'GM' },
+    //         { path: 'fullscreen', title: 'Full Screen Map', ab: 'FSM' },
+    //         { path: 'vector', title: 'Vector Map', ab: 'VM' }
+    //     ],
+    //     access: false
+    // }, 
+    // {
+    //     path: '/widgets',
+    //     title: 'Widgets',
+    //     type: 'link',
+    //     icontype: 'widgets'
 
-// }, {
-//     path: '/charts',
-//     title: 'Charts',
-//     type: 'link',
-//     icontype: 'timeline',
-//     access: false
+    // },
+    //  {
+    //     path: '/charts',
+    //     title: 'Charts',
+    //     type: 'link',
+    //     icontype: 'timeline',
+    //     access: false
 
-// }, {
-//     path: '/calendar',
-//     title: 'Calendar',
-//     type: 'link',
-//     icontype: 'date_range',
-//     access: false
-// }, {
-//     path: '/pages',
-//     title: 'Pages',
-//     type: 'sub',
-//     icontype: 'image',
-//     collapse: 'pages',
-//     children: [
-//         { path: 'pricing', title: 'Pricing', ab: 'P' },
-//         { path: 'timeline', title: 'Timeline Page', ab: 'TP' },
-//         { path: 'login', title: 'Login Page', ab: 'LP' },
-//         { path: 'register', title: 'Register Page', ab: 'RP' },
-//         { path: 'lock', title: 'Lock Screen Page', ab: 'LSP' },
-//         { path: 'user', title: 'User Page', ab: 'UP' }
-//     ],
-//     access: false
-// }
+    // }, {
+    //     path: '/calendar',
+    //     title: 'Calendar',
+    //     type: 'link',
+    //     icontype: 'date_range',
+    //     access: false
+    // }, {
+    //     path: '/pages',
+    //     title: 'Pages',
+    //     type: 'sub',
+    //     icontype: 'image',
+    //     collapse: 'pages',
+    //     children: [
+    //         { path: 'pricing', title: 'Pricing', ab: 'P' },
+    //         { path: 'timeline', title: 'Timeline Page', ab: 'TP' },
+    //         { path: 'login', title: 'Login Page', ab: 'LP' },
+    //         { path: 'register', title: 'Register Page', ab: 'RP' },
+    //         { path: 'lock', title: 'Lock Screen Page', ab: 'LSP' },
+    //         { path: 'user', title: 'User Page', ab: 'UP' }
+    //     ],
+    //     access: false
+    // }
 ];
 
 @Component({
@@ -190,8 +218,10 @@ export class SidebarComponent implements OnInit {
     getProfile() {
         const email = localStorage.getItem('email');
         this.service.getUserData(email).then(async p => {
+            this.user = p
             if (p == null) {
                 this.service.getUserData(email).then(async q => {
+                    this.user = q
                     this.name = q.name;
                     this.image = q.image;
                     this.role = q.role;
@@ -234,7 +264,7 @@ export class SidebarComponent implements OnInit {
                     this.menuItems.push(menuItem);
                 } else {
                     //console.log(`Access to ${menuItem.title} is ${this.service.isAllowedAccess(this.access_level, menuItem.title)}`)
-                    menuItem.access = this.service.isAllowedAccess(this.access_level.toLowerCase(), menuItem.title.toLowerCase());
+                    menuItem.access = this.service.isAllowedAccess(this.access_level.toLowerCase(), menuItem.title.replace(' ','-').toLowerCase());
                     this.menuItems.push(menuItem);
                 }
             }
@@ -298,10 +328,20 @@ export class SidebarComponent implements OnInit {
     }
 
     gotoLink(menu_path, child_path) {
+        // this.router.navigate([`${menu_path}/${child_path}`])
         if (this.role == 'Administrator') {
             this.router.navigate([`${menu_path}/${child_path}`])
         } else {
-            location.href = `${menu_path}/${child_path}`
+            location.href = `/${menu_path}/${child_path}`
+        }
+    }
+
+    gotoSingleLink(menu_path:string) {
+        // this.router.navigate([`${menu_path}`])
+        if (this.user.user_type == 'admin') {
+            this.router.navigate([`${menu_path}`])
+        } else {
+            location.href = `${menu_path}`
         }
     }
 }

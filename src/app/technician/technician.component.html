@@ -8,26 +8,17 @@
               <i class="material-icons">assignment</i>
             </div>
             <h4 class="card-title">My Technician</h4>
-            <button
-              mat-raised-button
-              class="btn btn-primary"
-              (click)="addTech()"
-            >
+            <button mat-raised-button class="btn btn-primary" (click)="addTech()">
               Add New Technician
             </button>
           </div>
           <div class="card-body">
             <div class="toolbar">
-              <!--        Here you can write extra buttons/actions for the toolbar              -->
+              <!--       *ngIf="dataTable" Here you can write extra buttons/actions for the toolbar              -->
             </div>
             <div class="material-datatables">
-              <table
-                id="datatables"
-                class="table table-striped table-no-bordered table-hover"
-                cellspacing="0"
-                width="100%"
-                style="width: 100%"
-              >
+              <table id="datatables" class="table table-striped table-no-bordered table-hover" cellspacing="0"
+                width="100%" style="width: 100%">
                 <thead>
                   <tr>
                     <th>{{ dataTable.headerRow[0] }}</th>
@@ -61,18 +52,11 @@
                     <td>{{ row[5] }}</td>
                     <td>{{ row[6] }}</td>
                     <td class="text-right">
-                      <a
-                        href="javascript:void(0)"
-                        (click)="editTechClick(row[0])"
-                        class="btn btn-link btn-warning btn-just-icon edit"
-                        ><i class="material-icons">edit</i></a
-                      >
-                      <a
-                        href="javascript:void(0)"
-                        (click)="deleteTechClick(row[0], row[4])"
-                        class="btn btn-link btn-danger btn-just-icon remove"
-                        ><i class="material-icons">close</i></a
-                      >
+                      <a href="javascript:void(0)" (click)="editTechClick(row[0])" data-toggle="tooltip" title="edit" data-placement="bottom"
+                        class="btn btn-link btn-warning btn-just-icon edit"><i class="material-icons">edit</i></a>
+                      <a *ngIf="role === 'Administrator' || role === 'SubAdmin'" href="javascript:void(0)"
+                        (click)="deleteTechClick(row[0], row[4])" data-toggle="tooltip" title="delete" data-placement="bottom"
+                        class="btn btn-link btn-danger btn-just-icon remove"><i class="material-icons">close</i></a>
                     </td>
                   </tr>
                 </tbody>
@@ -95,65 +79,55 @@
             <div class="card-icon">
               <i class="material-icons">mail_outline</i>
             </div>
-            <h4 class="card-title">New Technician</h4>
+            <h4 class="card-title">New Proto Technician</h4>
           </div>
           <div class="card-body">
             <form method="#" action="#">
+              <legend>Technician Profile Picture *</legend>
+              <div class="fileinput fileinput-new text-center" data-provides="fileinput">
+                <div class="fileinput-new thumbnail">
+                  <img src="{{_image}}" alt="..." id="myImage">
+                </div>
+                <div class="fileinput-preview fileinput-exists thumbnail"></div>
+                <div>
+                  <span class="btn btn-rose btn-round btn-file">
+                    <span class="fileinput-new">Select image</span>
+                    <span class="fileinput-exists">Change</span>
+                    <input type="file" name="..." id="pro_images" />
+                  </span>
+                  <a href="" class="btn btn-danger btn-round fileinput-exists" data-dismiss="fileinput"><i
+                      class="fa fa-times"></i> Remove</a>
+                </div>
+              </div>
               <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  [(ngModel)]="_name"
-                  placeholder="Name"
-                  name="mMame"
-                  type="text"
-                  class="form-control"
-                  id="tech_name"
-                />
+                <input matInput [(ngModel)]="_name" placeholder="Name" name="mMame" type="text" class="form-control"
+                  id="tech_name" />
               </mat-form-field>
 
               <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  placeholder=" Address"
-                  type="address"
-                  [(ngModel)]="_addr"
-                  class="form-control"
-                  name="mAddr"
-                  id="tech_addr"
-                />
+                <input matInput placeholder=" Address" type="address" [(ngModel)]="_addr" class="form-control"
+                  name="mAddr" id="tech_addr" />
               </mat-form-field>
 
               <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  placeholder="Phone Number"
-                  [(ngModel)]="_phone"
-                  name="mPhone"
-                  type="tel"
-                  class="form-control"
-                  id="tech_phone"
-                />
+                <input matInput placeholder="Phone Number" [(ngModel)]="_phone" name="mPhone" type="tel"
+                  class="form-control" id="tech_phone" />
               </mat-form-field>
 
               <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  [(ngModel)]="_email"
-                  name="memail"
-                  placeholder="Email"
-                  type="email"
-                  class="form-control"
-                  id="tech_email"
-                />
+                <input matInput [(ngModel)]="_email" name="memail" placeholder="Email" type="email" class="form-control"
+                  id="tech_email" />
               </mat-form-field>
 
-              <mat-form-field>
-                <mat-select
-                  placeholder="Blocked"
-                  [(ngModel)]="user_blocked"
-                  name="_blocked"
-                  id="tech_block"
-                >
+              <mat-form-field class="example-full-width" *ngIf="role === 'Administrator'">
+                <mat-select placeholder="Blocked" [(ngModel)]="user_blocked" name="_blocked" id="tech_block">
+                  <mat-option value="no">No</mat-option>
+                  <mat-option value="yes">Yes</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field class="example-full-width" *ngIf="role === 'Administrator'">
+                <mat-select placeholder="Verified" [(ngModel)]="user_verified" name="_ver" id="tech_ver">
                   <mat-option value="no">No</mat-option>
                   <mat-option value="yes">Yes</mat-option>
                 </mat-select>
@@ -162,18 +136,9 @@
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12">
                   <mat-form-field>
-                    <mat-select
-                      multiple
-                      placeholder="Category"
-                      [(ngModel)]="_cat"
-                      name="plumber"
-                      ariaLabel="Techies[0]"
-                      id="tech_cat"
-                    >
-                      <mat-option
-                        *ngFor="let tech of categories"
-                        [value]="tech.id"
-                      >
+                    <mat-select multiple placeholder="Category" [(ngModel)]="_cat" name="plumber" ariaLabel="Techies[0]"
+                      id="tech_cat">
+                      <mat-option *ngFor="let tech of categories" [value]="tech.id">
                         {{ tech.name }}
                       </mat-option>
                     </mat-select>
@@ -183,26 +148,16 @@
             </form>
           </div>
           <div class="card-footer">
-            <button
-              mat-raised-button
-              type="submit"
-              class="btn btn-fill btn-rose btn-block"
-              (click)="technicianSubmitClicked()"
-              [disabled]="button_pressed"
-            >
-            {{button_pressed ? 'Please wait...' : 'Submit'}}
+            <button mat-raised-button type="submit" class="btn btn-fill btn-rose btn-block"
+              (click)="technicianSubmitClicked()" [disabled]="button_pressed">
+              {{ button_pressed ? 'Please wait...' : 'Submit' }}
             </button>
-            <button
-              mat-raised-button
-              type="submit"
-              class="btn btn-fill btn-block btn-danger"
-              (click)="cancelAddTech()"
-            >
+            <button mat-raised-button type="submit" class="btn btn-fill btn-block btn-danger" (click)="cancelAddTech()">
               Cancel
             </button>
           </div>
           <br />
-          <div style="display: none;">
+          <div style="display: none">
             <p id="madd"></p>
             <p id="mgeo"></p>
           </div>

@@ -7,10 +7,12 @@ export interface AdminUsers {
     role?: string
     access_levels?: string
     blocked: boolean
+    verified?:boolean
+    msgID?:string[]
 
     user_type?: string//admin | technician
     address?: string
-    position?:any
+    position?: any
     phone?: string
     category?: string[]
     status?: string

@@ -1,0 +1,218 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="togglebutton" *ngIf="!selectedJob">
+      <legend>Your Status</legend>
+      <label>
+        <input type="checkbox" checked="" (change)="toggleStatus()" [(ngModel)]="techStatus">
+        <span class="toggle"></span>
+        GO {{!techStatus ? 'ONLINE' : 'OFFLINE'}}
+      </label>
+      <p>No jobs available at the moment.</p>
+    </div>
+    <div class="row" *ngIf="selectedJob">
+      <div class="col-md-4">
+        <!-- only pending jobs -->
+        <div class="card" *ngIf="selectedJob.status === 'Pending'">
+          <div class="card-header card-header-primary card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">assignment</i>
+            </div>
+            <h4 class="card-title">Your attention is needed here!</h4>
+          </div>
+          <div class="card-body">
+            <div *ngIf="!cancelPending">
+              <br>
+              <p>You have been assigned a Job from Pronto, please accept/reject this request.</p>
+            </div>
+            <div class="form-group mx-sm-3 mb-2" *ngIf="cancelPending">
+              <mat-form-field class="example-full-width">
+                <textarea matInput placeholder="Enter Reasons For Cancelation" [(ngModel)]="_note" name="nt"
+                  class="form-control" id="idnt"></textarea>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button mat-raised-button type="button" class="btn btn-round btn-danger" (click)="cancelPendingJob()">
+              {{!cancelPending ? 'Reject' : 'Cancel'}}
+            </button>
+            <button *ngIf="!cancelPending" mat-raised-button type="button" class="btn btn-round btn-success"
+              (click)="acceptPendingJob()">
+              Accept
+            </button>
+            <button *ngIf="cancelPending" mat-raised-button type="button" class="btn btn-round btn-primary"
+              (click)="submitCancelJob()">
+              Submit
+            </button>
+          </div>
+        </div>
+
+        <div class="card" *ngIf="selectedJob.status === 'Assigned'">
+          <div class="card-header card-header-primary card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">assignment</i>
+            </div>
+            <h4 class="card-title">Job Assigned</h4>
+          </div>
+          <div class="card-body">
+            <div *ngIf="!cancelAssigned">
+              <br>
+              <p>Please click on the "Start Button" below when you are about to start the job.</p>
+            </div>
+            <div class="form-group mx-sm-3 mb-2" *ngIf="cancelAssigned">
+              <mat-form-field class="example-full-width">
+                <textarea matInput placeholder="Enter Reasons For Cancelation" [(ngModel)]="_note" name="nt"
+                  class="form-control" id="idnt"></textarea>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button mat-raised-button type="button" class="btn btn-round btn-danger" (click)="cancelAssignedJob()">
+              {{!cancelAssigned ? 'Cancel Job' : 'Cancel'}}
+            </button>
+            <button *ngIf="!cancelAssigned" mat-raised-button type="button" class="btn btn-round btn-success"
+              (click)="acceptAssignedJob()">
+              Start Job
+            </button>
+            <button *ngIf="cancelAssigned" mat-raised-button type="button" class="btn btn-round btn-primary"
+              (click)="submitCancelJob()">
+              Submit
+            </button>
+          </div>
+        </div>
+
+        <div class="card" *ngIf="selectedJob.status === 'In-Progress' || selectedJob.status === 'Pending Approval'">
+          <div class="card-header card-header-primary card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">assignment</i>
+            </div>
+            <h4 class="card-title"></h4>
+          </div>
+          <div class="card-body">
+            <div *ngIf="!cancelProgress">
+              <br>
+              <p>Please click on the "Finish Job Button" below when you are done with the job.</p>
+            </div>
+            <div class="form-group mx-sm-3 mb-2" *ngIf="cancelProgress">
+              <mat-form-field class="example-full-width">
+                <textarea matInput placeholder="Enter Reasons For Cancelation" [(ngModel)]="_note" name="nt"
+                  class="form-control" id="idnt"></textarea>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button mat-raised-button type="button" class="btn btn-round btn-danger" (click)="cancelProgressJob()">
+              {{!cancelProgress ? 'Cancel Job' : 'Cancel'}}
+            </button>
+            <button *ngIf="!cancelProgress" mat-raised-button type="button" class="btn btn-round btn-success"
+              (click)="completeJob()">
+              Finish Job
+            </button>
+            <button *ngIf="cancelProgress" mat-raised-button type="button" class="btn btn-round btn-primary"
+              (click)="submitCancelJob()">
+              Submit
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+
+
+      <div class="col-md-8">
+        <ul class="timeline timeline-simple">
+          <li class="timeline-inverted">
+            <div class="timeline-badge info">
+              <i class="material-icons">work</i>
+            </div>
+            <div class="timeline-panel">
+              <div class="timeline-heading">
+                <span class="badge badge-info">JOB REQUEST</span>
+              </div>
+              <div class="timeline-body">
+                <p>
+                  Comment: <br /><strong>{{ selectedJob.note }}</strong>
+                </p>
+                <br />
+                <p id="stat" [ngStyle]="{'color': getStatusColorByName(selectedJob.status)}">
+                  Status: <br /><strong>{{ selectedJob.status }}</strong>
+                </p>
+                <br />
+                <p>Request:</p>
+                <div [innerHTML]="displayHTMLCategories(selectedJob.category)"></div>
+              </div>
+            </div>
+          </li>
+          <!-- <li class="timeline-inverted">
+            <div class="timeline-badge success">
+              <i class="material-icons">handyman</i>
+            </div>
+            <div class="timeline-panel">
+              <div class="timeline-heading">
+                <span class="badge badge-success">TECHNICIAN INFO</span>
+              </div>
+              <div class="timeline-body">
+                <div class="col-md-4">
+                  <div class="card card-profile">
+                    <div class="card-avatar">
+                      <a href="javascript:void(0)">
+                        <img class="img" src="assets/img/default-avatar.png" />
+                      </a>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="card-category text-gray">
+                        {{ selectedJob.assigned_to.email }}
+                      </h6>
+                      <h4 class="card-title">
+                        {{ selectedJob.assigned_to.phone }}
+                      </h4>
+                      <p class="card-description">
+                        {{ selectedJob.assigned_to.address }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h6>
+                <i class="ti-time"></i> {{ selectedJob.assigned_to.name }} -
+                {{ selectedJob.assigned_to.status }}
+              </h6>
+            </div>
+          </li> -->
+          <li class="timeline-inverted" *ngIf="selectedJob.status === 'Assigned' || selectedJob.status === 'In-Progress' || selectedJob.status === 'Pending Approval'">
+            <div class="timeline-badge danger">
+              <i class="material-icons">people</i>
+            </div>
+            <div class="timeline-panel">
+              <div class="timeline-heading">
+                <span class="badge badge-danger">CUSTOMER INFO</span>
+              </div>
+              <div class="timeline-body">
+                <div class="col-md-6">
+                  <div class="card card-profile">
+                    <div class="card-avatar">
+                      <a href="javascript:void(0)">
+                        <img class="img" src="assets/img/default-avatar.png" />
+                      </a>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="card-category text-gray">
+                        {{ selectedJob.customer.email }}
+                      </h6>
+                      <h4 class="card-title">
+                        {{ selectedJob.customer.phone }}
+                      </h4>
+                      <p class="card-description">
+                        {{ selectedJob.customer.address }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h6><i class="ti-time"></i> {{ selectedJob.customer.name }}</h6>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 export class EmailBody {
 
-    getStatusEmailBody(order_id:string, name:string, status:string, note:string, product_image:string){
+    getStatusEmailBody(order_id: string, name: string, status: string, note: string, product_image: string) {
         //https://firebasestorage.googleapis.com/v0/b/taconlinegiftshop.appspot.com/o/promo%20images%2F_MG_2295e.jpg?alt=media&token=0007eca1-a469-47ce-b0ef-9deab2e19266
         /**
          * <tr>
@@ -120,7 +120,7 @@ export class EmailBody {
         `
     }
 
-    getInvoiceBody(date: string, billing_name: string, currency_total_amount: string, trans_id: string, shipping_details: string, currency_shipping_fee: string, currency_tax_fee: string, cart_items: string, track_id:string): string {
+    getInvoiceBody(date: string, billing_name: string, currency_total_amount: string, trans_id: string, shipping_details: string, currency_shipping_fee: string, currency_tax_fee: string, cart_items: string, track_id: string): string {
         return `
         <table id="getbody" cellpadding="0" cellspacing="0" border="0" height="100%" width="100%" bgcolor="#eeeeee"
     style="border-collapse:collapse">

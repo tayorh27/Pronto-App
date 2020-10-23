@@ -1,7 +1,8 @@
+import { DataService } from './../services/data.services';
 import { MainCustomer } from './../model/customer';
-import { Component, OnInit, AfterViewInit, OnDestroy, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input } from '@angular/core';
 import * as firebase from 'firebase/app';
-import * as geofirex from 'geofirex'; 
+import * as geofirex from 'geofirex';
 import 'firebase/firestore';
 import 'firebase/database';
 import * as $ from 'jquery';
@@ -9,6 +10,7 @@ import 'datatables.net';
 import 'datatables.net-bs4';
 import { AppConfig } from '../services/global.service';
 import swal from 'sweetalert2';
+import { AdminUsersService } from '../services/admin-users.service';
 
 
 // declare const $: any;
@@ -40,6 +42,9 @@ export class MyCustomerComponent implements OnInit {
   config = new AppConfig()
 
   button_pressed = false
+
+  service = new AdminUsersService();
+  role = ''
 
   initAutoComplete() {
 
@@ -75,7 +80,7 @@ export class MyCustomerComponent implements OnInit {
     });
   }
 
-  constructor() { }
+
 
   getCustomers() {
     firebase.firestore().collection('customers').orderBy('timestamp', 'desc').onSnapshot(query => {
@@ -99,8 +104,34 @@ export class MyCustomerComponent implements OnInit {
     });
   }
 
+
+  // getCustomers() {
+  //   // firebase.firestore().collection('customers').onSnapshot(snap => {
+  //   //   // res.status(200).send({length: snap.size});
+  //   //   console.log(snap.size);
+
+  //   // });
+  //   firebase.firestore().collection('customers').get().then(snap => {
+  //     console.log(snap.size, 'collection size')
+  //   });
+  // }
+
+  //   firebase.firestore.collection('...').get().then(snap => {
+  //     res.status(200).send({length: snap.size});
+  // });
+
+  // constructor(private datas: DataService) { }
+  // get totalRows(): number {
+  //   return this.getCustomers.length;
+  // }
+
   ngOnInit() {
-    this.getCustomers()
+    const email = localStorage.getItem('email');
+    this.service.getUserData(email).then(user => {
+      this.role = user.role
+      this.getCustomers()
+    })
+    // this.datas.setMessage(this.totalRows)
   }
 
   addCus() {
@@ -115,45 +146,49 @@ export class MyCustomerComponent implements OnInit {
     this.addNewCus = false
     this.editCus = false
     this.button_pressed = false
+    this._name = ''
+    this._addr = ''
+    this._phone = '+234'
+    this._email = ''
   }
 
   _name = ''
   _addr = ''
-  _phone = ''
+  _phone = '+234'
   _email = ''
 
-  deleteCusClick(id: string, email:string) {
+  deleteCusClick(id: string, email: string) {
     swal({
-        title: 'Delete Alert',
-        text: 'Are you sure about deleting this customer?',
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, keep it',
-        confirmButtonClass: "btn btn-success",
-        cancelButtonClass: "btn btn-danger",
-        buttonsStyling: false
+      title: 'Delete Alert',
+      text: 'Are you sure about deleting this customer?',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it',
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
     }).then((result) => {
-        if (result.value) {
-            firebase.firestore().collection('customers').doc(id).delete().then(del => {
-                const current_email = localStorage.getItem('email')
-                const current_name = localStorage.getItem('name')
-                this.config.logActivity(`${current_name}|${current_email} deleted this customer: ${email}`)
-                this.config.displayMessage("Successfully deleted", true);
-            }).catch(err => {
-                this.config.displayMessage(`${err}`, false);
-            })
-        } else {
-            swal({
-                title: 'Cancelled',
-                text: 'Deletion not successful',
-                type: 'error',
-                confirmButtonClass: "btn btn-info",
-                buttonsStyling: false
-            }).catch(swal.noop)
-        }
+      if (result.value) {
+        firebase.firestore().collection('customers').doc(id).delete().then(del => {
+          const current_email = localStorage.getItem('email')
+          const current_name = localStorage.getItem('name')
+          this.config.logActivity(`${current_name}|${current_email} deleted this customer: ${email}`)
+          this.config.displayMessage("Successfully deleted", true);
+        }).catch(err => {
+          this.config.displayMessage(`${err}`, false);
+        })
+      } else {
+        swal({
+          title: 'Cancelled',
+          text: 'Deletion not successful',
+          type: 'error',
+          confirmButtonClass: "btn btn-info",
+          buttonsStyling: false
+        }).catch(swal.noop)
+      }
     })
-}
+  }
 
   editCusClick(cus: any) {
     this.editCus = true
@@ -173,7 +208,7 @@ export class MyCustomerComponent implements OnInit {
 
   }
 
-  ticketCusClick(email:string) {
+  ticketCusClick(email: string) {
     location.href = `/new-ticket?customer=${email}`
   }
 
@@ -187,6 +222,11 @@ export class MyCustomerComponent implements OnInit {
 
     if (name === '' || phone === '' || addr === '' || email === '') {
       this.config.displayMessage('Please fill all fields and use google autocomplete for address.', false)
+      return
+    }
+
+    if (!phone.startsWith('+234')) {
+      this.config.displayMessage('Please input correct address. Must start with +234', false)
       return
     }
 
@@ -214,6 +254,7 @@ export class MyCustomerComponent implements OnInit {
           geohash: position.geohash,
           geopoint: position.geopoint
         },
+        msgID: [],
         phone: phone,
         email: email,
         created_by: `${current_name}|${current_email}`,

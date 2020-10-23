@@ -4,15 +4,17 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-    production: false,
-     firebaseConfig :{
-        apiKey: "AIzaSyA3n47b9Kgdiy4l4ubnRMh6XGPGTJzod8c",
-        authDomain: "prontoappl.firebaseapp.com",
-        databaseURL: "https://prontoappl.firebaseio.com",
-        projectId: "prontoappl",
-        storageBucket: "prontoappl.appspot.com",
-        messagingSenderId: "494375460942",
-        appId: "1:494375460942:web:f55aa2ab2ca80946fbe31f",
-        measurementId: "G-MB5SYLV0WJ"
-      }
+  production: false,
+  firebaseConfig: {
+    apiKey: "AIzaSyA3n47b9Kgdiy4l4ubnRMh6XGPGTJzod8c",
+    authDomain: "prontoappl.firebaseapp.com",
+    databaseURL: "https://prontoappl.firebaseio.com",
+    projectId: "prontoappl",
+    storageBucket: "prontoappl.appspot.com",
+    messagingSenderId: "494375460942",
+    appId: "1:494375460942:web:f55aa2ab2ca80946fbe31f",
+    measurementId: "G-MB5SYLV0WJ"
+  },
+  twilioSID: 'AC5f49689d08d05357b0772dc2080eca38',
+  twilioTOKEN: 'ad3e407e3f086222aac609f8692da9ad'
 };

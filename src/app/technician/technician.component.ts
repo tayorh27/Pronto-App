@@ -1,9 +1,11 @@
+import { DataService } from './../services/data.services';
 import { MainTechnician } from './../model/technician';
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Output } from '@angular/core';
 import * as firebase from 'firebase/app';
-import * as geofirex from 'geofirex'; 
+import * as geofirex from 'geofirex';
 import 'firebase/firestore';
 import 'firebase/database';
+import 'firebase/storage'
 import * as $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-bs4';
@@ -11,6 +13,9 @@ import { AppConfig } from '../services/global.service';
 import { AdminUsers } from '../model/admin.users';
 import { MainCategory } from '../model/category';
 import swal from 'sweetalert2';
+import { AdminUsersService } from '../services/admin-users.service';
+import { EventEmitter } from '@angular/core';
+
 
 
 declare interface DataTable {
@@ -29,6 +34,8 @@ declare interface DataTable {
 
 export class MyTechnicianComponent implements OnInit, OnDestroy {
 
+  // @Output() public found = new EventEmitter<any>();
+
   public dataTable: DataTable;
   data: string[][] = []
   technicians: AdminUsers[] = []
@@ -44,12 +51,16 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
   button_pressed = false
 
   user_blocked = 'no'
+  user_verified = 'yes'
+
+  service = new AdminUsersService();
+  role = ''
 
   ngOnDestroy() {
 
   }
 
-  constructor() { }
+
 
   getCategories() {
     firebase.firestore().collection('categories').orderBy('name', 'asc').get().then(query => {
@@ -60,6 +71,10 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       })
     });
   }
+
+
+
+
 
   getTechnicians() {// db/categories/main-categories
     firebase.firestore().collection('users').where('user_type', '==', 'technician').orderBy('timestamp', 'desc').onSnapshot(query => {
@@ -79,6 +94,27 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       };
     });
   }
+
+
+
+
+
+  // totalNumber: number
+  // constructor(private datas: DataService) { }
+  // get totalRows(): number {
+  //   return this.getTechnicians.length;
+  // }
+  // doCount(): any {
+  //   this.datas.getMeTech(this.totalNumber).then((data: any) => {
+  //     for (var i = 0; i < data.Results.length; i++) {
+  //       let searchObj = new SearchResults(data.Results[i]);
+
+  //       this.found.emit(searchObj);
+
+  //     }
+  //   });
+
+  // }
 
   initAutoComplete() {
 
@@ -116,8 +152,13 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.getCategories()
-    this.getTechnicians()
+    const email = localStorage.getItem('email');
+    this.service.getUserData(email).then(user => {
+      this.role = user.role
+      this.getCategories()
+      this.getTechnicians()
+    })
+    // this.datas.setMessage(this.totalRows)
   }
 
   addTech() {
@@ -132,46 +173,53 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     this.addNewTech = false
     this.editTech = false
     this.button_pressed = false
+    this._name = ''
+    this._addr = ''
+    this._phone = '+234'
+    this._email = ''
+    this._image = './assets/img/default-avatar.png'
+    this._cat = []
   }
 
   _name = ''
   _addr = ''
-  _phone = ''
+  _phone = '+234'
   _email = ''
+  _image = './assets/img/default-avatar.png'
   _cat = []
 
-  deleteTechClick(id: string, email:string) {
+  deleteTechClick(id: string, email: string) {
     swal({
-        title: 'Delete Alert',
-        text: 'Are you sure about deleting this technician?',
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, keep it',
-        confirmButtonClass: "btn btn-success",
-        cancelButtonClass: "btn btn-danger",
-        buttonsStyling: false
+      title: 'Delete Alert',
+      text: 'Are you sure about deleting this technician?',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it',
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
     }).then((result) => {
-        if (result.value) {
-            firebase.firestore().collection('users').doc(email).delete().then(del => {
-                const current_email = localStorage.getItem('email')
-                const current_name = localStorage.getItem('name')
-                this.config.logActivity(`${current_name}|${current_email} deleted this technician: ${email}`)
-                this.config.displayMessage("Successfully deleted", true);
-            }).catch(err => {
-                this.config.displayMessage(`${err}`, false);
-            })
-        } else {
-            swal({
-                title: 'Cancelled',
-                text: 'Deletion not successful',
-                type: 'error',
-                confirmButtonClass: "btn btn-info",
-                buttonsStyling: false
-            }).catch(swal.noop)
-        }
+      if (result.value) {
+        firebase.firestore().collection('users').doc(email).delete().then(del => {
+          const current_email = localStorage.getItem('email')
+          const current_name = localStorage.getItem('name')
+          this.config.logActivity(`${current_name}|${current_email} deleted this technician: ${email}`)
+          this.config.displayMessage("Successfully deleted", true);
+        }).catch(err => {
+          this.config.displayMessage(`${err}`, false);
+        })
+      } else {
+        swal({
+          title: 'Cancelled',
+          text: 'Deletion not successful',
+          type: 'error',
+          confirmButtonClass: "btn btn-info",
+          buttonsStyling: false
+        }).catch(swal.noop)
+      }
     })
-}
+  }
 
   editTechClick(tech: any) {
     this.editTech = true
@@ -183,8 +231,10 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     this._addr = this.selectedTechnician.address
     this._phone = this.selectedTechnician.phone
     this._email = this.selectedTechnician.email
+    this._image = this.selectedTechnician.image
     this._cat = this.selectedTechnician.category
     this.user_blocked = this.selectedTechnician.blocked ? 'yes' : 'no'
+    this.user_verified = this.selectedTechnician.verified ? 'yes' : 'no'
     setTimeout(() => {
       document.getElementById('madd').innerHTML = this.selectedTechnician.address
       document.getElementById('mgeo').innerHTML = JSON.stringify(this.selectedTechnician.position.geopoint)
@@ -193,6 +243,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
   }
 
   async technicianSubmitClicked() {
+    const image = (<HTMLInputElement>document.getElementById("pro_images")).files
     const name = (<HTMLInputElement>document.getElementById("tech_name")).value;
     // const address = (<HTMLInputElement>document.getElementById("tech_addr")).value;
     const phone = (<HTMLInputElement>document.getElementById("tech_phone")).value;
@@ -201,6 +252,11 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     const addr = document.getElementById('madd').innerHTML
     if (name === '' || phone === '' || addr === '' || email === '' || this._cat.length === 0) {
       this.config.displayMessage('Please fill all fields and use google autocomplete for address.', false)
+      return
+    }
+
+    if (!phone.startsWith('+234')) {
+      this.config.displayMessage('Please input correct address. Must start with +234', false)
       return
     }
 
@@ -214,13 +270,26 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     const geoPoint = geofirex.init(firebase);
 
     if (!this.editTech) {
-      //determin if email exists
+      //determine if email exists
+      if (image.length == 0) {
+        this.button_pressed = false
+        this.config.displayMessage("Please upload an image for this gift basket", false)
+        return
+      }
       const query = await firebase.firestore().collection('users').where('email', '==', email).get()
       if (query.size > 0) {
+        this.button_pressed = false
         this.config.displayMessage('technician already exists', false)
         return
       }
       const position = geoPoint.point(geo['lat'], geo['lng'])
+
+      const url = await this.uploadImage(image)
+      if(url === undefined){
+        this.button_pressed = false
+        return
+      }
+
       const technician: AdminUsers = {
         id: key,
         name: name,
@@ -229,15 +298,17 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
           geohash: position.geohash,
           geopoint: position.geopoint
         },//new firebase.firestore.GeoPoint(geo['lat'], geo['lng']),
+        msgID: [],
         phone: phone,
         email: email,
         category: this._cat,
         role: 'Technician',
         access_levels: '',
         blocked: (this.user_blocked === 'no') ? false : true,
+        verified: (this.user_verified === 'no') ? false : true,
         status: 'offline',
         user_type: 'technician',
-        image: './assets/img/default-avatar.png',
+        image: url,
         user_position: 'Technician',
         created_by: `${current_name}|${current_email}`,
         created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
@@ -254,9 +325,18 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       })
     } else {//you are to perform update operattion here
       const position = (geo['lat'] === undefined) ? geoPoint.point(geo['latitude'], geo['longitude']) : geoPoint.point(geo['lat'], geo['lng'])
+      if(image.length > 0) {
+        const url = await this.uploadImage(image)
+        if(url === undefined){
+          this.button_pressed = false
+          return
+        }
+        this._image = url
+      }
       const technician: AdminUsers = {
         name: name,
         blocked: (this.user_blocked === 'no') ? false : true,
+        verified: (this.user_verified === 'no') ? false : true,
         address: addr,
         position: {
           geohash: position.geohash,
@@ -265,6 +345,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
         // coordinates: (geo['lat'] === undefined) ? new firebase.firestore.GeoPoint(geo['latitude'], geo['longitude']) : new firebase.firestore.GeoPoint(geo['lat'], geo['lng']),
         phone: phone,
         email: email,
+        image: this._image,
         category: this._cat,
         modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`
       }
@@ -278,6 +359,26 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       })
     }
 
+  }
+
+  async uploadImage(image:FileList) {
+    const type = image.item(0).name.substring(image.item(0).name.lastIndexOf('.'))
+    console.log(type)
+    const size = image.item(0).size
+    if (size > 204800) {
+      this.config.displayMessage(`Validation Error: File size must not be greater than 200KB`, false);
+      return
+    }
+    const ext = ['.jpg', '.jpeg', '.png']
+    if (!ext.includes(type)) {
+      this.config.displayMessage(`Validation Error: Incorrect file extension. Allowed extensions are: .jpg, .jpeg, .png`, false);
+      return
+    }
+    const key = firebase.database().ref().push().key
+    const upload_task = firebase.storage().ref("technicians").child(`${key}.jpg`)
+    await upload_task.put(image.item(0))
+    const url = await upload_task.getDownloadURL()
+    return url
   }
 
   ngAfterViewInit() {

@@ -9,21 +9,41 @@ import { MaterialModule } from './../app.module'
 import { NewTicketRoutes } from './new-ticket.routing';
 import { AgmCoreModule } from '@agm/core';
 import { BrowserModule } from '@angular/platform-browser';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { SearchCustomerComponent } from './search-customer/search-customer';
+import { TicketJobComponent } from './add-job/ticket-job.component';
+
+// @NgModule({
+//   exports: [
+//     AddJobModule
+//   ],
+// })
+
 
 @NgModule({
-    imports: [
-      CommonModule,
-      RouterModule.forChild(NewTicketRoutes),
-      FormsModule,
-      MdModule,
-      MaterialModule,
-      AgmCoreModule.forRoot({
-        apiKey: 'YOUR-API-KEY-HERE',
-        libraries: ['places']
-      })
-    ],
-    declarations: [
-      MyNewTicketComponent
-    ],
-  })
-  export class NewTicketModule { }
+  imports: [
+    CommonModule,
+    RouterModule.forChild(NewTicketRoutes),
+    FormsModule,
+    ReactiveFormsModule,
+    MdModule,
+    MaterialModule,
+    NgbModule,
+    // AddJobModule,
+    AgmCoreModule.forRoot({
+      apiKey: 'YOUR-API-KEY-HERE',
+      libraries: ['places']
+    }),
+  ],
+  declarations: [
+    MyNewTicketComponent,
+    // AddJobComponent,
+    SearchCustomerComponent,
+    TicketJobComponent
+  ],
+  // exports: [
+  //   AddJobComponent
+  // ]
+
+})
+export class NewTicketModule { }

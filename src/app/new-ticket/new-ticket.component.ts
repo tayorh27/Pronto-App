@@ -17,6 +17,10 @@ import { Jobs } from '../model/jobs';
 import { ProgressSpinnerComponent } from '../progress-spinner/progress-spinner.module';
 import { OverlayService } from '../overlay/overlay.module';
 import { JobActivity } from '../model/activity';
+import { AdminUsersService } from '../services/admin-users.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { startWith, } from 'rxjs/operators';
 
 declare var google: any;
 let map: any;
@@ -40,6 +44,8 @@ export class MyNewTicketComponent implements OnInit {
 
   @ViewChild('map', { static: false }) mapElement: ElementRef;
 
+  markerPan: any
+
   initMap() {
     navigator.geolocation.getCurrentPosition((location) => {
       map = new google.maps.Map(this.mapElement.nativeElement, {
@@ -54,12 +60,14 @@ export class MyNewTicketComponent implements OnInit {
         position: { lat: location.coords.latitude, lng: location.coords.longitude },
         map,
         title: 'Click to zoom',
-        // icon: iconBase + 'blue-dot.png'
+        icon: iconBase + 'blue-dot.png'
       });
+
+      this.markerPan = marker['current']
 
       map.addListener('center_changed', () => {
         window.setTimeout(() => {
-          map.panTo(marker['current'].getPosition());
+          map.panTo(this.markerPan.getPosition());
         }, 3000);
       });
 
@@ -89,11 +97,17 @@ export class MyNewTicketComponent implements OnInit {
   // }
 
   createMarker(latitude: any, longitude: any, _id: any, tech: any) {
+    const isReassign = this.isReassign
+    const stat = `${tech['status']}` //status of technician: offline, online
+    const display = (stat === 'online') ? 'block' : 'none'
+
     marker[_id] = new google.maps.Marker({
       map,
       position: { lat: latitude, lng: longitude },
-      icon: iconBase + 'green-dot.png'
+      icon: (stat === 'online') ? iconBase + 'green-dot.png' : iconBase + 'red-dot.png'
     });
+
+    this.markerPan = marker[_id]
 
     google.maps.event.addListener(marker[_id], 'click', function () {
       infowindow.setContent(`<div class="card">
@@ -108,15 +122,13 @@ export class MyNewTicketComponent implements OnInit {
         <label>Status: ${tech['status']}</label><br>
         </div>
         <div class="card-footer">
-        <button mat-raised-button type="button" id="${_id}" class="btn btn-fill btn-rose btn-block"
-              >
-              Assign
-            </button>
+        <button style="display: ${display};" mat-raised-button type="button" id="${_id}" class="btn btn-fill btn-rose btn-block">
+              ${(isReassign) ? 'Re-Assign' : 'Assign'}
+        </button>
         </div>
       </div>
       </div>`)//(click)="assignClicked('hello')"
       infowindow.open(map, marker[_id])
-
       setTimeout(() => {
         //listen for onclick
         document.getElementById(_id).addEventListener('click', () => {
@@ -128,42 +140,165 @@ export class MyNewTicketComponent implements OnInit {
   }
 
 
-  constructor(private previewProgressSpinner: OverlayService) {
-    this.initMap();
+  constructor(private http: HttpClient, private previewProgressSpinner: OverlayService) {
+    // this.initMap();
   }
 
   config = new AppConfig()
+  service = new AdminUsersService()
   categories: MainCategory[] = []
   technicians: any[] = []
   _cat: string[] = []
   _addr = ''
   radius = 10
+  _note = ''
 
   selectedCustomer: MainCustomer
+  currentUser: AdminUsers
 
   button_pressed = false
 
-  ngOnInit() {
-    if (location.search === '') {
-      this.config.displayMessage('Please select a customer for this ticket.', false)
-      location.href = '/customer'
+  isReassign = false
+  selectedJob: Jobs
+
+  hasURLQuery = false
+  isAddNewCus = false
+
+  //for adding new customers
+  _name = ''
+  _cus_addr = ''
+  _phone = '+234'
+  _email = ''
+
+  onCustomerSelect(evt: any) {
+    this.previewProgressSpinner.open({ hasBackdrop: true }, ProgressSpinnerComponent)
+    const email = evt.option.value
+    this.isAddNewCus = false
+    this.hasURLQuery = true
+    this.getCustomerByEmail(email).then(d => {
+      this.previewProgressSpinner.close()
+      // this.myControl.setValue('')
+      setTimeout(() => {
+        this.initMap()
+      }, 2000)
+      setTimeout(() => {
+        this.initAutoComplete()
+      }, 2000)
+    })
+  }
+
+  AddCus(evt: boolean) {
+    this.isAddNewCus = evt
+    setTimeout(() => {
+      this.initAutoComplete()
+    }, 2000)
+  }
+
+  async customerSubmitClicked() {
+    const name = (<HTMLInputElement>document.getElementById("cus_name")).value;
+    // const address = (<HTMLInputElement>document.getElementById("cus_addr")).value;
+    const phone = (<HTMLInputElement>document.getElementById("cus_phone")).value;
+    const email = (<HTMLInputElement>document.getElementById("cus_email")).value;
+
+    const addr = document.getElementById('madd').innerHTML
+
+    if (name === '' || phone === '' || addr === '' || email === '') {
+      this.config.displayMessage('Please fill all fields and use google autocomplete for address.', false)
       return
     }
-    const customerEmail = location.search.substring(10)//?customer=
-    this.getCustomerByEmail(customerEmail)
-    this.initAutoComplete()
+
+    if (!phone.startsWith('+234')) {
+      this.config.displayMessage('Please input correct address. Must start with +234', false)
+      return
+    }
+
+    const geo = JSON.parse(document.getElementById('mgeo').innerHTML)
+    this.button_pressed = true
+
+    const key = firebase.database().ref().push().key
+    const current_email = localStorage.getItem('email')
+    const current_name = localStorage.getItem('name')
+    const geoPoint = geofirex.init(firebase);
+
+    const query = await firebase.firestore().collection('customers').where('email', '==', email).get()
+    if (query.size > 0) {
+      this.button_pressed = false
+      this.config.displayMessage('customer already exists', false)
+      return
+    }
+    const position = geoPoint.point(geo['lat'], geo['lng'])
+    const customer: MainCustomer = {
+      id: key,
+      name: name,
+      address: addr,
+      position: {
+        geohash: position.geohash,
+        geopoint: position.geopoint
+      },
+      phone: phone,
+      email: email,
+      created_by: `${current_name}|${current_email}`,
+      created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
+      modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }
+    firebase.firestore().collection('customers').doc(email.toLowerCase()).set(customer).then(d => {
+      this.button_pressed = false
+      this.config.logActivity(`${current_name}|${current_email} created this customer: ${email}`)
+      this.onCustomerSelect({ option: { value: email } })
+    }).catch(err => {
+      this.button_pressed = false
+      this.config.displayMessage(`${err}`, false)
+    })
+  }
+
+  gotoSearch() {
+    this.hasURLQuery = false
+  }
+
+  ngOnInit() {
+    if (location.search !== '') {
+      this.hasURLQuery = true
+      // this.config.displayMessage('Please select a customer for this ticket.', false)
+      // setTimeout(() => {
+      //   location.href = '/customer'}, 2000
+      // )
+      // return
+      const customerEmail = this.config.getUrlParameter('customer')
+      const job_id = this.config.getUrlParameter('jobid')
+      // console.log(customerEmail, job_id)
+      this.getCustomerByEmail(customerEmail)
+      if (job_id !== undefined) {
+        this.isReassign = true
+        this.getJobDataById(job_id)
+      }
+      setTimeout(() => {
+        this.initMap()
+      }, 2000)
+      setTimeout(() => {
+        this.initAutoComplete()
+      }, 2000)
+    }
+    // this.getCustomers()
     this.getCategories()
+    const email = localStorage.getItem('email');
+    this.service.getUserData(email).then(user => {
+      this.currentUser = user
+    })
   }
 
   /**
    * get the customer data from firebase provided the email is given
    * @param email string
-   */
+  */
   async getCustomerByEmail(email: string) {
     const query = await firebase.firestore().collection('customers').doc(email.toLowerCase()).get()
     if (!query.exists) {
       this.config.displayMessage('Invalid customer.', false)
-      location.href = '/customer'
+      setTimeout(() => {
+        location.href = '/customer'
+      }, 2000
+      )
       return
     }
     this.selectedCustomer = <MainCustomer>query.data()
@@ -172,6 +307,25 @@ export class MyNewTicketComponent implements OnInit {
       document.getElementById('madd').innerHTML = this.selectedCustomer.address
       document.getElementById('mgeo').innerHTML = JSON.stringify(this.selectedCustomer.position.geopoint)
     }, 3000)
+  }
+
+  /**
+   * get the job data from firebase provided the id is given
+   * @param id string
+   */
+  async getJobDataById(id: string) {
+    const query = await firebase.firestore().collection('jobs').doc(id).get()
+    if (!query.exists) {
+      this.config.displayMessage('Invalid job ID.', false)
+      setTimeout(() => {
+        location.href = '/customer'
+      }, 2000
+      )
+      return
+    }
+    this.selectedJob = <Jobs>query.data()
+    this._cat = this.selectedJob.category
+    this._note = this.selectedJob.note
   }
 
   /**
@@ -188,7 +342,7 @@ export class MyNewTicketComponent implements OnInit {
   }
 
   initAutoComplete() {
-    const locationInput = (<HTMLInputElement>document.getElementById("formGroupExampleInput2"));
+    const locationInput = (this.isAddNewCus) ? (<HTMLInputElement>document.getElementById("cus_addr")) : (<HTMLInputElement>document.getElementById("formGroupExampleInput2"))
     var autocomplete = new google.maps.places.Autocomplete(locationInput);
     // Set the data fields to return when the user selects a place.
     autocomplete.setFields(['address_components', 'geometry', 'icon', 'name']);
@@ -221,7 +375,7 @@ export class MyNewTicketComponent implements OnInit {
   searchButtonClick() {
     const addr = document.getElementById('madd').innerHTML//addr === '' ||
     if (this._cat.length === 0 || addr === '' || this.radius === 0 || this.radius === null) {
-      this.config.displayMessage('please fill all fields', false)
+      this.config.displayMessage('please fill all fields with *', false)
       return
     }
     this.searchForTechnicians()
@@ -249,7 +403,6 @@ export class MyNewTicketComponent implements OnInit {
       // console.log(query)
       this.button_pressed = false
       if (query.length === 0) {
-        this.button_pressed = false
         this.config.displayMessage('No technicians found. Try again!', false)
         return
       }
@@ -260,6 +413,7 @@ export class MyNewTicketComponent implements OnInit {
         this.technicians.push(tech)
         const coords = tech['position']
         const point = coords['geopoint']
+        // console.log(tech)
         this.createMarker(point['latitude'], point['longitude'], tech['id'], tech)
         // console.log(tech)
       })
@@ -282,48 +436,100 @@ export class MyNewTicketComponent implements OnInit {
       phone: findTech['phone'],
       email: findTech['email'],
       category: findTech['category'],
-      modified_date: findTech['modified_date']
+      status: findTech['status']
     }
 
     const current_email = localStorage.getItem('email')
     const current_name = localStorage.getItem('name')
     const key = firebase.database().ref().push().key
 
-    const job: Jobs = {
-      id: key,
-      customer: this.selectedCustomer,
-      assigned_to: technician,
-      status: 'pending',//will be changed later
-      created_by: `${current_name}|${current_email}`,
-      created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
-      modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }
-
-    firebase.firestore().collection('jobs').doc(key).set(job).then(d => {
-      //create activity collection
-      const id = firebase.database().ref().push().key
-      const act: JobActivity = {
-        id: id,
-        comment: `This job was created for : ${this.selectedCustomer.name} assigned to ${technician.name}`,
+    if (!this.isReassign) {//add new job
+      const job: Jobs = {
+        id: key,
+        job_id: this.config.randomInt(0, 9999999999),
+        customer: this.selectedCustomer,
+        assigned_to: technician,
+        agent: this.currentUser,
+        status: 'Pending',//will be changed later
+        back_end_status: 'active',
+        category: this._cat,
+        note: this._note,
+        created_by: `${current_name}|${current_email}`,
         created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
+        modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       }
-      firebase.firestore().collection('jobs').doc(key).collection('activities').doc(id).set(act).then(d => {
-        this.previewProgressSpinner.close()
-        this.config.logActivity(`${current_name}|${current_email} created this job for : ${this.selectedCustomer.name} assigned to ${technician.name}`)
-        this.config.displayMessage('Successfully created', true)
+
+      firebase.firestore().collection('jobs').doc(key).set(job).then(d => {
+        //create activity collection
+        const id = firebase.database().ref().push().key
+        const act: JobActivity = {
+          id: id,
+          comment: `This job was created for : ${this.selectedCustomer.name} and assigned to ${technician.name}`,
+          created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }
+        firebase.firestore().collection('jobs').doc(key).collection('activities').doc(id).set(act).then(d => {
+          this.previewProgressSpinner.close()
+          this.config.logActivity(`${current_name}|${current_email} created this job for : ${this.selectedCustomer.name} and assigned to ${technician.name}`)
+          this.sendSMS(findTech['name'], findTech['phone'], findTech['msgID'])
+          this.config.displayMessage('Successfully created', true)
+          setTimeout(() => {
+            location.href = '/jobs'
+          }, 2000)
+        }).catch(err => {
+          this.previewProgressSpinner.close()
+          this.config.displayMessage(`${err}`, false)
+        })
       }).catch(err => {
         this.previewProgressSpinner.close()
         this.config.displayMessage(`${err}`, false)
       })
-    }).catch(err => {
-      this.previewProgressSpinner.close()
-      this.config.displayMessage(`${err}`, false)
-    })
+    } else {//update job that needs reassigning
+      const job: Jobs = {
+        customer: this.selectedCustomer,
+        assigned_to: technician,
+        agent: this.currentUser,
+        status: 'Pending',//this.selectedJob.status,//
+        back_end_status: 'active',
+        category: this._cat,
+        note: this._note,
+        modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
+      }
+      firebase.firestore().collection('jobs').doc(this.selectedJob.id).update(job).then(d => {
+        //create activity collection
+        const id = firebase.database().ref().push().key
+        const act: JobActivity = {
+          id: id,
+          comment: `This job was updated for : ${this.selectedCustomer.name} and reassigned to ${technician.name}`,
+          created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }
+        firebase.firestore().collection('jobs').doc(this.selectedJob.id).collection('activities').doc(id).set(act).then(d => {
+          this.previewProgressSpinner.close()
+          this.config.logActivity(`${current_name}|${current_email} updated this job for : ${this.selectedCustomer.name} and reassigned to ${technician.name}`)
+          this.sendSMS(findTech['name'], findTech['phone'], findTech['msgID'])
+          this.config.displayMessage('Successfully created', true)
+        }).catch(err => {
+          this.previewProgressSpinner.close()
+          this.config.displayMessage(`${err}`, false)
+        })
+      }).catch(err => {
+        this.previewProgressSpinner.close()
+        this.config.displayMessage(`${err}`, false)
+      })
+    }
+  }
+
+  sendSMS(tech_name: string, tech_number: string, ids: string[]) {
+    const techSMS = `You have been assigned a job. Please login to Pronto to accept the job and to view customer details.`
+    const cusSMS = `A technician will be with you shortly. \nName: ${tech_name}\nPhone: ${tech_number}`
+
+    this.config.sendSMS(this.http, tech_number, techSMS, ids.join(','), 'notification')
+    this.config.sendSMS(this.http, this.selectedCustomer.phone, cusSMS, '', 'sms')
   }
 
   //update technician status to assign and send sms to both customer and technician
-  
+
 
 }

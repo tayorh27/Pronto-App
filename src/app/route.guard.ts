@@ -1,5 +1,8 @@
 import { CanActivate, ActivatedRoute } from "@angular/router";
 import { AdminUsersService } from "./services/admin-users.service";
+import * as firebase from 'firebase/app'
+import 'firebase/firestore'
+import { RoleUsers } from "./model/role.users";
 
 export class RouteGuard implements CanActivate {
 
@@ -14,12 +17,14 @@ export class RouteGuard implements CanActivate {
         } else {
             const p = await this.service.getUserData(email)
             //console.log(`from route = ${p.access_levels}`)
-            const levels = p.access_levels.toLowerCase()
+            const r = await firebase.firestore().collection('roles').where('name', '==', p.role).get()
+            const role = <RoleUsers>r.docs[0].data()//p.access_levels.toLowerCase()
+            const levels = role.access_levels
             const current_menu = window.location.href.toLowerCase().split("/")[3]
 
-            if(p.role == 'Administrator'){
+            if (p.role == 'Administrator') {
                 return true
-            }else{
+            } else {
                 //console.log(`from route allow = ${this.service.isAllowedAccess(levels, current_menu)}`)
                 return this.service.isAllowedAccess(levels, current_menu)
             }

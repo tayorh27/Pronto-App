@@ -4,7 +4,7 @@
       <div class="col-lg-12">
         <p class="h2">Administrative Settings</p>
         <ngb-tabset [justify]="'center'" class="custom-tab-content flex-column flex-md-row" type="pills">
-          <ngb-tab title="USER ROLES">
+          <ngb-tab *ngIf="_role === 'Administrator'" title="USER ROLES">
             <ng-template ngbTabContent>
               <div class="col-md-12">
                 <div class="card">
@@ -15,12 +15,13 @@
                     <h4 class="card-title">User Roles</h4>
                   </div>
                   <div class="td-actions text-right">
-                    <button mat-raised-button type="button" class="btn btn-primary btn-round" (click)="addRole()" ngbAutofocus>
+                    <button mat-raised-button type="button" class="btn btn-primary btn-round" (click)="addRole()"
+                      ngbAutofocus>
                       <i class="material-icons">add</i>
                     </button>
                   </div>
                   <div class="card-body">
-                    <div class="table-responsive">
+                    <div class="table-responsive" *ngIf="tableData1">
                       <table class="table">
                         <thead>
                           <tr>
@@ -36,11 +37,11 @@
                             <td>{{row[2]}}</td>
                             <td>{{row[3]}}</td>
                             <td class="td-actions text-right" *ngIf="row[2] != 'Administrator'">
-                              <button mat-raised-button type="button" class="btn btn-success {{row[4]}}"
+                              <button mat-raised-button type="button" data-toggle="tooltip" title="edit" data-placement="bottom" class="btn btn-success {{row[4]}}"
                                 (click)="editRole(row)">
                                 <i class="material-icons">edit</i>
                               </button>
-                              <button mat-raised-button type="button" class="btn btn-danger {{row[4]}}"
+                              <button mat-raised-button type="button" data-toggle="tooltip" title="delete" data-placement="bottom" class="btn btn-danger {{row[4]}}"
                                 (click)="deleteRole(row[1], row[2])">
                                 <i class="material-icons">close</i>
                               </button>
@@ -70,7 +71,7 @@
                     </button>
                   </div>
                   <div class="card-body">
-                    <div class="table-responsive">
+                    <div class="table-responsive" *ngIf="tableData2">
                       <table class="table">
                         <thead>
                           <tr>
@@ -90,7 +91,7 @@
                             <td>
                               <div class="user">
                                 <div class="photo">
-                                    <img src="{{row[1]}}" />
+                                  <img src="{{row[1]}}" />
                                 </div>
                               </div>
                             </td>
@@ -100,10 +101,12 @@
                             <td>{{row[6]}}</td>
                             <td class="text-right">{{row[8]}}</td>
                             <td class="td-actions text-right" *ngIf="row[6] != 'Administrator'">
-                              <button mat-raised-button type="button" class="btn btn-success {{row[9]}}" (click)="editUser(row)">
+                              <button mat-raised-button type="button" class="btn btn-success {{row[9]}}" data-toggle="tooltip" title="edit" data-placement="bottom"
+                                (click)="editUser(row)">
                                 <i class="material-icons">edit</i>
                               </button>
-                              <button mat-raised-button type="button" class="btn btn-danger {{row[9]}}" (click)="deleteUser(row)">
+                              <button *ngIf="_role === 'Administrator'" mat-raised-button type="button" data-toggle="tooltip" title="delete" data-placement="bottom" class="btn btn-danger {{row[9]}}"
+                                (click)="deleteUser(row)">
                                 <i class="material-icons">close</i>
                               </button>
                             </td>
@@ -115,72 +118,85 @@
                 </div>
               </div>
               <div>
-                  <div class="container" *ngIf="!display_users">
-                      <div class="row">
-                        <div class="col-md-12 ml-auto mr-auto">
-                          <div class="card card-signup">
-                            <h2 class="card-title text-center">Register</h2>
-                            <div class="card-body">
-                              <div class="row">
-                                <div class="col-md-5 ml-auto">
-                                    <form class="form" method="" action="">
-                                        <div class="form-group has-default">
-                                          <div class="input-group">
-                                            <div class="input-group-prepend">
-                                              <span class="input-group-text">
-                                                <i class="material-icons">face</i>
-                                              </span>
-                                            </div>
-                                            <input type="text" class="form-control" placeholder="Account Name" id="account_name">
-                                          </div>
-                                        </div>
-                                        <div class="form-group has-default">
-                                          <div class="input-group">
-                                            <div class="input-group-prepend">
-                                              <span class="input-group-text">
-                                                <i class="material-icons">mail</i>
-                                              </span>
-                                            </div>
-                                            <input type="email" class="form-control" placeholder="Email Address" id="email">
-                                          </div>
-                                        </div>
-                                      </form>
+                <div class="container" *ngIf="!display_users">
+                  <div class="row">
+                    <div class="col-md-12 ml-auto mr-auto">
+                      <div class="card card-signup">
+                        <h2 class="card-title text-center">Register</h2>
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-5 ml-auto">
+                              <form class="form" method="" action="">
+                                <div class="form-group has-default">
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text">
+                                        <i class="material-icons">face</i>
+                                      </span>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="Account Name"
+                                      id="account_name">
+                                  </div>
                                 </div>
-                                <div class="col-md-5 mr-auto">
-                                  <form class="form" method="" action="">
-                                    <div class="form-group has-default">
-                                      <div class="input-group">
-                                        <div class="input-group-prepend">
-                                          <span class="input-group-text">
-                                            <i class="material-icons">face</i>
-                                          </span>
-                                        </div>
-                                        <input type="text" placeholder="Position" id="position" class="form-control">
-                                      </div>
+                                <div class="form-group has-default">
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text">
+                                        <i class="material-icons">mail</i>
+                                      </span>
                                     </div>
-                                    <div class="form-group has-default">
-                                      <div class="input-group">
-                                        <mat-form-field [ngClass]="{'mat-focused':focus1===false}">
-                                          <mat-select focused="true" placeholder="Access Role" [(ngModel)]="accountRole" name="Roles" ariaLabel="roles[0]">
-                                              <mat-option *ngFor="let rl of roles" [value]="rl.name">
-                                                  {{ rl.name }}
-                                              </mat-option>
-                                          </mat-select>
-                                      </mat-form-field>
-                                      </div>
-                                    </div>
-                                    <div class="text-center">
-                                      <a class="btn btn-fill btn-primary" (click)="registerUser()">Add User</a>
-                                      <a class="btn btn-fill btn-danger" (click)="cancelAddUser()">Cancel</a>
-                                    </div>
-                                  </form>
+                                    <input type="email" class="form-control" placeholder="Email Address" id="email">
+                                  </div>
                                 </div>
-                              </div>
+                              </form>
+                            </div>
+                            <div class="col-md-5 mr-auto">
+                              <form class="form" method="" action="">
+                                <div class="form-group has-default">
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text">
+                                        <i class="material-icons">face</i>
+                                      </span>
+                                    </div>
+                                    <input type="text" placeholder="Position" id="position" class="form-control">
+                                  </div>
+                                </div>
+                                <div class="form-group has-default">
+                                  <div class="input-group">
+                                    <mat-form-field [ngClass]="{'mat-focused':focus1===false}">
+                                      <mat-select focused="true" placeholder="Access Role" [(ngModel)]="accountRole"
+                                        name="Roles" ariaLabel="roles[0]">
+                                        <mat-option *ngFor="let rl of roles" [value]="rl.name">
+                                          {{ rl.name }}
+                                        </mat-option>
+                                      </mat-select>
+                                    </mat-form-field>
+                                  </div>
+                                </div>
+                                <div class="form-group has-default">
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text">
+                                        <i class="material-icons">face</i>
+                                      </span>
+                                    </div>
+                                    <input type="tel" value="+234" placeholder="Phone Number" id="phone"
+                                      class="form-control">
+                                  </div>
+                                </div>
+                                <div class="text-center">
+                                  <a class="btn btn-fill btn-primary" (click)="registerUser()">Add User</a>
+                                  <a class="btn btn-fill btn-danger" (click)="cancelAddUser()">Cancel</a>
+                                </div>
+                              </form>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
               </div>
             </ng-template>
           </ngb-tab>
@@ -257,25 +273,29 @@
           <div class="card-body ">
             <form method="#" action="#">
               <mat-form-field class="example-full-width">
-                <input matInput placeholder="Role Name" value="{{currentRole[2]}}" name="role_nm" id="role_name" type="text">
+                <input matInput placeholder="Role Name" value="{{currentRole[2]}}" name="role_nm" id="role_name"
+                  type="text">
               </mat-form-field>
               <mat-form-field [ngClass]="{'mat-focused':focus1===false}">
-                <mat-select focused="true" multiple placeholder="Access Levels" [(ngModel)]="currentLevel" name="Levels" ariaLabel="levels[0]">
-                    <mat-option *ngFor="let lv of levels" [value]="lv.value">
-                        {{ lv.viewValue }}
-                    </mat-option>
+                <mat-select focused="true" multiple placeholder="Access Levels" [(ngModel)]="currentLevel" name="Levels"
+                  ariaLabel="levels[0]">
+                  <mat-option *ngFor="let lv of levels" [value]="lv.value">
+                    {{ lv.viewValue }}
+                  </mat-option>
                 </mat-select>
-            </mat-form-field>
+              </mat-form-field>
             </form>
           </div>
           <div class="card-footer ">
-              <div class="loader" *ngIf="button_pressed">
-                  <svg class="circular" viewBox="25 25 50 50">
-                      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
-                  </svg>
-              </div>
-            <button mat-raised-button type="submit" class="btn btn-fill btn-rose" *ngIf="isAddRole" (click)="roleButtonAction()">Add</button>
-            <button mat-raised-button type="submit" class="btn btn-fill btn-rose" *ngIf="!isAddRole" (click)="roleButtonAction()">Update</button>
+            <div class="loader" *ngIf="button_pressed">
+              <svg class="circular" viewBox="25 25 50 50">
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+              </svg>
+            </div>
+            <button mat-raised-button type="submit" class="btn btn-fill btn-rose" *ngIf="isAddRole"
+              (click)="roleButtonAction()">Add</button>
+            <button mat-raised-button type="submit" class="btn btn-fill btn-rose" *ngIf="!isAddRole"
+              (click)="roleButtonAction()">Update</button>
           </div>
         </div>
       </div>
@@ -300,23 +320,26 @@
           <div class="card-body ">
             <form method="#" action="#">
               <mat-form-field [ngClass]="{'mat-focused':focus1===false}">
-                <mat-select focused="true" placeholder="Access Role" [(ngModel)]="accountRole" name="Roles" ariaLabel="roles[0]">
-                    <mat-option *ngFor="let rl of roles" [value]="rl.name">
-                        {{ rl.name }}
-                    </mat-option>
+                <mat-select focused="true" placeholder="Access Role" [(ngModel)]="accountRole" name="Roles"
+                  ariaLabel="roles[0]">
+                  <mat-option *ngFor="let rl of roles" [value]="rl.name">
+                    {{ rl.name }}
+                  </mat-option>
                 </mat-select>
-            </mat-form-field>
+              </mat-form-field>
               <mat-form-field [ngClass]="{'mat-focused':focus1===false}">
-                <mat-select placeholder="Blocked Status" [(ngModel)]="blocked_status" name="Blocked" ariaLabel="blocks_data[0]">
-                    <mat-option *ngFor="let bd of blocks_data"[value]="bd.value">
-                      {{bd.viewValue}}
-                    </mat-option>
+                <mat-select placeholder="Blocked Status" [(ngModel)]="blocked_status" name="Blocked"
+                  ariaLabel="blocks_data[0]">
+                  <mat-option *ngFor="let bd of blocks_data" [value]="bd.value">
+                    {{bd.viewValue}}
+                  </mat-option>
                 </mat-select>
-            </mat-form-field>
+              </mat-form-field>
             </form>
           </div>
           <div class="card-footer ">
-            <button mat-raised-button type="submit" class="btn btn-fill btn-rose" (click)="userButtonAction()">Update</button>
+            <button mat-raised-button type="submit" class="btn btn-fill btn-rose"
+              (click)="userButtonAction()">Update</button>
           </div>
         </div>
       </div>
