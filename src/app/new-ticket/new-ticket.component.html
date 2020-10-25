@@ -40,7 +40,7 @@
                     <form>
                       <div class="form-group mx-sm-3 mb-2">
                         <mat-form-field>
-                          <mat-select multiple placeholder="Category*" [(ngModel)]="_cat" name="plumber"
+                          <mat-select multiple placeholder="Required skill-set *" [(ngModel)]="_cat" name="plumber"
                             ariaLabel="Techies[0]" id="tech_cat">
                             <mat-option *ngFor="let tech of categories" [value]="tech.id">
                               {{ tech.name }}
@@ -51,7 +51,7 @@
                       <div class="form-group mx-sm-3 mb-2">
                         <mat-form-field class="example-full-width">
                           <input matInput type="address" [(ngModel)]="_addr" [ngModelOptions]="{standalone: true}"
-                            class="form-control" id="formGroupExampleInput2" placeholder="Address*" />
+                            class="form-control" id="formGroupExampleInput2" placeholder="Address of customer*" />
                         </mat-form-field>
                       </div>
                       <div class="form-group mx-sm-3 mb-2">
@@ -62,7 +62,7 @@
                       </div>
                       <div class="form-group mx-sm-3 mb-2">
                         <mat-form-field class="example-full-width">
-                          <textarea matInput placeholder="Additional Comment" [(ngModel)]="_note" name="nt"
+                          <textarea matInput placeholder="Additional comments for this job" [(ngModel)]="_note" name="nt"
                             class="form-control" id="idnt"></textarea>
                         </mat-form-field>
                       </div>

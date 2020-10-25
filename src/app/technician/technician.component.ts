@@ -273,7 +273,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       //determine if email exists
       if (image.length == 0) {
         this.button_pressed = false
-        this.config.displayMessage("Please upload an image for this gift basket", false)
+        this.config.displayMessage("Please upload an image for this technician", false)
         return
       }
       const query = await firebase.firestore().collection('users').where('email', '==', email).get()
@@ -349,7 +349,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
         category: this._cat,
         modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`
       }
-      firebase.firestore().collection('users').doc(this.selectedTechnician.email).update(technician).then(d => {
+      firebase.firestore().collection('users').doc(`${this.selectedTechnician.email}`.toLowerCase()).update(technician).then(d => {
         this.config.logActivity(`${current_name}|${current_email} updated this technician: ${email}`)
         this.cancelAddTech()
         this.config.displayMessage('Successfully updated', true)
