@@ -12,7 +12,7 @@
                     matInput [matAutocomplete]="auto">
                 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onCustomerSelect($event)">
                     <mat-option *ngFor="let cus of filteredOptions | async" [value]="cus.email">
-                        {{cus.name}}
+                        {{cus.name}} - {{cus.phone}}
                     </mat-option>
                 </mat-autocomplete>
             </mat-form-field>

@@ -46,7 +46,7 @@ export class SearchCustomerComponent implements OnInit {
     private _filter(value: string): MainCustomer[] {
         const filterValue = value.toLowerCase();
 
-        return this.customers.filter(option => option.name.toLowerCase().includes(filterValue));
+        return this.customers.filter(option => option.name.toLowerCase().includes(filterValue) || option.phone.toLowerCase().includes(filterValue));
     }
 
     onCustomerSelect(event:any) {

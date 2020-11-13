@@ -53,6 +53,7 @@ export const sendSMS = functions.https.onRequest(async (request, response) => {
     const phoneNumber = `${request.query.number}`
     const smsText = `${request.query.text}`
     const type = `${request.query.type}`
+    const email = `${request.query.email}`
 
     var tokenMsg = request.header("tokenMsg")
     if (tokenMsg === undefined) {
@@ -68,7 +69,7 @@ export const sendSMS = functions.https.onRequest(async (request, response) => {
         }
     } else if (type === 'notification') {
         if (tokenMsg !== '') {
-            const res = await _sendNotification(tokenMsg, smsText)
+            const res = await _sendNotification(tokenMsg, smsText, email)
             response.send(res)
         } else {
             response.send(JSON.stringify({ "message": "done" }))
@@ -76,7 +77,7 @@ export const sendSMS = functions.https.onRequest(async (request, response) => {
 
     } else {
         const sms = _sendSMS(`+${phoneNumber}`, smsText)
-        await _sendNotification(tokenMsg, smsText)
+        await _sendNotification(tokenMsg, smsText, email)
         if (sms !== undefined) {
             response.send(sms)
         }
@@ -116,7 +117,16 @@ function _sendSMS(phoneNumber: string, smsText: string) {
     return null
 }
 
-async function _sendNotification(_token: string, smsText: string) {
+async function _sendNotification(_token: string, smsText: string, _email:string) {
+    const key = (await admin.database().ref().push()).key
+    await admin.firestore().collection('notifications').doc(key ?? 'asdfghjkl').set({
+        id: key,
+        message: smsText,
+        email: _email,
+        read:false,
+        created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
+        timestamp: admin.firestore.FieldValue.serverTimestamp()
+    })
     const payload = {
         notification: {
             title: `Message from Pronto`,

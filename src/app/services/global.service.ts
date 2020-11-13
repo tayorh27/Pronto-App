@@ -64,11 +64,11 @@ export class AppConfig {
     //     return /^\*?[1-9]\d{1, 14}$/.test(num)
     // }
 
-    sendSMS(http: HttpClient, phoneNumber: string, body: string, msg: string, type: string) {
+    sendSMS(http: HttpClient, phoneNumber: string, body: string, msg: string, type: string, email:string) {
         const _header = {
             "tokenMsg": msg
         }
-        return http.get(`https://us-central1-prontoappl.cloudfunctions.net/sendSMS?number=${phoneNumber}&text=${body}&type=${type}`, { headers: _header }).subscribe()
+        return http.get(`https://us-central1-prontoappl.cloudfunctions.net/sendSMS?number=${phoneNumber}&text=${body}&type=${type}&email=${email}`, { headers: _header }).subscribe()
     }
 
     async updateJobStatus(http: HttpClient, status: string, reasons: string, selectedJob: Jobs) {
@@ -96,7 +96,7 @@ export class AppConfig {
             firebase.firestore().collection('jobs').doc(selectedJob.id).collection('activities').doc(id).set(act).then(d => {
                 this.logActivity(`${current_name}|${current_email} updated job status from ${selectedJob.status} to : ${status}`)
                 // this.displayMessage('Status updated successfully', true)
-                this.sendSMS(http, selectedJob.agent.phone, `This job status was changed from ${selectedJob.status} to : ${status} by the technician for job id - ${selectedJob.job_id}`, selectedJob.agent.msgID.join(','), 'notification')
+                this.sendSMS(http, selectedJob.agent.phone, `This job status was changed from ${selectedJob.status} to : ${status} by the technician for job id - ${selectedJob.job_id}`, selectedJob.agent.msgID.join(','), 'notification', selectedJob.agent.email)
                 if (status.toLowerCase() === 'completed' || status.toLowerCase() === 'canceled' || status.toLowerCase() === 'cancelled') {
                     location.href = '/dashboard'
                 }

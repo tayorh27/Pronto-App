@@ -11,6 +11,7 @@ import { AppConfig } from 'src/app/services/global.service';
 import { HttpClient } from '@angular/common/http';
 import { ProgressSpinnerComponent } from '../../progress-spinner/progress-spinner.module';
 import { OverlayService } from '../../overlay/overlay.module';
+import * as geofirex from 'geofirex';
 
 declare const $: any
 
@@ -36,8 +37,40 @@ export class TechnicianDashboardComponent implements OnInit {
 
   _note = ''
 
-  constructor(private http: HttpClient, private previewProgressSpinner: OverlayService) {
+  w: Worker
 
+  constructor(private http: HttpClient, private previewProgressSpinner: OverlayService) {
+    if (typeof (Worker) !== "undefined") {
+      // console.log('working')
+      if (typeof (this.w) === "undefined") {
+        this.w = new Worker("background-services.js");
+      }
+      this.w.onmessage = async function (event) {
+        const res = event.data
+        console.log(res)
+        if (res.type === 'location') {
+          const pos = res.result
+          const email = localStorage.getItem('email')
+          const geoPoint = geofirex.init(firebase);
+          const position = geoPoint.point(pos.coords.latitude, pos.coords.longitude)
+          const _update = {
+            position: {
+              geohash: position.geohash,
+              geopoint: position.geopoint
+            },
+            modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`
+          }
+          await firebase.firestore().collection('customers').doc(email).update(_update)
+        } else {  
+          let audio = new Audio();
+          audio.src = "assets/audio/alarm-clock-23772.mp3";
+          audio.load();
+          audio.play();
+        }
+      };
+    } else {
+      // Sorry! No Web Worker support..
+    }
   }
 
   getCurrentJob() {
@@ -124,7 +157,11 @@ export class TechnicianDashboardComponent implements OnInit {
 
   acceptPendingJob() {
     this.previewProgressSpinner.open({ hasBackdrop: true }, ProgressSpinnerComponent)
-    this.config.updateJobStatus(this.http, 'Assigned', '', this.selectedJob).then(d => {
+    this.config.updateJobStatus(this.http, 'Assigned', '', this.selectedJob).then(async d => {
+      // const current_email = localStorage.getItem('email')
+      // const user = await this.service.getUserData(current_email)
+      const cusSMS = `A technician will be with you shortly. \nName: ${this.selectedJob.assigned_to.name}\nPhone: ${this.selectedJob.assigned_to.phone}`
+      this.config.sendSMS(this.http, this.selectedJob.customer.phone, cusSMS, '', 'sms', '')
       this.previewProgressSpinner.close()
     })
   }

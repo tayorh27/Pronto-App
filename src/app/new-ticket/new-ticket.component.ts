@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { FormControl, FormGroupDirective, FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import * as firebase from 'firebase/app';
@@ -40,7 +40,7 @@ const iconBase = 'http://maps.google.com/mapfiles/ms/icons/';
   styleUrls: ['./new-ticket.component.css']
 })
 
-export class MyNewTicketComponent implements OnInit {
+export class MyNewTicketComponent implements OnInit, OnDestroy {
 
   @ViewChild('map', { static: false }) mapElement: ElementRef;
 
@@ -142,6 +142,26 @@ export class MyNewTicketComponent implements OnInit {
 
   constructor(private http: HttpClient, private previewProgressSpinner: OverlayService) {
     // this.initMap();
+    const current_state = sessionStorage.getItem('current_state')
+  }
+
+  ngOnDestroy(): void {
+    const sessionState = {
+      _cat: this._cat,
+      _addr: this._addr,
+      radius: this.radius,
+      _note: this._note,
+      isReassign: this.isReassign,
+      hasURLQuery: this.hasURLQuery,
+      isAddNewCus: this.isAddNewCus,
+      _name: this._name,
+      _cus_addr: this._cus_addr,
+      _phone: this._phone,
+      _email: this._email,
+      // _addr: this._addr,
+      // _addr: this._addr,
+    }
+    sessionStorage.setItem('current_state', JSON.stringify(sessionState))
   }
 
   config = new AppConfig()
@@ -434,7 +454,7 @@ export class MyNewTicketComponent implements OnInit {
       address: findTech['address'],
       position: findTech['position'],
       phone: findTech['phone'],
-      email: findTech['email'],
+      email: `${findTech['email']}`.toLowerCase(),
       category: findTech['category'],
       status: findTech['status']
     }
@@ -472,7 +492,7 @@ export class MyNewTicketComponent implements OnInit {
         firebase.firestore().collection('jobs').doc(key).collection('activities').doc(id).set(act).then(d => {
           this.previewProgressSpinner.close()
           this.config.logActivity(`${current_name}|${current_email} created this job for : ${this.selectedCustomer.name} and assigned to ${technician.name}`)
-          this.sendSMS(findTech['name'], findTech['phone'], findTech['msgID'])
+          this.sendSMS(findTech['name'], findTech['phone'], findTech['msgID'], findTech['email'])
           this.config.displayMessage('Successfully created', true)
           setTimeout(() => {
             location.href = '/jobs'
@@ -508,7 +528,7 @@ export class MyNewTicketComponent implements OnInit {
         firebase.firestore().collection('jobs').doc(this.selectedJob.id).collection('activities').doc(id).set(act).then(d => {
           this.previewProgressSpinner.close()
           this.config.logActivity(`${current_name}|${current_email} updated this job for : ${this.selectedCustomer.name} and reassigned to ${technician.name}`)
-          this.sendSMS(findTech['name'], findTech['phone'], findTech['msgID'])
+          this.sendSMS(findTech['name'], findTech['phone'], findTech['msgID'], findTech['email'])
           this.config.displayMessage('Successfully created', true)
         }).catch(err => {
           this.previewProgressSpinner.close()
@@ -521,12 +541,12 @@ export class MyNewTicketComponent implements OnInit {
     }
   }
 
-  sendSMS(tech_name: string, tech_number: string, ids: string[]) {
+  sendSMS(tech_name: string, tech_number: string, ids: string[], email:string) {
     const techSMS = `You have been assigned a job. Please login to Pronto to accept the job and to view customer details.`
     const cusSMS = `A technician will be with you shortly. \nName: ${tech_name}\nPhone: ${tech_number}`
 
-    this.config.sendSMS(this.http, tech_number, techSMS, ids.join(','), 'notification')
-    this.config.sendSMS(this.http, this.selectedCustomer.phone, cusSMS, '', 'sms')
+    this.config.sendSMS(this.http, tech_number, techSMS, ids.join(','), 'notification', email)
+    // this.config.sendSMS(this.http, this.selectedCustomer.phone, cusSMS, '', 'sms')
   }
 
   //update technician status to assign and send sms to both customer and technician

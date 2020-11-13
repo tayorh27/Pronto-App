@@ -50,6 +50,8 @@ import { AppRoutes } from './app.routing';
 import { RouteGuard, LoginRouteGuard } from './route.guard';
 import { AppOverlayModule } from './overlay/overlay.module';
 import { ProgressSpinnerModule, ProgressSpinnerComponent } from './progress-spinner/progress-spinner.module';
+// import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 // // import { AddJobComponent } from './add-job/add-job.component';
 
@@ -96,6 +98,7 @@ import { ProgressSpinnerModule, ProgressSpinnerComponent } from './progress-spin
     // GooglePlaceModule
   ],
   declarations: [],
+  // imports: [ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })],
 })
 export class MaterialModule { }
 

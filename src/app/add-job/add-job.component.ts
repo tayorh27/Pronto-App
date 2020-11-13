@@ -279,9 +279,9 @@ export class AddJobComponent implements OnInit {
   async backEndJobUpdate(status: string) {
     const current_email = localStorage.getItem('email')
     await firebase.firestore().collection('jobs').doc(this.selectedJob.id).update({
-      'back_end_status': (status.toLowerCase() === 'completed' || status.toLowerCase() === 'canceled' || status.toLowerCase() === 'cancelled') ? 'inactive' : 'active'
+      'back_end_status': (status.toLowerCase() === 'completed' || status.toLowerCase() === 'approved' || status.toLowerCase() === 'canceled' || status.toLowerCase() === 'cancelled') ? 'inactive' : 'active'
     })
-    if(status.toLowerCase() === 'completed' || status.toLowerCase() === 'canceled' || status.toLowerCase() === 'cancelled'){
+    if(status.toLowerCase() === 'completed' || status.toLowerCase() === 'canceled' || status.toLowerCase() === 'cancelled' || status.toLowerCase() === 'approved'){
       this.config.updateTechnicianStatus(current_email, 'online')
     }
   }

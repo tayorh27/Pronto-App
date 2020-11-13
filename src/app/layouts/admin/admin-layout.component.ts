@@ -195,20 +195,20 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
 
 
   requestMessagingPermissionAndGetToken(email: string) {
-    const key = firebase.database().ref().push().key
-    firebase.messaging().usePublicVapidKey("BPsDZQr2d7uTVo61hA6YRR1vvxwqB_hVsO1vbO14DH6dczeH4hJgHebN6egPv0zR5wDOdwYAal6XhwWSTyz7CbI")
-    // Notification.requestPermission
-    firebase.messaging().requestPermission().then(done => {
-      firebase.messaging().getToken().then(userToken => {
-        firebase.firestore().collection("users").doc(email).update({
-          msgID: firebase.firestore.FieldValue.arrayUnion(userToken)
-        })
-      })
-    })
-    firebase.messaging().onTokenRefresh(userToken => {
-      firebase.firestore().collection("users").doc(email).update({
-        msgID: firebase.firestore.FieldValue.arrayUnion(userToken)
-      })
-    })
+    // const key = firebase.database().ref().push().key
+    // firebase.messaging().usePublicVapidKey("BPsDZQr2d7uTVo61hA6YRR1vvxwqB_hVsO1vbO14DH6dczeH4hJgHebN6egPv0zR5wDOdwYAal6XhwWSTyz7CbI")
+    // // Notification.requestPermission
+    // firebase.messaging().requestPermission().then(done => {
+    //   firebase.messaging().getToken().then(userToken => {
+    //     firebase.firestore().collection("users").doc(email).update({
+    //       msgID: firebase.firestore.FieldValue.arrayUnion(userToken)
+    //     })
+    //   })
+    // })
+    // firebase.messaging().onTokenRefresh(userToken => {
+    //   firebase.firestore().collection("users").doc(email).update({
+    //     msgID: firebase.firestore.FieldValue.arrayUnion(userToken)
+    //   })
+    // })
   }
 }
