@@ -143,16 +143,32 @@ export class MyNewTicketComponent implements OnInit, OnDestroy {
   constructor(private http: HttpClient, private previewProgressSpinner: OverlayService) {
     // this.initMap();
     const current_state = sessionStorage.getItem('current_state')
+    if (current_state !== null) {
+      if (current_state !== '') {
+        const json = JSON.parse(current_state)
+        this._cat = json._cat
+        // this._addr = json._addr
+        this.radius = json.radius
+        this._note = json._note
+        // this.isReassign = json.isReassign
+        // this.hasURLQuery = json.hasURLQuery
+        this.isAddNewCus = json.isAddNewCus
+        this._name = json._name
+        this._cus_addr = json._cus_addr
+        this._phone = json._phone
+        this._email = json._email
+      }
+    }
   }
 
   ngOnDestroy(): void {
     const sessionState = {
       _cat: this._cat,
-      _addr: this._addr,
+      // _addr: this._addr,
       radius: this.radius,
       _note: this._note,
-      isReassign: this.isReassign,
-      hasURLQuery: this.hasURLQuery,
+      // isReassign: this.isReassign,
+      // hasURLQuery: this.hasURLQuery,
       isAddNewCus: this.isAddNewCus,
       _name: this._name,
       _cus_addr: this._cus_addr,
@@ -541,7 +557,7 @@ export class MyNewTicketComponent implements OnInit, OnDestroy {
     }
   }
 
-  sendSMS(tech_name: string, tech_number: string, ids: string[], email:string) {
+  sendSMS(tech_name: string, tech_number: string, ids: string[], email: string) {
     const techSMS = `You have been assigned a job. Please login to Pronto to accept the job and to view customer details.`
     const cusSMS = `A technician will be with you shortly. \nName: ${tech_name}\nPhone: ${tech_number}`
 

@@ -211,6 +211,21 @@ export class SidebarComponent implements OnInit {
     public menuItems: any[] = [];
     ps: any;
 
+    notification_count = 0
+    notifications = []
+
+    getNotifications() {
+        const email = localStorage.getItem('email')
+        firebase.firestore().collection('notifications').where('email', '==', email).where('read', '==', false).orderBy('timestamp', 'desc').onSnapshot(query => {
+            this.notifications = []
+            this.notification_count = query.size
+            query.forEach(q => {
+                const n = q.data()
+                this.notifications.push(n)
+            })
+        })
+    }
+
     constructor(private router: Router) {
         this.getProfile();
     }
@@ -313,6 +328,7 @@ export class SidebarComponent implements OnInit {
             const elemSidebar = <HTMLElement>document.querySelector('.sidebar .sidebar-wrapper');
             this.ps = new PerfectScrollbar(elemSidebar);
         }
+        this.getNotifications()
     }
     updatePS(): void {
         if (window.matchMedia(`(min-width: 960px)`).matches && !this.isMac()) {

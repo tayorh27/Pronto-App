@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import swal from 'sweetalert2';
 import * as firebase from "firebase/app";
+import 'firebase/firestore'
 import 'firebase/auth'
 const misc: any = {
     navbar_menu_visible: 0,
@@ -26,6 +27,21 @@ export class NavbarComponent implements OnInit {
     private toggleButton: any;
     private sidebarVisible: boolean;
     private _router: Subscription;
+
+    notification_count = 0
+    notifications = []
+
+    getNotifications() {
+        const email = localStorage.getItem('email')
+        firebase.firestore().collection('notifications').where('email', '==', email).where('read', '==', false).orderBy('timestamp', 'desc').onSnapshot(query => {
+            this.notifications = []
+            this.notification_count = query.size
+            query.forEach(q => {
+                const n = q.data()
+                this.notifications.push(n)
+            })
+        })
+    }
 
     @ViewChild('app-navbar-cmp', {static: false}) button: any;
 
@@ -112,6 +128,7 @@ export class NavbarComponent implements OnInit {
             $layer.remove();
           }
         });
+        this.getNotifications()
     }
     onResize(event) {
       if ($(window).width() > 991) {

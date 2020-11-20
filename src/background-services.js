@@ -1,7 +1,7 @@
 console.log('hereeeeee')
-// importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js');
-// importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js');
-// importScripts('https://maps.googleapis.com/maps/api/js?key=AIzaSyA3n47b9Kgdiy4l4ubnRMh6XGPGTJzod8c&amp;libraries=places&amp;language=en');
+importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js');
+importScripts('https://maps.googleapis.com/maps/api/js?key=AIzaSyA3n47b9Kgdiy4l4ubnRMh6XGPGTJzod8c&amp;libraries=places&amp;language=en');
 
 // // Initialize the Firebase app in the service worker by passing in the
 // // messagingSenderId.

@@ -35,6 +35,25 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   user_type = ''
 
+  notification_count = 0
+  notifications = []
+
+  getNotifications() {
+    const email = localStorage.getItem('email')
+    firebase.firestore().collection('notifications').where('email', '==', email).where('read', '==', false).orderBy('timestamp', 'desc').onSnapshot(query => {
+      this.notifications = []
+      this.notification_count = query.size
+      query.forEach(q => {
+        const n = q.data()
+        this.notifications.push(n)
+      })
+    })
+  }
+
+  async updateNot(id: string) {
+    await firebase.firestore().collection('notifications').doc(id).update({ 'read': true })
+  }
+
   // constructor(private datas: DataService) { }
 
   getCustomer() {
@@ -92,8 +111,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.getCustomer()
         this.getTechnicians()
         this.getJobs()
-      } else {
-
+        this.getNotifications()
       }
     })
 

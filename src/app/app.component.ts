@@ -73,7 +73,21 @@ export class AppComponent implements OnInit {
     }
   }
 
+  worker:Worker
+
   ngOnInit() {
+    if (typeof Worker !== 'undefined') {
+      // Create a new
+      console.log('33hmmmmm')
+      this.worker = new Worker('./app.worker', { type: 'module' });
+      this.worker.onmessage = ({ data }) => {
+        console.log(`page got message: ${data}`);
+      };
+    } else {
+      console.log('hmmmmm')
+      // Web Workers are not supported in this environment.
+      // You should add a fallback so that your program still executes correctly.
+    }
     this._router = this.router.events.filter(event => event instanceof NavigationEnd).subscribe((event: NavigationEnd) => {
       const body = document.getElementsByTagName('body')[0];
       const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
@@ -89,6 +103,10 @@ export class AppComponent implements OnInit {
 
     this.checkLoggedInAccess()
     this.checkblockeduser()
+    setTimeout(()=>{
+      console.log(this.worker)
+      this.worker.postMessage('hello');
+    },5000)
   }
 
 }

@@ -59,7 +59,8 @@
               "node_modules/jqvmap/dist/jquery.vmap.min.js",
               "node_modules/jqvmap/dist/maps/jquery.vmap.world.js",
               "node_modules/jquery-validation/dist/jquery.validate.min.js"
-            ]
+            ],
+            "webWorkerTsConfig": "tsconfig.worker.json"
           },
           "configurations": {
             "production": {
@@ -151,7 +152,8 @@
           "options": {
             "tsConfig": [
               "src/tsconfig.app.json",
-              "src/tsconfig.spec.json"
+              "src/tsconfig.spec.json",
+              "tsconfig.worker.json"
             ],
             "exclude": [
               "**/node_modules/**"

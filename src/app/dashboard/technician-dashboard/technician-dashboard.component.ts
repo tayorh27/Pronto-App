@@ -40,37 +40,43 @@ export class TechnicianDashboardComponent implements OnInit {
   w: Worker
 
   constructor(private http: HttpClient, private previewProgressSpinner: OverlayService) {
-    if (typeof (Worker) !== "undefined") {
-      // console.log('working')
-      if (typeof (this.w) === "undefined") {
-        this.w = new Worker("background-services.js");
-      }
-      this.w.onmessage = async function (event) {
-        const res = event.data
-        console.log(res)
-        if (res.type === 'location') {
-          const pos = res.result
-          const email = localStorage.getItem('email')
-          const geoPoint = geofirex.init(firebase);
-          const position = geoPoint.point(pos.coords.latitude, pos.coords.longitude)
-          const _update = {
-            position: {
-              geohash: position.geohash,
-              geopoint: position.geopoint
-            },
-            modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`
-          }
-          await firebase.firestore().collection('customers').doc(email).update(_update)
-        } else {  
-          let audio = new Audio();
-          audio.src = "assets/audio/alarm-clock-23772.mp3";
-          audio.load();
-          audio.play();
-        }
-      };
-    } else {
-      // Sorry! No Web Worker support..
-    }
+    // if (typeof (Worker) !== "undefined") {
+    //   // console.log('working')
+    //   if (typeof (this.w) === "undefined") {
+    //     console.log('hhh')
+    //     // this.w = new Worker("background-services.js");
+    //     this.w = new Worker('./app.worker', { type: 'module' });
+    //     this.w.onmessage = async function (event) {
+    //       const res = event
+    //       console.log(res)
+    //       // if (res.type === 'location') {
+    //       //   const pos = res.result
+    //       //   const email = localStorage.getItem('email')
+    //       //   const geoPoint = geofirex.init(firebase);
+    //       //   const position = geoPoint.point(pos.coords.latitude, pos.coords.longitude)
+    //       //   const _update = {
+    //       //     position: {
+    //       //       geohash: position.geohash,
+    //       //       geopoint: position.geopoint
+    //       //     },
+    //       //     modified_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`
+    //       //   }
+    //       //   await firebase.firestore().collection('users').doc(email).update(_update)
+    //       // } else {
+    //       //   // let audio = new Audio();
+    //       //   // audio.src = "assets/audio/alarm-clock-23772.mp3";
+    //       //   // audio.load();
+    //       //   // audio.play();
+    //       // }
+    //     };
+    //     this.w.postMessage('start work now')
+    //     this.w.onerror = function (err) {
+    //       // console.log(err.message)
+    //     }
+    //   }
+    // } else {
+    //   console.log('none')
+    // }
   }
 
   getCurrentJob() {
@@ -83,7 +89,7 @@ export class TechnicianDashboardComponent implements OnInit {
         return
       }
       this.selectedJob = <Jobs>query.docs[0].data()
-      if (this.selectedJob.status === "Pending") {
+      if (this.selectedJob.status === "Pending") {//change later
         this.playAudio()
       }
     })
