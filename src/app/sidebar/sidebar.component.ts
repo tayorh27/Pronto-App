@@ -15,6 +15,7 @@ declare const $: any;
 export interface RouteInfo {
     path: string;
     title: string;
+    display_title: string;
     type: string;
     icontype: string;
     access?: boolean;
@@ -33,6 +34,7 @@ export interface ChildrenItems {
 export const ROUTES: RouteInfo[] = [{
     path: '/dashboard',
     title: 'Dashboard',
+    display_title: 'Dashboard',
     type: 'link',
     icontype: 'dashboard',
     access: true
@@ -40,27 +42,31 @@ export const ROUTES: RouteInfo[] = [{
 {
     path: '/new-ticket',
     title: 'New Ticket',
+    display_title: 'New Ticket',
     type: 'link',
     icontype: 'create_new_folder',
     access: false
 },
 {
     path: '/customer',
-    title: 'Pronto Customer',
+    title: 'Customer',
+    display_title: 'Pronto Customer',
     type: 'link',
     icontype: 'people',
     access: false
 },
 {
     path: '/category',
-    title: 'Skill-Sets',
+    title: 'Category',
+    display_title: 'Skill-Sets',
     type: 'link',
     icontype: 'link',
     access: false
 },
 {
     path: '/technician',
-    title: 'Pronto Technician',
+    title: 'Technician',
+    display_title: 'Pronto Technician',
     type: 'link',
     icontype: 'handyman',
     access: false
@@ -68,6 +74,7 @@ export const ROUTES: RouteInfo[] = [{
 {
     path: '/jobs',
     title: 'Jobs',
+    display_title: 'Jobs',
     type: 'link',
     icontype: 'work',
     access: false
@@ -75,17 +82,19 @@ export const ROUTES: RouteInfo[] = [{
 {
     path: '/app-settings',
     title: 'App Settings',
+    display_title: 'App Settings',
     type: 'sub',
     icontype: 'settings',
     access: false,
     collapse: 'appsettings',
     children: [
-        { path: 'status', title: 'Status', ab: 'S' },
+        { path: 'status', title: 'Status', display_title: 'Status', ab: 'S' },
     ]
 },
 {
     path: '/logs',
     title: 'Logs',
+    display_title: 'Logs',
     type: 'link',
     icontype: 'apps',
     access: false
@@ -93,6 +102,7 @@ export const ROUTES: RouteInfo[] = [{
 {
     path: '/assigned-jobs',
     title: 'Assigned Jobs',
+    display_title: 'Assigned Jobs',
     type: 'link',
     icontype: 'work',
     access: false
