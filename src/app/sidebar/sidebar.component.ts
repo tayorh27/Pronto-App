@@ -26,6 +26,7 @@ export interface RouteInfo {
 export interface ChildrenItems {
     path: string;
     title: string;
+    display_title: string;
     ab: string;
     type?: string;
 }
