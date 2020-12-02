@@ -15,6 +15,7 @@ declare const $: any;
 export interface RouteInfo {
     path: string;
     title: string;
+    display_title: string;
     type: string;
     icontype: string;
     access?: boolean;
@@ -25,6 +26,7 @@ export interface RouteInfo {
 export interface ChildrenItems {
     path: string;
     title: string;
+    display_title: string;
     ab: string;
     type?: string;
 }
@@ -33,6 +35,7 @@ export interface ChildrenItems {
 export const ROUTES: RouteInfo[] = [{
     path: '/dashboard',
     title: 'Dashboard',
+    display_title: 'Dashboard',
     type: 'link',
     icontype: 'dashboard',
     access: true
@@ -40,27 +43,31 @@ export const ROUTES: RouteInfo[] = [{
 {
     path: '/new-ticket',
     title: 'New Ticket',
+    display_title: 'New Ticket',
     type: 'link',
     icontype: 'create_new_folder',
     access: false
 },
 {
     path: '/customer',
-    title: 'Pronto Customer',
+    title: 'Customer',
+    display_title: 'Pronto Customer',
     type: 'link',
     icontype: 'people',
     access: false
 },
 {
     path: '/category',
-    title: 'Skill-Sets',
+    title: 'Category',
+    display_title: 'Skill-Sets',
     type: 'link',
     icontype: 'link',
     access: false
 },
 {
     path: '/technician',
-    title: 'Pronto Technician',
+    title: 'Technician',
+    display_title: 'Pronto Technician',
     type: 'link',
     icontype: 'handyman',
     access: false
@@ -68,6 +75,7 @@ export const ROUTES: RouteInfo[] = [{
 {
     path: '/jobs',
     title: 'Jobs',
+    display_title: 'Jobs',
     type: 'link',
     icontype: 'work',
     access: false
@@ -75,17 +83,19 @@ export const ROUTES: RouteInfo[] = [{
 {
     path: '/app-settings',
     title: 'App Settings',
+    display_title: 'App Settings',
     type: 'sub',
     icontype: 'settings',
     access: false,
     collapse: 'appsettings',
     children: [
-        { path: 'status', title: 'Status', ab: 'S' },
+        { path: 'status', title: 'Status', display_title: 'Status', ab: 'S' },
     ]
 },
 {
     path: '/logs',
     title: 'Logs',
+    display_title: 'Logs',
     type: 'link',
     icontype: 'apps',
     access: false
@@ -93,6 +103,7 @@ export const ROUTES: RouteInfo[] = [{
 {
     path: '/assigned-jobs',
     title: 'Assigned Jobs',
+    display_title: 'Assigned Jobs',
     type: 'link',
     icontype: 'work',
     access: false
@@ -211,21 +222,6 @@ export class SidebarComponent implements OnInit {
     public menuItems: any[] = [];
     ps: any;
 
-    notification_count = 0
-    notifications = []
-
-    getNotifications() {
-        const email = localStorage.getItem('email')
-        firebase.firestore().collection('notifications').where('email', '==', email).where('read', '==', false).orderBy('timestamp', 'desc').onSnapshot(query => {
-            this.notifications = []
-            this.notification_count = query.size
-            query.forEach(q => {
-                const n = q.data()
-                this.notifications.push(n)
-            })
-        })
-    }
-
     constructor(private router: Router) {
         this.getProfile();
     }
@@ -328,7 +324,6 @@ export class SidebarComponent implements OnInit {
             const elemSidebar = <HTMLElement>document.querySelector('.sidebar .sidebar-wrapper');
             this.ps = new PerfectScrollbar(elemSidebar);
         }
-        this.getNotifications()
     }
     updatePS(): void {
         if (window.matchMedia(`(min-width: 960px)`).matches && !this.isMac()) {
@@ -354,7 +349,8 @@ export class SidebarComponent implements OnInit {
 
     gotoSingleLink(menu_path:string) {
         // this.router.navigate([`${menu_path}`])
-        if (this.user.user_type == 'admin') {
+        //this.user.user_type == 'admin'
+        if (this.role == 'Administrator') {
             this.router.navigate([`${menu_path}`])
         } else {
             location.href = `${menu_path}`
