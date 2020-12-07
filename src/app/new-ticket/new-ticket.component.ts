@@ -31,7 +31,7 @@ const options = {
   maximumAge: 0
 };
 let infowindow: any;
-const iconBase = 'http://maps.google.com/mapfiles/ms/icons/';
+const iconBase = 'https://maps.google.com/mapfiles/ms/icons/';
 
 
 @Component({
@@ -443,6 +443,7 @@ export class MyNewTicketComponent implements OnInit, OnDestroy {
         return
       }
 
+      //remove markers
       this.technicians = []
       // map.marke
       query.forEach(tech => {
