@@ -34,7 +34,26 @@ export const cloudpbx = functions.https.onRequest(async (request, response) => {
 
     return axios.post('https://9mobile.nativetalk.com.ng/api/signup', getBody, { headers: _header }).then(res => {
         // console.log(res.data)
-        response.send(res.data);
+        // response.send(res.data);
+
+        const dt = res.data
+        const _dt = dt["data"]
+
+        const otp_body = {
+            "otp": _dt["otp"],
+            "number": _dt["number"],//this.did.toString().replace(re, ''),
+            "last_id": _dt["last_id"]
+        }
+
+        return axios.post('https://9mobile.nativetalk.com.ng/api/signup/verify_otp', JSON.stringify(otp_body), { headers: _header }).then(_res => {
+            response.send(_res.data);
+        }).catch(err => {
+            // console.log(err)
+            response.send(err);
+        })
+
+
+
     }).catch(err => {
         // console.log(err)
         response.send(err);
@@ -117,13 +136,13 @@ function _sendSMS(phoneNumber: string, smsText: string) {
     return null
 }
 
-async function _sendNotification(_token: string, smsText: string, _email:string) {
+async function _sendNotification(_token: string, smsText: string, _email: string) {
     const key = (await admin.database().ref().push()).key
     await admin.firestore().collection('notifications').doc(key ?? 'asdfghjkl').set({
         id: key,
         message: smsText,
         email: _email,
-        read:false,
+        read: false,
         created_date: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,
         timestamp: admin.firestore.FieldValue.serverTimestamp()
     })

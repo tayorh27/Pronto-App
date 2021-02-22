@@ -1,6 +1,6 @@
 <div class="main-content">
   <div class="container-fluid">
-    <div class="row" *ngIf="!addNewTech">
+    <div class="row" *ngIf="!addNewTech  && !mapview">
       <div class="col-md-12">
         <div class="card">
           <div class="card-header card-header-primary card-header-icon">
@@ -10,6 +10,9 @@
             <h4 class="card-title">My Technician</h4>
             <button mat-raised-button class="btn btn-primary" (click)="addTech()">
               Add New Technician
+            </button>
+            <button mat-raised-button class="btn btn-primary" (click)="enableMapView()">
+              MapView
             </button>
           </div>
           <div class="card-body">
@@ -45,18 +48,20 @@
                 </tfoot>
                 <tbody>
                   <tr *ngFor="let row of dataTable.dataRows">
-                    <td>{{ row[1] }}</td>
+                    <td><a href="/jobs/technician/{{row[4]}}">{{ row[1] }}</a></td>
                     <td>{{ row[2] }}</td>
                     <td>{{ row[3] }}</td>
                     <td>{{ row[4] }}</td>
                     <td>{{ row[5] }}</td>
                     <td>{{ row[6] }}</td>
                     <td class="text-right">
-                      <a href="javascript:void(0)" (click)="editTechClick(row[0])" data-toggle="tooltip" title="edit" data-placement="bottom"
-                        class="btn btn-link btn-warning btn-just-icon edit"><i class="material-icons">edit</i></a>
+                      <a href="javascript:void(0)" (click)="editTechClick(row[0])" data-toggle="tooltip" title="edit"
+                        data-placement="bottom" class="btn btn-link btn-warning btn-just-icon edit"><i
+                          class="material-icons">edit</i></a>
                       <a *ngIf="role === 'Administrator' || role === 'SubAdmin'" href="javascript:void(0)"
-                        (click)="deleteTechClick(row[0], row[4])" data-toggle="tooltip" title="delete" data-placement="bottom"
-                        class="btn btn-link btn-danger btn-just-icon remove"><i class="material-icons">close</i></a>
+                        (click)="deleteTechClick(row[0], row[4])" data-toggle="tooltip" title="delete"
+                        data-placement="bottom" class="btn btn-link btn-danger btn-just-icon remove"><i
+                          class="material-icons">close</i></a>
                     </td>
                   </tr>
                 </tbody>
@@ -72,7 +77,7 @@
     <!-- end row -->
 
     <!-----FORM FIELDS-->
-    <div class="row" *ngIf="addNewTech">
+    <div class="row" *ngIf="addNewTech && !mapview">
       <div class="col-md-10 offset-md-1">
         <div class="card">
           <div class="card-header card-header-rose card-header-icon">
@@ -160,6 +165,22 @@
           <div style="display: none">
             <p id="madd"></p>
             <p id="mgeo"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="mapview">
+      <div class="col-md-10 offset-md-1">
+        <div class="card">
+          <div class="card-header card-header-rose card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">mail_outline</i>
+            </div>
+            <h4 class="card-title">Technicians Location</h4>
+          </div>
+          <div class="card-body">
+            <div #map id="map" class="mapSize"></div>
           </div>
         </div>
       </div>

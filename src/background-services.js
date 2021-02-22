@@ -1,7 +1,13 @@
 console.log('hereeeeee')
-importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js');
-importScripts('https://maps.googleapis.com/maps/api/js?key=AIzaSyA3n47b9Kgdiy4l4ubnRMh6XGPGTJzod8c&amp;libraries=places&amp;language=en');
+addEventListener('message', ({ data }) => {
+    const response = `worker response to ${data}`;
+    console.log(response)
+    postMessage(response);
+    // c()
+});
+// importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js');
+// importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js');
+// importScripts('https://maps.googleapis.com/maps/api/js?key=AIzaSyA3n47b9Kgdiy4l4ubnRMh6XGPGTJzod8c&amp;libraries=places&amp;language=en');
 
 // // Initialize the Firebase app in the service worker by passing in the
 // // messagingSenderId.
@@ -40,7 +46,7 @@ function report(state) {
 
 function getLocation() {
     console.log('here 1')
-    navigator.geolocation.watchPosition(showPosition);
+    window.navigator.geolocation.watchPosition(showPosition);
     // if (navigator.geolocation) {
     //     navigator.geolocation.watchPosition(showPosition);
     // } else {
@@ -57,7 +63,7 @@ function showPosition(position) {
 
 function listenForJobs() {
     console.log('here 3')
-    const email = localStorage.getItem('email')
+    const email = window.localStorage.getItem('email')
     firebase.firestore().collection('jobs').where('assigned_to.email', '==', email).where('back_end_status', '==', 'active').onSnapshot(query => {
         // query.forEach(data => {
         //   const job = <Jobs>data.data()
@@ -74,4 +80,4 @@ function listenForJobs() {
 }
 
 handlePermission();
-// listenForJobs();
+listenForJobs();

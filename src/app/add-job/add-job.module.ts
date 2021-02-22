@@ -9,6 +9,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AddJobRoutes } from './add-job.routing';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { SearchJobComponent } from './jobs/search-job.component';
 @NgModule({
     imports: [
         CommonModule,
@@ -19,10 +20,11 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
         NgbModule
     ],
     declarations: [
-        AddJobComponent
+        AddJobComponent,
+        SearchJobComponent
     ],
     exports: [
-        AddJobComponent
+        AddJobComponent,
     ]
 })
 export class AddJobModule { }

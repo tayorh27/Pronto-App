@@ -79,7 +79,7 @@ export class AppComponent implements OnInit {
     if (typeof Worker !== 'undefined') {
       // Create a new
       console.log('33hmmmmm')
-      this.worker = new Worker('./app.worker', { type: 'module' });
+      this.worker = new Worker('background-services.js')//, { type: 'module' }
       this.worker.onmessage = ({ data }) => {
         console.log(`page got message: ${data}`);
       };
@@ -103,10 +103,10 @@ export class AppComponent implements OnInit {
 
     this.checkLoggedInAccess()
     this.checkblockeduser()
-    setTimeout(()=>{
-      console.log(this.worker)
-      this.worker.postMessage('hello');
-    },5000)
+    // setTimeout(()=>{
+    //   console.log(this.worker)
+    //   this.worker.postMessage('hello');
+    // },5000)
   }
 
 }

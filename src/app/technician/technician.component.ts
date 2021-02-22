@@ -1,6 +1,6 @@
 import { DataService } from './../services/data.services';
 import { MainTechnician } from './../model/technician';
-import { Component, OnInit, AfterViewInit, OnDestroy, Output } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Output, ElementRef, ViewChild } from '@angular/core';
 import * as firebase from 'firebase/app';
 import * as geofirex from 'geofirex';
 import 'firebase/firestore';
@@ -26,6 +26,18 @@ declare interface DataTable {
 
 // declare const $: any;
 
+declare var google: any;
+let map: any;
+let marker: any = {}
+const options = {
+  enableHighAccuracy: true,
+  timeout: 60000,
+  maximumAge: 0
+};
+let infowindow: any;
+const iconBase = 'https://maps.google.com/mapfiles/ms/icons/';
+
+
 @Component({
   selector: 'app-technician',
   templateUrl: './technician.component.html',
@@ -33,6 +45,87 @@ declare interface DataTable {
 })
 
 export class MyTechnicianComponent implements OnInit, OnDestroy {
+
+  @ViewChild('map', { static: false }) mapElement: ElementRef;
+
+  markerPan: any
+
+  initMap() {
+    navigator.geolocation.getCurrentPosition((location) => {
+      map = new google.maps.Map(this.mapElement.nativeElement, {
+        center: { lat: location.coords.latitude, lng: location.coords.longitude },
+        zoom: 10
+      });
+
+      infowindow = new google.maps.InfoWindow();
+
+
+      marker['current'] = new google.maps.Marker({
+        position: { lat: location.coords.latitude, lng: location.coords.longitude },
+        map,
+        title: 'Click to zoom',
+        icon: iconBase + 'blue-dot.png'
+      });
+
+      this.markerPan = marker['current']
+
+      map.addListener('center_changed', () => {
+        window.setTimeout(() => {
+          map.panTo(this.markerPan.getPosition());
+        }, 3000);
+      });
+
+      marker['current'].addListener('click', (event: any) => {
+        infowindow.setPosition(event.latLng);
+        infowindow.setContent(`Current location`);// +'<h3><a href="/add-donor/' + marker.getPosition().lat() + '/' + marker.getPosition().lng() + '">Register Here</a></h3>
+        infowindow.open(map, marker['current']);
+      });
+    }, (error) => {
+      this.config.displayMessage(`${error.message}. Refresh this page.`, false);
+    }, options);
+  }
+
+  createMarker(latitude: any, longitude: any, _id: any, tech: any) {
+    const stat = `${tech['status']}` //status of technician: offline, online
+    const display = (stat === 'online') ? 'block' : 'none'
+
+    marker[_id] = new google.maps.Marker({
+      map,
+      position: { lat: latitude, lng: longitude },
+      icon: (stat === 'online') ? iconBase + 'green-dot.png' : iconBase + 'red-dot.png'
+    });
+
+    this.markerPan = marker[_id]
+
+    google.maps.event.addListener(marker[_id], 'click', function () {
+      infowindow.setContent(`<div class="card">
+      <div class="card-header card-header-text card-header-rose">
+        <div class="card-text">
+          <h4 class="card-title">${tech['name']}</h4>
+        </div>
+        <div class="card-body">
+        <label>Email Address: <a href="mailto:${tech['email']}">${tech['email']}</a></label><br>
+        <label>Phone Number: <a href="tel:${tech['phone']}">${tech['phone']}</a></label><br>
+        <label>Address: <a href="https://google.com/maps/@${latitude},${longitude},15z" target="_blank">${latitude},${longitude}</a></label><br>
+        <label>Status: ${tech['status']}</label><br>
+        </div>
+        <div class="card-footer">
+        <a href="/new-ticket?technician=${tech["email"].toLowerCase()}" style="display: ${display};" mat-raised-button type="button" id="${_id}" class="btn btn-fill btn-rose btn-block">
+             Assign
+        </a>
+        </div>
+      </div>
+      </div>`)//(click)="assignClicked('hello')"
+      infowindow.open(map, marker[_id])
+      setTimeout(() => {
+        //listen for onclick
+        document.getElementById(_id).addEventListener('click', () => {
+          document.getElementById('assign-id').innerText = _id
+          document.getElementById('assignBtnClick').click()
+        })
+      }, 500)
+    });
+  }
 
   // @Output() public found = new EventEmitter<any>();
 
@@ -55,6 +148,8 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
 
   service = new AdminUsersService();
   role = ''
+
+  mapview = false
 
   ngOnDestroy() {
 
@@ -285,7 +380,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       const position = geoPoint.point(geo['lat'], geo['lng'])
 
       const url = await this.uploadImage(image)
-      if(url === undefined){
+      if (url === undefined) {
         this.button_pressed = false
         return
       }
@@ -325,9 +420,9 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
       })
     } else {//you are to perform update operattion here
       const position = (geo['lat'] === undefined) ? geoPoint.point(geo['latitude'], geo['longitude']) : geoPoint.point(geo['lat'], geo['lng'])
-      if(image.length > 0) {
+      if (image.length > 0) {
         const url = await this.uploadImage(image)
-        if(url === undefined){
+        if (url === undefined) {
           this.button_pressed = false
           return
         }
@@ -361,7 +456,7 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
 
   }
 
-  async uploadImage(image:FileList) {
+  async uploadImage(image: FileList) {
     const type = image.item(0).name.substring(image.item(0).name.lastIndexOf('.'))
     console.log(type)
     const size = image.item(0).size
@@ -400,6 +495,37 @@ export class MyTechnicianComponent implements OnInit, OnDestroy {
     const table = (<any>$('#datatables')).DataTable();
 
     $('.card .material-datatables label').addClass('form-group');
+  }
+
+  /**
+   * perform search on firebase using geofirex library
+  */
+  async searchForTechnicians() {
+    console.log('yo')
+    // Create a GeoCollection reference
+    firebase.firestore().collection('users').where('user_type', '==', 'technician').onSnapshot(query => {
+      marker = {}
+      query.forEach(tech => {
+        // this.technicians.push(tech)
+        const dt = tech.data()
+        const coords = dt['position']
+        const point = coords['geopoint']
+        console.log(point)
+        // console.log(tech)
+        this.createMarker(point['latitude'], point['longitude'], dt['id'], dt)
+        // console.log(tech)
+      })
+    })
+
+
+  }
+
+  enableMapView() {
+    this.mapview = true
+    setTimeout(() => {
+      this.initMap()
+    }, 2000)
+    setTimeout(() => { this.searchForTechnicians() }, 10000)
   }
 }
 

@@ -71,6 +71,10 @@
                           (click)="searchButtonClick()" [disabled]="button_pressed">
                           {{button_pressed ? 'Please wait...' : 'Search'}}
                         </button>
+                        <!-- <button *ngIf="technicianSelected" mat-raised-button type="submit" class="btn btn-fill btn-rose btn-block"
+                          (click)="searchButtonClick()" [disabled]="button_pressed">
+                          {{button_pressed ? 'Please wait...' : 'Assign Now'}}
+                        </button> -->
                         <div style="display: none;">
                           <p id="madd"></p>
                           <p id="mgeo"></p>

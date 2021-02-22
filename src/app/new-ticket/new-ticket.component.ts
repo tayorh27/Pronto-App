@@ -199,6 +199,8 @@ export class MyNewTicketComponent implements OnInit, OnDestroy {
 
   hasURLQuery = false
   isAddNewCus = false
+  technicianSelected = false
+  technicianSelectedName = ''
 
   //for adding new customers
   _name = ''
@@ -220,6 +222,13 @@ export class MyNewTicketComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.initAutoComplete()
       }, 2000)
+      setTimeout(() => {
+        const q = location.search
+        if (q.substring(1).startsWith("technician")) {
+          this.technicianSelected = true
+          this.getTechnicianData()
+        }
+      }, 8000)
     })
   }
 
@@ -294,26 +303,33 @@ export class MyNewTicketComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (location.search !== '') {
-      this.hasURLQuery = true
-      // this.config.displayMessage('Please select a customer for this ticket.', false)
-      // setTimeout(() => {
-      //   location.href = '/customer'}, 2000
-      // )
-      // return
-      const customerEmail = this.config.getUrlParameter('customer')
-      const job_id = this.config.getUrlParameter('jobid')
-      // console.log(customerEmail, job_id)
-      this.getCustomerByEmail(customerEmail)
-      if (job_id !== undefined) {
-        this.isReassign = true
-        this.getJobDataById(job_id)
+      const q = location.search
+      if (q.substring(1).startsWith("technician")) {
+        this.technicianSelected = true
+        this.getTechnicianData()
       }
-      setTimeout(() => {
-        this.initMap()
-      }, 2000)
-      setTimeout(() => {
-        this.initAutoComplete()
-      }, 2000)
+      if (q.substring(1).startsWith("customer") || q.startsWith("?customer")) {
+        this.hasURLQuery = true
+        // this.config.displayMessage('Please select a customer for this ticket.', false)
+        // setTimeout(() => {
+        //   location.href = '/customer'}, 2000
+        // )
+        // return
+        const customerEmail = this.config.getUrlParameter('customer')
+        const job_id = this.config.getUrlParameter('jobid')
+        // console.log(customerEmail, job_id)
+        this.getCustomerByEmail(customerEmail)
+        if (job_id !== undefined) {
+          this.isReassign = true
+          this.getJobDataById(job_id)
+        }
+        setTimeout(() => {
+          this.initMap()
+        }, 2000)
+        setTimeout(() => {
+          this.initAutoComplete()
+        }, 2000)
+      }
     }
     // this.getCustomers()
     this.getCategories()
@@ -321,6 +337,27 @@ export class MyNewTicketComponent implements OnInit, OnDestroy {
     this.service.getUserData(email).then(user => {
       this.currentUser = user
     })
+  }
+
+  async getTechnicianData() {
+    const email = this.config.getUrlParameter("technician")
+    console.log(email)
+    const query = await firebase.firestore().collection('users').where("email", '==', email).get()
+    if (query.empty) {
+      this.config.displayMessage('Invalid technician.', false)
+      setTimeout(() => {
+        location.href = '/technician'
+      }, 2000
+      )
+      return
+    }
+    const data = query.docs[0].data()
+    this.technicianSelectedName = `Assign to ${data["name"]}`
+    const coords = data['position']
+    const point = coords['geopoint']
+    console.log(point)
+    // console.log(tech)
+    this.createMarker(point['latitude'], point['longitude'], data['id'], data)
   }
 
   /**
@@ -409,6 +446,11 @@ export class MyNewTicketComponent implements OnInit, OnDestroy {
   }
 
   searchButtonClick() {
+    // const q = location.search
+    // if(q.substring(1).startsWith("technician")) {
+    //   this.getTechnicianData()
+    //   return
+    // }
     const addr = document.getElementById('madd').innerHTML//addr === '' ||
     if (this._cat.length === 0 || addr === '' || this.radius === 0 || this.radius === null) {
       this.config.displayMessage('please fill all fields with *', false)
@@ -445,6 +487,7 @@ export class MyNewTicketComponent implements OnInit, OnDestroy {
 
       //remove markers
       this.technicians = []
+      marker = {}
       // map.marke
       query.forEach(tech => {
         this.technicians.push(tech)
