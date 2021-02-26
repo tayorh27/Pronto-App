@@ -62,6 +62,26 @@ export const cloudpbx = functions.https.onRequest(async (request, response) => {
 
 });
 
+export const detectcalls = functions.https.onRequest(async (request, response) => {
+
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Credentials", "true");
+    response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    response.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Authorization, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+
+    const saveData = {
+        params: request.query,
+        body: request.body,
+        header: request.headers,
+    }
+
+    console.log(request)
+
+    await admin.firestore().collection("test-call").add(saveData)
+    response.send({"message": "received"})
+
+})
+
 export const sendSMS = functions.https.onRequest(async (request, response) => {
 
     response.setHeader("Access-Control-Allow-Origin", "*");
