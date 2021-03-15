@@ -69,16 +69,35 @@ export const detectcalls = functions.https.onRequest(async (request, response) =
     response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     response.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Authorization, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 
+    const key = (await admin.database().ref().push()).key
     const saveData = {
+        id: key,
         params: request.query,
         body: request.body,
         header: request.headers,
+        assigned_to: "none",
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        hasAccount: false,
+        customer_email: "N/A",
+        customer_name: "N/A",
     }
 
-    console.log(request)
 
-    await admin.firestore().collection("test-call").add(saveData)
-    response.send({"message": "received"})
+    if (request.query.phone_number !== undefined) {
+        const query = await admin.firestore().collection('customers').where('phone', '==', `+234${request.query.phone_number}`).get()
+        if (query.size > 0) {
+            const data = query.docs[0].data()
+            saveData.hasAccount = true
+            saveData.customer_email = data["email"]
+            saveData.customer_name = data["name"]
+        }
+        if(key !== null) {
+            await admin.firestore().collection("incoming-calls").doc(key).set(saveData)
+            response.send({ "message": "received" })
+        }
+        
+    }
+    response.send({ "message": "received" })
 
 })
 

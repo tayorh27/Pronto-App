@@ -330,6 +330,10 @@ export class MyNewTicketComponent implements OnInit, OnDestroy {
           this.initAutoComplete()
         }, 2000)
       }
+      if(q.substring(1).startsWith("create")) {
+        this.AddCus(true)
+        this._phone = `+${this.config.getUrlParameter('number')}`
+      }
     }
     // this.getCustomers()
     this.getCategories()

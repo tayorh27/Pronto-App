@@ -18,6 +18,7 @@ declare const $: any;
 })
 
 export class AdminLayoutComponent implements OnInit, AfterViewInit {
+
   public navItems: NavItem[];
   private _router: Subscription;
   private lastPoppedUrl: string;
@@ -26,12 +27,17 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
   location: Location;
   service = new AdminUsersService()
 
+  hasIncomingCall = false
+  callData:any
+
   @ViewChild('sidebar', { static: false }) sidebar: any;
   // @ViewChild(NavbarComponent, {static: false}) navbar: NavbarComponent;
   constructor(private router: Router, location: Location) {
     this.location = location;
   }
+
   ngOnInit() {
+    this.getIncomingCalls()
     const elemMainPanel = <HTMLElement>document.querySelector('.main-panel');
     const elemSidebar = <HTMLElement>document.querySelector('.sidebar .sidebar-wrapper');
     this.location.subscribe((ev: PopStateEvent) => {
@@ -116,10 +122,12 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
       { type: NavItemType.NavbarLeft, title: 'Log out' }
     ];
   }
+
   ngAfterViewInit() {
     this.runOnRouteChange();
     this.startNotificationAccess()
   }
+
   public isMap() {
     if (this.location.prepareExternalUrl(this.location.path()) === '/maps/fullscreen') {
       return true;
@@ -127,6 +135,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
       return false;
     }
   }
+  
   runOnRouteChange(): void {
     if (window.matchMedia(`(min-width: 960px)`).matches && !this.isMac()) {
       const elemSidebar = <HTMLElement>document.querySelector('.sidebar .sidebar-wrapper');
@@ -136,6 +145,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
       ps.update();
     }
   }
+
   isMac(): boolean {
     let bool = false;
     if (navigator.platform.toUpperCase().indexOf('MAC') >= 0 || navigator.platform.toUpperCase().indexOf('IPAD') >= 0) {
@@ -155,6 +165,25 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
         this.requestMessagingPermissionAndGetToken(email);
       }
     })
+  }
+
+  getIncomingCalls() {
+    firebase.firestore().collection('incoming-calls').where("assigned_to", '==', "none").orderBy("timestamp", 'desc').onSnapshot(query => {
+      // console.log(query) incoming-calls
+      if(query.size > 0) {
+        const length = query.size
+        this.callData = query.docs[0].data()
+        this.hasIncomingCall = true
+        this.playAudio()
+      }
+    })
+  }
+
+  playAudio() {
+    let audio = new Audio();
+    audio.src = "assets/audio/13798_sms_good_msg_tone.mp3";
+    audio.load();
+    audio.play();
   }
 
   requestMessaging() {
@@ -196,19 +225,19 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
 
   requestMessagingPermissionAndGetToken(email: string) {
     // const key = firebase.database().ref().push().key
-    // firebase.messaging().usePublicVapidKey("BPsDZQr2d7uTVo61hA6YRR1vvxwqB_hVsO1vbO14DH6dczeH4hJgHebN6egPv0zR5wDOdwYAal6XhwWSTyz7CbI")
-    // // Notification.requestPermission
-    // firebase.messaging().requestPermission().then(done => {
-    //   firebase.messaging().getToken().then(userToken => {
-    //     firebase.firestore().collection("users").doc(email).update({
-    //       msgID: firebase.firestore.FieldValue.arrayUnion(userToken)
-    //     })
-    //   })
-    // })
-    // firebase.messaging().onTokenRefresh(userToken => {
-    //   firebase.firestore().collection("users").doc(email).update({
-    //     msgID: firebase.firestore.FieldValue.arrayUnion(userToken)
-    //   })
-    // })
+    firebase.messaging().usePublicVapidKey("BPsDZQr2d7uTVo61hA6YRR1vvxwqB_hVsO1vbO14DH6dczeH4hJgHebN6egPv0zR5wDOdwYAal6XhwWSTyz7CbI")
+    // Notification.requestPermission
+    firebase.messaging().requestPermission().then(done => {
+      firebase.messaging().getToken().then(userToken => {
+        firebase.firestore().collection("users").doc(email).update({
+          msgID: firebase.firestore.FieldValue.arrayUnion(userToken)
+        })
+      })
+    })
+    firebase.messaging().onTokenRefresh(userToken => {
+      firebase.firestore().collection("users").doc(email).update({
+        msgID: firebase.firestore.FieldValue.arrayUnion(userToken)
+      })
+    })
   }
 }
