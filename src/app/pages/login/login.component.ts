@@ -106,6 +106,7 @@ export class LoginComponent implements OnInit, OnDestroy {
                     localStorage.setItem('email', email);
                     localStorage.setItem('name', ud.name);
                     localStorage.setItem('dp', ud.image);
+                    localStorage.setItem("SIPexten", ud.SIPexten)
                     this.login_pressed = false;
                     this.router.navigate(['/dashboard'])
                     //location.reload(true)
@@ -135,6 +136,7 @@ export class LoginComponent implements OnInit, OnDestroy {
                 localStorage.setItem('email', email);
                 localStorage.setItem('name', ud.name);
                 localStorage.setItem('dp', ud.image);
+                localStorage.setItem("SIPexten", ud.SIPexten)
                 this.login_pressed = false;
 
                 this.router.navigate(['/dashboard'])

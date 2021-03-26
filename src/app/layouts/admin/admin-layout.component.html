@@ -12,4 +12,82 @@
         </div>
     </div>
     <app-fixedplugin *ngIf="hasIncomingCall" [data]="callData"></app-fixedplugin>
+
+    <ng-template #incomingcall let-c="close" let-d="dismiss">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="container">
+                <div class="row">
+                  <div class="col-lg-12">
+                    <form class="form" method="" action="">
+                      <div class="card card-login">
+                        <div class="card-header card-header-rose text-center">
+                          <h4 class="card-title">Incoming Call</h4>
+                          <div class="social-line">
+                          </div>
+                        </div>
+                        <div class="card-body ">
+                            <ul>
+                                <li class="adjustments-line">
+                                    <a href="javascript:void(0)" class="switch-trigger">
+                                        <p>Phone Number</p>
+                                        <label class="ml-auto">
+                                            <div class="togglebutton switch-sidebar-mini">
+                                                <label>
+                                                    +234{{callData.params.phone_number}}
+                                                </label>
+                                            </div>
+                                        </label>
+                                        <div class="clearfix"></div>
+                                        <div class="ripple-container"></div>
+                                    </a>
+                                </li>
+                                <li class="adjustments-line">
+                                    <a href="javascript:void(0)" class="switch-trigger">
+                                        <p>Customer Name</p>
+                                        <label class="switch-mini ml-auto">
+                                            <div class="togglebutton switch-sidebar-image">
+                                                <label>
+                                                    {{callData.customer_name}}
+                                                </label>
+                                            </div>
+                                        </label>
+                                        <div class="clearfix"></div>
+                                        <div class="ripple-container"></div>
+                                    </a>
+                                </li>
+                                <li class="adjustments-line">
+                                    <a href="javascript:void(0)" class="switch-trigger">
+                                        <p>Customer Email</p>
+                                        <label class="switch-mini ml-auto">
+                                            <div class="togglebutton switch-sidebar-image">
+                                                <label>
+                                                    {{callData.customer_email}}
+                                                </label>
+                                            </div>
+                                        </label>
+                                        <div class="clearfix"></div>
+                                        <div class="ripple-container"></div>
+                                    </a>
+                                </li>
+                                <div class="header-title">Perform Action</div>
+                                <button mat-raised-button class="btn btn-primary" (click)="performActionButtonClicked()">
+                                    {{callData.hasAccount ? 'Create Ticket' : 'Create Customer'}}
+                                </button>
+                            </ul>
+                        </div>
+                        <!-- <div class="card-footer justify-content-center">
+                          <a href="javascript:void(0)" class="btn btn-rose btn-link btn-lg" (click)="login()">Lets Go</a>
+                        </div> -->
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="c('Close click')">Close</button> -->
+          </div>
+        </div>
+      </ng-template>
 </div>

@@ -242,14 +242,26 @@ export class NavbarComponent implements OnInit {
       }
         for (let i = 0; i < this.listTitles.length; i++) {
             if (this.listTitles[i].type === "link" && this.listTitles[i].path === titlee) {
-                return this.listTitles[i].title;
+                var mTitle = this.listTitles[i].title;
+                if(mTitle === 'Customer' || mTitle === 'Technician') {
+                    mTitle = `Pronto ${mTitle}`
+                } else if(mTitle === 'Category') {
+                    mTitle = 'Skill-sets'
+                }
+                return mTitle;
             } else if (this.listTitles[i].type === "sub") {
                 for (let j = 0; j < this.listTitles[i].children.length; j++) {
                     let subtitle = this.listTitles[i].path + '/' + this.listTitles[i].children[j].path;
                     // console.log(subtitle)
                     // console.log(titlee)
                     if (subtitle === titlee) {
-                        return this.listTitles[i].children[j].title;
+                        var mTitle = this.listTitles[i].children[j].title;
+                        if(mTitle === 'Customer' || mTitle === 'Technician') {
+                            mTitle = `Pronto ${mTitle}`
+                        } else if(mTitle === 'Category') {
+                            mTitle = 'Skill-sets'
+                        }
+                        return mTitle;//this.listTitles[i].children[j].title;
                     }
                 }
             }

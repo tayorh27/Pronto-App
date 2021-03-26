@@ -79,5 +79,5 @@ function listenForJobs() {
     })
 }
 
-handlePermission();
-listenForJobs();
+// handlePermission();
+// listenForJobs();

@@ -160,9 +160,10 @@ export class SettingsComponent implements OnInit {
     const email = (<HTMLInputElement>document.getElementById("email")).value;
     const position = (<HTMLInputElement>document.getElementById("position")).value;
     const phone = (<HTMLInputElement>document.getElementById("phone")).value;
+    const sip_exten = (<HTMLInputElement>document.getElementById("sip_exten")).value;
 
     const ar = this.accountRole
-    if (name == '' || email == '' || position == '' || phone == '' || this.accountRole == '') {
+    if (name == '' || email == '' || position == '' || phone == '' || this.accountRole == '' || sip_exten === '') {
       this.config.displayMessage("Please enter all fields", false)
       return
     }
@@ -187,6 +188,7 @@ export class SettingsComponent implements OnInit {
       image: './assets/img/default-avatar.png',
       name: name,
       user_position: position,
+      SIPexten: sip_exten,
       msgID: [],
       phone: phone,
       role: this.accountRole,

@@ -9,7 +9,7 @@ export interface AdminUsers {
     blocked: boolean
     verified?:boolean
     msgID?:string[]
-
+    SIPexten?:string
     user_type?: string//admin | technician
     address?: string
     position?: any

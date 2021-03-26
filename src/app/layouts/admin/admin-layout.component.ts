@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, ElementRef } from '@angular/core';
 import { Router, NavigationEnd, NavigationStart } from '@angular/router';
 import { NavItem, NavItemType } from '../../md/md.module';
 import { Subscription } from 'rxjs/Subscription';
@@ -9,6 +9,7 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import * as firebase from 'firebase/app';
 import 'firebase/messaging'
 import { AdminUsersService } from 'src/app/services/admin-users.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 declare const $: any;
 
@@ -29,11 +30,35 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
 
   hasIncomingCall = false
   callData:any
+  closeResult = ''
 
   @ViewChild('sidebar', { static: false }) sidebar: any;
+  @ViewChild('incomingcall', { static: false }) private incomingCallContainer: ElementRef;
   // @ViewChild(NavbarComponent, {static: false}) navbar: NavbarComponent;
-  constructor(private router: Router, location: Location) {
+  constructor(private modalService: NgbModal, private router: Router, location: Location) {
     this.location = location;
+  }
+
+  open(content, type, modalDimension) {
+    if (modalDimension === 'sm' && type === 'modal_mini') {
+      this.modalService.open(content, { windowClass: 'modal-mini', size: 'sm', centered: true }).result.then((result) => {
+        this.closeResult = 'Closed with: $result';
+      }, (reason) => {
+        this.closeResult = 'Dismissed $this.getDismissReason(reason)';
+      });
+    } else if (modalDimension === '' && type === 'Notification') {
+      this.modalService.open(content, { windowClass: 'modal-danger', centered: true }).result.then((result) => {
+        this.closeResult = 'Closed with: $result';
+      }, (reason) => {
+        this.closeResult = 'Dismissed $this.getDismissReason(reason)';
+      });
+    } else {
+      this.modalService.open(content, { centered: true }).result.then((result) => {
+        this.closeResult = 'Closed with: $result';
+      }, (reason) => {
+        this.closeResult = 'Dismissed $this.getDismissReason(reason)';
+      });
+    }
   }
 
   ngOnInit() {
@@ -168,16 +193,29 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
   }
 
   getIncomingCalls() {
-    firebase.firestore().collection('incoming-calls').where("assigned_to", '==', "none").orderBy("timestamp", 'desc').onSnapshot(query => {
+    const sip = localStorage.getItem("SIPexten")
+    firebase.firestore().collection('incoming-calls').where("assigned_to", '==', "none").where("params.SIPexten", "==", sip).orderBy("timestamp", 'desc').onSnapshot(query => {
       // console.log(query) incoming-calls
       if(query.size > 0) {
         const length = query.size
         this.callData = query.docs[0].data()
         this.hasIncomingCall = true
+        this.open(this.incomingCallContainer, '', '')
         this.playAudio()
       }
     })
   }
+
+  async performActionButtonClicked() {
+    const email = localStorage.getItem("email")
+    await firebase.firestore().collection("incoming-calls").doc(this.callData.id).update({"assigned_to": email})
+
+    if(this.callData.hasAccount) {
+        location.href = `/new-ticket?customer=${this.callData.customer_email}`
+        return
+    }
+    location.href = `/new-ticket?create=new&number=234${this.callData.params.phone_number}`
+}
 
   playAudio() {
     let audio = new Audio();
