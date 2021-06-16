@@ -33,29 +33,25 @@ export const cloudpbx = functions.https.onRequest(async (request, response) => {
     }
 
     return axios.post('https://9mobile.nativetalk.com.ng/api/signup', getBody, { headers: _header }).then(res => {
-        // console.log(res.data)
-        // response.send(res.data);
 
         const dt = res.data
         const _dt = dt["data"]
 
         const otp_body = {
             "otp": _dt["otp"],
-            "number": _dt["number"],//this.did.toString().replace(re, ''),
+            "number": _dt["number"],
             "last_id": _dt["last_id"]
         }
 
         return axios.post('https://9mobile.nativetalk.com.ng/api/signup/verify_otp', JSON.stringify(otp_body), { headers: _header }).then(_res => {
             response.send(_res.data);
         }).catch(err => {
-            // console.log(err)
             response.send(err);
         })
 
 
 
     }).catch(err => {
-        // console.log(err)
         response.send(err);
     })
 
@@ -209,9 +205,8 @@ function getDateDiff(dateString: string) {
 }
 //*/30 * * * *
 export const CheckJobsStatus = functions.pubsub.schedule('every 30 minutes').onRun(context => {
-
-    return admin.firestore().collection('jobs').where('back_end_status', '==', 'active').where('status', '==', 'Pending')
-        .where('status', '==', 'Assigned').get().then(query => {
+    //.where('status', '==', 'Assigned')\
+    return admin.firestore().collection('jobs').where('back_end_status', '==', 'active').where('status', '==', 'Pending').get().then(query => {
 
             if (query.empty) {
                 return

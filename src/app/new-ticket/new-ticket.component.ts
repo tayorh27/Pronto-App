@@ -610,7 +610,7 @@ export class MyNewTicketComponent implements OnInit, OnDestroy {
     const cusSMS = `A technician will be with you shortly. \nName: ${tech_name}\nPhone: ${tech_number}`
 
     this.config.sendSMS(this.http, tech_number, techSMS, ids.join(','), 'notification', email)
-    // this.config.sendSMS(this.http, this.selectedCustomer.phone, cusSMS, '', 'sms')
+    this.config.sendSMS(this.http, this.selectedCustomer.phone, cusSMS, '', 'sms', email)
   }
 
   //update technician status to assign and send sms to both customer and technician
