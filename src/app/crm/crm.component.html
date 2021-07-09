@@ -1,0 +1,206 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row" *ngIf="!addNewCat">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header card-header-primary card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">assignment</i>
+            </div>
+            <h4 class="card-title" *ngIf="!selectedTicket">CRM</h4>
+            <h4 class="card-title" *ngIf="selectedTicket">CRM - {{selectedTicket.email}}</h4>
+            <!-- <button
+              mat-raised-button
+              class="btn btn-primary"
+              (click)="addCat()"
+            >
+              Add New Skill-set
+            </button> -->
+          </div>
+          <div class="card-body">
+            <div class="toolbar">
+              <!--        Here you can write extra buttons/actions for the toolbar              -->
+            </div>
+            <!-- here me-->
+            <div class="row">
+              <div class="col-xl-4">
+                <div class="card">
+                  <div class="card-body">
+                    <ul class="nav nav-pills nav-pills-primary" role="tablist">
+                      <li class="nav-item" (click)="onTabSelected('All Enqueued Tickets', 'enqueue')">
+                        <a class="nav-link active" data-toggle="tab" href="#link1" role="tablist">
+                          <i class="material-icons">article</i> {{enqueuedCount}}
+                        </a>
+                      </li>
+                      <li class="nav-item" (click)="onTabSelected('All Assigned Tickets', 'assigned')">
+                        <a class="nav-link" data-toggle="tab" href="#link2" role="tablist">
+                          <i class="material-icons" style="width: 24; height: 24;">exit_to_app</i> {{assignedCount}}
+                        </a>
+                      </li>
+                      <li class="nav-item" (click)="onTabSelected('All Resolved Tickets', 'resolved')">
+                        <a class="nav-link" data-toggle="tab" href="#link3" role="tablist">
+                          <i class="material-icons">task_alt</i> {{resolvedCount}}
+                        </a>
+                      </li>
+                    </ul>
+                    <hr>
+                    <p><strong>{{tabSelected}}</strong></p>
+                    <hr>
+                    <ul class="timeline timeline-simple">
+                      <li class="timeline-inverted" style="cursor: pointer;"
+                        *ngFor="let ticket of tabbedTickets; index as i;" (click)="openTicket(i)">
+                        <div
+                          [ngClass]="(ticket.ticket_type === 'enqueue') ? 'timeline-badge danger' : (ticket.ticket_type === 'assigned') ? 'timeline-badge info' : 'timeline-badge success'">
+                          <i class="material-icons">{{(ticket.ticket_type === 'enqueue') ? 'mark_email_unread' :
+                            (ticket.ticket_type === 'assigned') ? 'markunread' : 'mark_email_read'}}</i>
+                        </div>
+                        <div class="timeline-panel">
+                          <div class="timeline-heading">
+                            <span
+                              [ngClass]="(ticket.ticket_type === 'enqueue') ? 'badge badge-danger' : (ticket.ticket_type === 'assigned') ? 'badge badge-info' : 'badge badge-success'">{{ticket.email}}</span>
+                          </div>
+                          <div class="timeline-body">
+                            <p>{{ticket.last_message}}</p>
+                          </div>
+                          <h6>
+                            <i class="ti-time"></i> {{ticket.modified_date.split(' ')[0]}}
+                          </h6>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-8" *ngIf="selectedTicket">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-xl-6">
+                        <strong>Assigned: {{(selectedTicket.assigned_to.email) === currentUser.email ? 'You' :
+                          currentUser.name}}</strong>&nbsp;&nbsp;&nbsp;&nbsp;<button mat-raised-button class="btn btn-danger btn-sm"
+                          (click)="reverseTicket()">Return To Queue</button>
+                      </div>
+                      <div class="col-xl-6">
+                        <strong>#{{selectedTicket.ticket_id}}&nbsp;&nbsp;&nbsp;&nbsp;{{selectedTicket.created_date}}</strong>
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                      <div class="col-lg-4 col-md-6 col-sm-3">
+                        <div class="dropdown">
+                          <button mat-raised-button href="javascript:void(0)"
+                            class="dropdown-toggle btn btn-warning btn-round btn-block" data-toggle="dropdown">{{selectedTicket.status}}
+                            <b class="caret"></b>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-left">
+                            <li class="dropdown-header">Ticket Status</li>
+                            <li (click)="updateTicketStatus('Active')">
+                              <a href="javascript:void(0)">Active</a>
+                            </li>
+                            <li (click)="updateTicketStatus('Pending')">
+                              <a href="javascript:void(0)">Pending</a>
+                            </li>
+                            <li (click)="updateTicketStatus('Blocked')">
+                              <a href="javascript:void(0)">Blocked</a>
+                            </li>
+                            <li (click)="updateTicketStatus('On Hold')">
+                              <a href="javascript:void(0)">On Hold</a>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 col-md-6 col-sm-3">
+                        <button *ngIf="selectedTicket.ticket_type !== 'resolved'" mat-raised-button
+                        class="btn btn-success btn-sm" (click)="resolveTicket()">Resolve</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-body">
+                    <div class="wrapper">
+                    <div class="main-panel">
+                      <ul class="timeline timeline-simple">
+                        <li class="timeline-inverted" style="cursor: pointer;"
+                          *ngFor="let convo of conversations; index as i;">
+                          <div>
+
+                          </div>
+                          <div class="timeline-panel">
+                            <div class="timeline-heading">
+                              <div class="row">
+                                <div class="col-xl-9">
+                                  <strong>From: </strong>{{currentUser.email}}&nbsp;&nbsp;<strong>To: </strong>{{selectedTicket.email}}
+                                </div>
+                                <div class="col-xl-3">
+                                  <p>{{convo.created_date}}</p>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-xl-9">
+                                  <strong>{{convo.subject}}</strong>
+                                </div>
+                                <div class="col-xl-3">
+                                  <button mat-raised-button class="btn btn-warning btn-sm" (click)="onConvoSelected(i)">Reply</button>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="timeline-body">
+                              <div class="card">
+                                <div class="card-body" [innerHTML]="convo.html"></div>
+                              </div>
+                            </div>
+                            <h6>
+                              <i class="ti-time"></i> {{ticket.modified_date.split(' ')[0]}}
+                            </h6>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-xl-3">
+                        <p>Email</p>
+                      </div>
+                      <div class="col-xl-9">
+                        <strong>From: </strong>{{currentUser.email}}&nbsp;&nbsp;<strong>To: </strong>{{selectedTicket.email}}
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                      <div class="col-xl-12">
+                        <p>Reply to email thread:<br><strong>{{conversationSubject}}</strong></p>
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="replyTo">
+                      <div class="col-xl-12">
+                        <p><mat-form-field class="example-full-width">
+                          <textarea matInput placeholder="Reply" [(ngModel)]="replyMessage" rows="5"></textarea>
+                        </mat-form-field></p>
+                        <button mat-raised-button
+                        class="btn btn-warning btn-sm" (click)="submitReponse('note')" [disabled]="button_pressed">{{button_pressed ? 'Please wait...' : 'Submit as Note'}}</button>
+                        <button mat-raised-button
+                        class="btn btn-success btn-sm" (click)="submitReponse('user')" [disabled]="button_pressed">{{button_pressed ? 'Please wait...' : 'Send Reply'}}</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end content-->
+        </div>
+        <!--  end card  -->
+      </div>
+      <!-- end col-md-12 -->
+    </div>
+    <!-- end row -->
+  </div>
+</div>

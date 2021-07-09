@@ -1,0 +1,21 @@
+.sectn {
+  padding: 25px 20px;
+}
+
+.fieldbtn {
+  text-align: center;
+}
+.rmvborder {
+  border: none;
+  outline: none;
+  margin-left: 20px;
+  padding: 10px;
+}
+.rmvbr {
+  padding: auto 17px;
+  margin-left: 24px;
+}
+
+.timeline > li:after {
+  clear: none;
+}

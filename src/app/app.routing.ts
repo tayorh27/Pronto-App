@@ -29,6 +29,11 @@ export const AppRoutes: Routes = [
         canActivate: [RouteGuard]
       },
       {
+        path: 'crm',
+        loadChildren: './crm/crm.module#CRMModule',
+        canActivate: [RouteGuard]
+      },
+      {
         path: 'components',
         loadChildren: './components/components.module#ComponentsModule',
       },
