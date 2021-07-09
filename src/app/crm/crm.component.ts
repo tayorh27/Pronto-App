@@ -130,7 +130,7 @@ export class CRMComponent implements OnInit {
     }
     this.button_pressed = true
     const key = firebase.database().ref().push().key
-    const convo: Conversation = {
+    const convo: Conversation = { //send user to messagebird and note to firebase
       id: key,
       ticket_id: this.selectedTicket.id,
       type: conversation_type, //note, user

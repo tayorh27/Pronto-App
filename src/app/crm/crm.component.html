@@ -127,7 +127,7 @@
                           <div>
 
                           </div>
-                          <div class="timeline-panel">
+                          <div class="timeline-panel" *ngIf="convo.type === 'user'">
                             <div class="timeline-heading">
                               <div class="row">
                                 <div class="col-xl-9">
@@ -151,8 +151,18 @@
                                 <div class="card-body" [innerHTML]="convo.html"></div>
                               </div>
                             </div>
+                          </div>
+                          <div class="timeline-panel" *ngIf="convo.type === 'note'">
+                            <div class="timeline-heading">
+                              Note:
+                            </div>
+                            <div class="timeline-body">
+                              <div class="card">
+                                <div class="card-body" [innerHTML]="convo.html"></div>
+                              </div>
+                            </div>
                             <h6>
-                              <i class="ti-time"></i> {{ticket.modified_date.split(' ')[0]}}
+                              <i class="ti-time"></i> {{convo.created_date}}
                             </h6>
                           </div>
                         </li>

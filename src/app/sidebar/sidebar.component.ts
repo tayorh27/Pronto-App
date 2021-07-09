@@ -116,98 +116,98 @@ export const ROUTES: RouteInfo[] = [{
     icontype: 'work',
     access: false
 },
-    {
-        path: '/components',
-        display_title: 'Components',
-        type: 'sub',
-        icontype: 'apps',
-        access: false,
-        collapse: 'components',
-        children: [
-            { path: 'buttons', display_title: 'Buttons', ab: 'B' },
-            { path: 'grid', display_title: 'Grid System', ab: 'GS' },
-            { path: 'panels', display_title: 'Panels', ab: 'P' },
-            { path: 'sweet-alert', display_title: 'Sweet Alert', ab: 'SA' },
-            { path: 'notifications', display_title: 'Notifications', ab: 'N' },
-            { path: 'icons', display_title: 'Icons', ab: 'I' },
-            { path: 'typography', display_title: 'Typography', ab: 'T' }
-        ]
-    }, 
-    {
-        path: '/forms',
-        display_title: 'Forms',
-        type: 'sub',
-        icontype: 'content_paste',
-        collapse: 'forms',
-        access: false,
-        children: [
-            { path: 'regular', display_title: 'Regular Forms', ab: 'RF' },
-            { path: 'extended', display_title: 'Extended Forms', ab: 'EF' },
-            { path: 'validation', display_title: 'Validation Forms', ab: 'VF' },
-            { path: 'wizard', display_title: 'Wizard', ab: 'W' }
-        ]
-    }, 
-    {
-        path: '/tables',
-        display_title: 'Tables',
-        type: 'sub',
-        icontype: 'grid_on',
-        collapse: 'tables',
-        children: [
-            { path: 'regular', display_title: 'Regular Tables', ab: 'RT' },
-            { path: 'extended', display_title: 'Extended Tables', ab: 'ET' },
-            { path: 'datatables.net', display_title: 'Datatables.net', ab: 'DT' }
-        ],
-        access: false
-    }, {
-        path: '/maps',
-        display_title: 'Maps',
-        type: 'sub',
-        icontype: 'place',
-        collapse: 'maps',
-        children: [
-            { path: 'google', display_title: 'Google Maps', ab: 'GM' },
-            { path: 'fullscreen', display_title: 'Full Screen Map', ab: 'FSM' },
-            { path: 'vector', display_title: 'Vector Map', ab: 'VM' }
-        ],
-        access: false
-    }, 
-    {
-        path: '/widgets',
-        display_title: 'Widgets',
-        type: 'link',
-        icontype: 'widgets'
+    // {
+    //     path: '/components',
+    //     display_title: 'Components',
+    //     type: 'sub',
+    //     icontype: 'apps',
+    //     access: false,
+    //     collapse: 'components',
+    //     children: [
+    //         { path: 'buttons', display_title: 'Buttons', ab: 'B' },
+    //         { path: 'grid', display_title: 'Grid System', ab: 'GS' },
+    //         { path: 'panels', display_title: 'Panels', ab: 'P' },
+    //         { path: 'sweet-alert', display_title: 'Sweet Alert', ab: 'SA' },
+    //         { path: 'notifications', display_title: 'Notifications', ab: 'N' },
+    //         { path: 'icons', display_title: 'Icons', ab: 'I' },
+    //         { path: 'typography', display_title: 'Typography', ab: 'T' }
+    //     ]
+    // }, 
+    // {
+    //     path: '/forms',
+    //     display_title: 'Forms',
+    //     type: 'sub',
+    //     icontype: 'content_paste',
+    //     collapse: 'forms',
+    //     access: false,
+    //     children: [
+    //         { path: 'regular', display_title: 'Regular Forms', ab: 'RF' },
+    //         { path: 'extended', display_title: 'Extended Forms', ab: 'EF' },
+    //         { path: 'validation', display_title: 'Validation Forms', ab: 'VF' },
+    //         { path: 'wizard', display_title: 'Wizard', ab: 'W' }
+    //     ]
+    // }, 
+    // {
+    //     path: '/tables',
+    //     display_title: 'Tables',
+    //     type: 'sub',
+    //     icontype: 'grid_on',
+    //     collapse: 'tables',
+    //     children: [
+    //         { path: 'regular', display_title: 'Regular Tables', ab: 'RT' },
+    //         { path: 'extended', display_title: 'Extended Tables', ab: 'ET' },
+    //         { path: 'datatables.net', display_title: 'Datatables.net', ab: 'DT' }
+    //     ],
+    //     access: false
+    // }, {
+    //     path: '/maps',
+    //     display_title: 'Maps',
+    //     type: 'sub',
+    //     icontype: 'place',
+    //     collapse: 'maps',
+    //     children: [
+    //         { path: 'google', display_title: 'Google Maps', ab: 'GM' },
+    //         { path: 'fullscreen', display_title: 'Full Screen Map', ab: 'FSM' },
+    //         { path: 'vector', display_title: 'Vector Map', ab: 'VM' }
+    //     ],
+    //     access: false
+    // }, 
+    // {
+    //     path: '/widgets',
+    //     display_title: 'Widgets',
+    //     type: 'link',
+    //     icontype: 'widgets'
 
-    },
-     {
-        path: '/charts',
-        display_title: 'Charts',
-        type: 'link',
-        icontype: 'timeline',
-        access: false
+    // },
+    //  {
+    //     path: '/charts',
+    //     display_title: 'Charts',
+    //     type: 'link',
+    //     icontype: 'timeline',
+    //     access: false
 
-    }, {
-        path: '/calendar',
-        title: 'Calendar',
-        type: 'link',
-        icontype: 'date_range',
-        access: false
-    }, {
-        path: '/pages',
-        title: 'Pages',
-        type: 'sub',
-        icontype: 'image',
-        collapse: 'pages',
-        children: [
-            { path: 'pricing', title: 'Pricing', ab: 'P' },
-            { path: 'timeline', title: 'Timeline Page', ab: 'TP' },
-            { path: 'login', title: 'Login Page', ab: 'LP' },
-            { path: 'register', title: 'Register Page', ab: 'RP' },
-            { path: 'lock', title: 'Lock Screen Page', ab: 'LSP' },
-            { path: 'user', title: 'User Page', ab: 'UP' }
-        ],
-        access: false
-    }
+    // }, {
+    //     path: '/calendar',
+    //     title: 'Calendar',
+    //     type: 'link',
+    //     icontype: 'date_range',
+    //     access: false
+    // }, {
+    //     path: '/pages',
+    //     title: 'Pages',
+    //     type: 'sub',
+    //     icontype: 'image',
+    //     collapse: 'pages',
+    //     children: [
+    //         { path: 'pricing', title: 'Pricing', ab: 'P' },
+    //         { path: 'timeline', title: 'Timeline Page', ab: 'TP' },
+    //         { path: 'login', title: 'Login Page', ab: 'LP' },
+    //         { path: 'register', title: 'Register Page', ab: 'RP' },
+    //         { path: 'lock', title: 'Lock Screen Page', ab: 'LSP' },
+    //         { path: 'user', title: 'User Page', ab: 'UP' }
+    //     ],
+    //     access: false
+    // }
 ];
 
 @Component({
