@@ -8,6 +8,7 @@ import { quiz } from '../model/docs';
 import { health } from '../model/health';
 import { social } from '../model/socio';
 import { AdminUsersService } from '../services/admin-users.service';
+import { Ticket } from '../model/tickets';
 
 
 // import { LegendItem, ChartType } from '../md/md-chart/md-chart.component';
@@ -37,6 +38,35 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   notification_count = 0
   notifications = []
+
+  tickets: Ticket[] = []
+
+  totalTicketCount = 0
+  enqueuedCount = 0
+  assignedCount = 0
+  resolvedCount = 0
+
+  getTickets() {
+    firebase.firestore().collection("tickets").orderBy("timestamp", "desc").onSnapshot(query => {
+      this.tickets = []
+      query.forEach(ticket => {
+        const t: Ticket = <Ticket>ticket.data()
+        this.tickets.push(t)
+      })
+
+      this.totalTicketCount = this.tickets.length
+      this.enqueuedCount = this.getTicketsByTypeCount("enqueue")
+      this.assignedCount = this.getTicketsByTypeCount("assigned")
+      this.resolvedCount = this.getTicketsByTypeCount("resolved")
+    })
+  }
+
+  getTicketsByTypeCount(type: string) {
+    const t = this.tickets.filter((val, ind, arr) => {
+      return val.ticket_type.toLowerCase() === type.toLowerCase()
+    })
+    return t.length
+  }
 
   getNotifications() {
     const email = localStorage.getItem('email')
@@ -108,6 +138,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.service.getUserData(email).then(user => {
       this.user_type = user.user_type
       if (user.user_type === 'admin') {
+        this.getTickets()
         this.getCustomer()
         this.getTechnicians()
         this.getJobs()

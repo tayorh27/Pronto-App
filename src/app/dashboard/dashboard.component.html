@@ -178,6 +178,76 @@
         </div>
       </div>
     </div>
+    <div class="row" *ngIf="user_type === 'admin'">
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-header card-header-info card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">inbox</i>
+            </div>
+            <p class="card-category">Total Tickets</p>
+            <h3 class="card-title">{{totalTicketCount}}</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">pageview</i>
+              <a href="/crm">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-header card-header-danger card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">article</i>
+            </div>
+            <p class="card-category">Enqueued Tickets</p>
+            <h3 class="card-title">{{enqueuedCount}}</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">pageview</i>
+              <a href="/crm">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-header card-header-warning card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">exit_to_app</i>
+            </div>
+            <p class="card-category">Assigned Tickets</p>
+            <h3 class="card-title">{{assignedCount}}</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">pageview</i>
+              <a href="/crm">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-header card-header-success card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">task_alt</i>
+            </div>
+            <p class="card-category">Resolved Tickets</p>
+            <h3 class="card-title">{{resolvedCount}}</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">pageview</i>
+              <a href="/crm">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="row" id="notification" *ngIf="user_type === 'admin'">
       <div class="col-lg-6 col-md-12">
         <div class="card">

@@ -53,7 +53,7 @@ export const ROUTES: RouteInfo[] = [{
     title: 'CRM',
     display_title: 'CRM',
     type: 'link',
-    icontype: 'create_new_folder',
+    icontype: 'inbox',
     access: false
 },
 {
