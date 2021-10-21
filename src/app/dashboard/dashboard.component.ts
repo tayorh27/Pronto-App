@@ -134,23 +134,86 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     // this.totalRows = this.datas.getMessage()
     // console.log(this.totalRows);
-    const email = localStorage.getItem('email')
-    this.service.getUserData(email).then(user => {
-      this.user_type = user.user_type
-      if (user.user_type === 'admin') {
-        this.getTickets()
-        this.getCustomer()
-        this.getTechnicians()
-        this.getJobs()
-        this.getNotifications()
+
+    // const email = localStorage.getItem('email')
+    // this.service.getUserData(email).then(user => {
+    //   this.user_type = user.user_type
+    //   if (user.user_type === 'admin') {
+    //     this.getTickets()
+    //     this.getCustomer()
+    //     this.getTechnicians()
+    //     this.getJobs()
+    //     this.getNotifications()
+    //   }
+    // })
+    this.getQuestion(['test1a', 'test2', 'test1b', 'test1c', 'test3'], ['Wrong answer', 'OK', 'Runtime error', 'OK', 'Time limit exceeded'])
+  }
+
+  getQuestion(T:string[], R:string[]) {
+
+    const store = {};
+    var n_ok_groups = 0;
+    var total_groups = 0;
+
+    for(var i = 0; i < T.length; i++) {
+
+        const t = T[i];
+        const r = R[i];
+        
+        const t1 = t.substring(t.length - 2);
+        // console.log(t1);
+        const start = t1.split("")[0];
+
+        if(start.match(/^\d/)) {
+          // console.log("he");
+          const sT1 = t1.split("");
+          const ini = sT1[0];
+          if(store[ini] == undefined) {
+            store[ini] = (r === "OK") ? 1 : -1;
+          }else{
+            var res = (r === "OK") ? 1 : -1;
+            if(store[ini] < 0) {
+              res = 1;
+            }
+            store[ini] = store[ini] * res;
+          }
+          
+        }else {
+
+        // console.log("here");
+          const sT1 = t1.split("");
+          const ini = sT1[1];
+          if(store[ini] === undefined) {
+            store[ini] = (r === "OK") ? 1 : -1;
+          }else {
+            var res = (r === "OK") ? 1 : -1;
+            if(store[ini] < 0) {
+              res = 1;
+            }
+            store[ini] = store[ini] * res;
+          }
+        }
+    }
+    console.log(store)
+    for(const key in store) {
+
+      total_groups = total_groups + 1;
+      if(store[key] > 0) {
+        n_ok_groups = n_ok_groups + 1;
       }
-    })
+    }
+
+    const ans = Math.round(n_ok_groups * 100 / total_groups);
+    console.log(ans);
+
 
   }
 
   ngAfterViewInit() {
     // this.workQuiz()
   }
+
+  
 
   workQuiz() {
     var reply = `Quiz(

@@ -257,4 +257,39 @@ export class CRMComponent implements OnInit {
     })
   }
 
+  updateProgramLevels() {
+
+    var oldProgramLevel = ""
+    var newProgramLevel = ""
+
+    if(oldProgramLevel == '-MHqXMo7PEBTMOzG42Wi' || oldProgramLevel == "-MI4WxAzRCETJyjkxdyU" || oldProgramLevel == "-MI4b3_fmy82_BdWY5qG"  || oldProgramLevel == "-MLCKeRsmTDeu6aLsKCG" || oldProgramLevel == "-MLCIVlDe0oZFAv5Bk0I" || oldProgramLevel == "-MI3qIGamNTBsuLFzslT" || oldProgramLevel == "-MKefC8HScqoUk5C6i56" 
+    || oldProgramLevel == "-MKehcbFVTa-VgftmYyb"  || oldProgramLevel == "-MLCLEEZi-tVM916kkEk" || oldProgramLevel == "-MLCLBxXGge27wHyWbvj" || oldProgramLevel == "-MIP4UEHJ5UWICCJdhxv"  || oldProgramLevel == "-MKei0dM9k45_5_FCrp2" || oldProgramLevel == "-MGd3h2BVg74BXVTjv7j"   )  {
+      newProgramLevel = "-MHqXqy18pSEeW2NuJCf" 
+    }
+
+    if(oldProgramLevel == "-MGd3dMXVuspn90pLdZw" || oldProgramLevel == "-MKehkgOHb9jynxJIMF7" || oldProgramLevel == "-MGd3_BIh5ztc2pKlK9u" || oldProgramLevel == "-MA1aJLr-XgZKv4-Bm3h" ) {
+      newProgramLevel = "-M8SKdZRjwe8z9OAmUnr"
+    }
+
+    if(oldProgramLevel == "-MA1aJLr-XgZKv4-Bm3h" || oldProgramLevel == "-MKehWWe95clVIbEPc4x" || oldProgramLevel == "-MHqXnvubuaDkYYiBpYY" || oldProgramLevel == "-MJg5dTqh_rFjM4CNaig" || oldProgramLevel == "-MJg7zJkWRH_b5p3D11-"  ){
+      newProgramLevel = "-MfDL-CQ3NEq6xJotjgc"
+    }
+
+    if(oldProgramLevel == "-MA1aOVrt5IbyVVgRIX9" || oldProgramLevel == "-MFuZ7w2hpOjlZD2D3Ad" || oldProgramLevel == "-MFF4giTCkLA3FFCOew_" || oldProgramLevel == "-MFoPiiVMjkKkqDdRFkH" || oldProgramLevel == "-MHqXO8ddsxd6AjEvpvI"  || oldProgramLevel == "-MHqXSj_41s_inFUy6iD"  || oldProgramLevel == "-MIA3RzOqbsiIM8QrCv_8" 
+    || oldProgramLevel == "-MHqZOU8XTTDGvC71hIv" || oldProgramLevel == "-MIP4Xb4CyS2aXCBuxlv" ){
+      newProgramLevel = "-MfDKvHrDiKa5Ij9vIRz"  
+
+    }
+
+    if(oldProgramLevel == "-MI3mmWB2EM_5MVDo6kp" || oldProgramLevel == "-MI3mmWB2EM_5MVDo6kp" || oldProgramLevel == "-MAagmoZhvIprjehEbUB"){
+      newProgramLevel = "-MAagZ26ua6gAZ_LwgTK"  
+    }
+
+    if(oldProgramLevel == "-MARpnwCuM-aDugAE0V4" || oldProgramLevel == "-MFuVlWRhLFEvlsWUhYS" || oldProgramLevel == "-MI3TFiOUf1CUXLUY2gF" || oldProgramLevel == "-MA1aRNhFgswXfsFFHXp" ){
+      newProgramLevel = "-MfDg3ZPglVABNtEqcdA"  
+    }
+
+
+  }
+
 }

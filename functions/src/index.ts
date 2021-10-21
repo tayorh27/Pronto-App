@@ -58,6 +58,198 @@ export const cloudpbx = functions.https.onRequest(async (request, response) => {
 
 });
 
+
+export const getcalls = functions.https.onRequest(async (request, response) => {
+
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Credentials", "true");
+    response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    response.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Authorization, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+
+    const message = request.query
+
+    const user = `${message.phone_login}` //get user uid from call
+
+    const query = await admin.firestore().collection("proj-users").where("SIPexten", "==", user).get()
+
+    if (query.size > 0) {
+        const adminUser = query.docs[0].data()
+
+        //save logs
+        const key = (await admin.database().ref().push()).key
+        const saveData = {
+            id: key,
+            params: request.query,
+            body: request.body,
+            header: request.headers,
+            assigned_to: "none",
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            hasAccount: false,
+            customer_email: "N/A",
+            customer_name: "N/A",
+            user: adminUser.id
+        }
+
+        if (key !== null)
+            await admin.firestore().collection("proj-logs").doc(key).set(saveData)
+
+        //get configurations
+        const configQuery = await admin.firestore().collection("proj-users").doc(adminUser.id).collection("configs").doc("settings").get()
+
+        if (configQuery.exists) {
+            const config = configQuery.data()
+
+            if (config !== undefined) {
+
+                //check if zendesk config exists
+                if (config.zendesk !== undefined) {
+                    await createTicketForZendesk(config, adminUser.id, request.query)
+                }
+
+                //check if zoho config exists
+                if (config.zoho !== undefined) {
+                    await createTicketForZoho(config, adminUser.id, request.query)
+                }
+
+                //check if freshdesk config exists
+                if (config.freshdesk !== undefined) {
+                    await createTicketForFreshdesk(config, adminUser.id, request.query)
+                }
+            }
+
+        }
+    }
+    response.send({ "message": "received" })
+})
+
+async function createTicketForZendesk(config: any, userId: any, data: any) {
+    const zendesk_subdomain = config.zendesk_subdomain
+    const zendesk_email = config.zendesk_email
+    const zendesk_password = config.zendesk_password
+    // const zendesk_token = config.zendesk_token
+
+    const url = `${zendesk_subdomain}/api/v2/tickets.json`
+
+    const header = {
+        "Content-Type": "application/json",
+        "Authorization": `${zendesk_email}:${zendesk_password}`
+    }
+
+    const body = {
+        "ticket": {
+            "comment": {
+                "body": "The smoke is very colorful."
+            },
+            "priority": "urgent",
+            "subject": "My printer is on fire!"
+        }
+    }
+
+    const resp = await axios.post(url, body, { headers: header })
+    const resData = resp.data
+
+    console.log(resData)
+
+    if (resData["ticket"]) {
+        await admin.firestore().collection("proj-users").doc(userId).collection("configs").doc("tickets").update({
+            zendesk: admin.firestore.FieldValue.increment(1)
+        })
+    }
+
+
+}
+
+async function createTicketForZoho(config: any, userId: any, data: any) {
+    const zoho_orgId = config.zoho_orgId
+    const zoho_auth = config.zoho_auth
+    const zoho_departmentId = config.zoho_departmentId
+    const zoho_assigneeId = config.assigneeId
+
+    const url = 'https://desk.zoho.com/api/v1/tickets'
+
+    const header = {
+        "Content-Type": "application/json",
+        "orgId": zoho_orgId,
+        "Authorization": `Zoho-oauthtoken ${zoho_auth}`
+    }
+
+    const body = {
+        // "entitySkills" : [ "18921000000379001", "18921000000364001", "18921000000379055", "18921000000379031" ],
+        // "subCategory" : "Sub General",
+        "cf": {
+            "cf_permanentaddress": null,
+            "cf_dateofpurchase": null,
+            "cf_phone": null,
+            "cf_numberofitems": null,
+            "cf_url": null,
+            "cf_secondaryemail": null,
+            "cf_severitypercentage": "0.0",
+            "cf_modelname": "F3 2017"
+        },
+        "productId": "",
+        "contactId": "",
+        "subject": "New Ticket",
+        // "dueDate" : "",
+        "departmentId": zoho_departmentId,
+        "channel": "Api",
+        "description": "",
+        "language": "English",
+        "priority": "High",
+        "classification": "",
+        "assigneeId": zoho_assigneeId,
+        "phone": "",
+        "category": "general",
+        "email": "",
+        "status": "Open"
+    }
+
+    const resp = await axios.post(url, body, { headers: header })
+    const resData = resp.data
+
+    console.log(resData)
+
+    if (resData["ticketNumber"]) {
+        await admin.firestore().collection("proj-users").doc(userId).collection("configs").doc("tickets").update({
+            zoho: admin.firestore.FieldValue.increment(1)
+        })
+    }
+}
+
+async function createTicketForFreshdesk(config: any, userId: any, data: any) {
+    const freshdesk_subdomain = config.freshdesk_subdomain
+    const freshdesk_token =  config.freshdesk_token
+
+    const url = `${freshdesk_subdomain}/api/v2/tickets`
+
+    const header = {
+        "Content-Type": "application/json",
+        "yourapikey": freshdesk_token,
+    }
+
+    const body = { 
+        "description": "Details about the issue...", 
+        "subject": "Support Needed...", 
+        "email": "tom@outerspace.com", 
+        "priority": 3, 
+        "status": 2,
+        "source": 3,
+        "phone": '',
+        // "cc_emails": ["ram@freshdesk.com","diana@freshdesk.com"] 
+    }
+
+    const resp = await axios.post(url, body, { headers: header })
+    const resData = resp.data
+
+    console.log(resData)
+
+    if (resData["priority"]) {
+        await admin.firestore().collection("proj-users").doc(userId).collection("configs").doc("tickets").update({
+            freshdesk: admin.firestore.FieldValue.increment(1)
+        })
+    }
+}
+
+
 export const detectcalls = functions.https.onRequest(async (request, response) => {
 
     response.setHeader("Access-Control-Allow-Origin", "*");
@@ -87,11 +279,11 @@ export const detectcalls = functions.https.onRequest(async (request, response) =
             saveData.customer_email = data["email"]
             saveData.customer_name = data["name"]
         }
-        if(key !== null) {
+        if (key !== null) {
             await admin.firestore().collection("incoming-calls").doc(key).set(saveData)
             response.send({ "message": "received" })
         }
-        
+
     }
     response.send({ "message": "received" })
 
@@ -208,40 +400,40 @@ export const CheckJobsStatus = functions.pubsub.schedule('every 30 minutes').onR
     //.where('status', '==', 'Assigned')\
     return admin.firestore().collection('jobs').where('back_end_status', '==', 'active').where('status', '==', 'Pending').get().then(query => {
 
-            if (query.empty) {
-                return
-            }
-            const batch = admin.firestore().batch()
+        if (query.empty) {
+            return
+        }
+        const batch = admin.firestore().batch()
 
-            const sms: any[] = []
+        const sms: any[] = []
 
-            query.forEach(dt => {
-                const job = dt.data()
+        query.forEach(dt => {
+            const job = dt.data()
 
-                const job_created_date = job.created_date
+            const job_created_date = job.created_date
 
-                const job_status = job.status
+            const job_status = job.status
 
-                const diff = new Date(getDateDiff(job_created_date)).getMinutes()
+            const diff = new Date(getDateDiff(job_created_date)).getMinutes()
 
-                if (diff >= 30) {
-                    sms.push({
-                        number: job.agent.number,
-                        status: job_status,
-                        id: job.job_id,
-                        technician: job.assigned_to.name
-                    })
-                    const ref = admin.firestore().collection('jobs').doc(job.id)
-                    const update = { 'status': 'OverDue' }
-                    batch.update(ref, update)
-                }
-            })
-
-            return batch.commit().then(d => {
-                sms.forEach(s => {
-                    const message = `This job with job id - ${s.id} has been changed from ${s.status} to OverDue since the assigned technician (${s.technician}) has not performed any action.`
-                    _sendSMS(s.number, message)
+            if (diff >= 30) {
+                sms.push({
+                    number: job.agent.number,
+                    status: job_status,
+                    id: job.job_id,
+                    technician: job.assigned_to.name
                 })
+                const ref = admin.firestore().collection('jobs').doc(job.id)
+                const update = { 'status': 'OverDue' }
+                batch.update(ref, update)
+            }
+        })
+
+        return batch.commit().then(d => {
+            sms.forEach(s => {
+                const message = `This job with job id - ${s.id} has been changed from ${s.status} to OverDue since the assigned technician (${s.technician}) has not performed any action.`
+                _sendSMS(s.number, message)
             })
         })
+    })
 })

@@ -10,7 +10,7 @@ export interface Ticket {
     is_assigned:boolean
     ticket_type:string //enqueue, assigned, resolved
     status:string //Active,Pending,Blocked,On Hold
-    channel_type:string //email,whatsapp,facebook
+    channel_type:string //email,whatsapp,facebook,nativetalk
     created_date:string
     modified_date:string
     timestamp:any
