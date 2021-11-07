@@ -68,6 +68,8 @@ export const getcalls = functions.https.onRequest(async (request, response) => {
 
     const message = request.query
 
+    // console.log(message)
+
     const user = `${message.phone_login}` //get user uid from call
 
     const query = await admin.firestore().collection("proj-users").where("SIPexten", "==", user).get()
@@ -106,7 +108,7 @@ export const getcalls = functions.https.onRequest(async (request, response) => {
                     await createTicketForZendesk(config, adminUser.id, request.query)
                 }
 
-                //check if zoho config exists
+                // check if zoho config exists
                 if (config.zoho !== undefined) {
                     await createTicketForZoho(config, adminUser.id, request.query)
                 }
@@ -123,40 +125,117 @@ export const getcalls = functions.https.onRequest(async (request, response) => {
 })
 
 async function createTicketForZendesk(config: any, userId: any, data: any) {
+    // console.log(data["agent_email"])
     const zendesk_subdomain = config.zendesk_subdomain
-    const zendesk_email = config.zendesk_email
-    const zendesk_password = config.zendesk_password
+    // const zendesk_email = config.zendesk_email
+    // const zendesk_password = config.zendesk_password
     // const zendesk_token = config.zendesk_token
-
-    const url = `${zendesk_subdomain}/api/v2/tickets.json`
 
     const header = {
         "Content-Type": "application/json",
-        "Authorization": `${zendesk_email}:${zendesk_password}`
+        "Authorization": 'Basic dWdvY2hpLnVnYm9tZWhAdGVjaDRtYXRpb25sdGQuY29tOiQkZGVmYXVsdDEyMzQjIw=='//`${zendesk_email}:${zendesk_password}`
     }
 
-    const body = {
-        "ticket": {
-            "comment": {
-                "body": "The smoke is very colorful."
-            },
-            "priority": "urgent",
-            "subject": "My printer is on fire!"
+    //check for customer details
+    const customer_number = data["alt_phone"]
+    const customer_first_name = data["first_name"]
+    const customer_last_name = data["last_name"]
+    const customer_email = data["email"]
+
+    var zendesk_customer_id = ""
+
+    //check if customer exists
+    const customerQuery = await admin.firestore().collection("proj_customers").where("customer_number", "==", customer_number).where("company", "==", userId).get()
+    if(customerQuery.empty) { //customer does not exist
+        //create new customer on zendesk
+        const custUrl = `${zendesk_subdomain}/api/v2/users.json`
+        const createCustomerBody = {
+            "user": {
+                "name": `${customer_first_name} ${customer_last_name}`,
+                "email": customer_email, 
+                "role": "end-user",
+                "verified": true
+            }
         }
-    }
+        const custResp = await axios.post(custUrl, createCustomerBody, { headers: header })
+        const custResData = custResp.data
+        const user = custResData["user"]
+        zendesk_customer_id = `${user["id"]}`
 
-    const resp = await axios.post(url, body, { headers: header })
-    const resData = resp.data
-
-    console.log(resData)
-
-    if (resData["ticket"]) {
-        await admin.firestore().collection("proj-users").doc(userId).collection("configs").doc("tickets").update({
-            zendesk: admin.firestore.FieldValue.increment(1)
+        //save customer
+        const key = admin.firestore().collection("proj_customers").doc().id
+        await admin.firestore().collection("proj_customers").doc(key).set({
+            id: key,
+            company: userId,
+            customer_number: customer_number,
+            customer_first_name: customer_first_name,
+            customer_last_name: customer_last_name,
+            customer_email: customer_email,
+            zendesk_customer_id: zendesk_customer_id
         })
+
+        //create new ticket
+        const body = {
+            "ticket": {
+                "comment": {
+                    "body": data["comments"]
+                },
+                "priority": "urgent",
+                "subject": "New Ticket From NativeTalk",
+                "assignee_id": Number(`${data["fullname"]}`.split("_")[1]), //agent id
+                "requester_id": Number(`${zendesk_customer_id}`), //customer id
+                "submitter_id": Number(`${zendesk_customer_id}`), //customer id
+            }
+        }
+        // console.log(body)
+        const url = `${zendesk_subdomain}/api/v2/tickets.json`
+        const resp = await axios.post(url, body, { headers: header })
+        const resData = resp.data
+        const ticket = resData["ticket"]
+    
+        // console.log(resData)
+    
+        if (resData["ticket"]) {
+            //update customer details with ticket id
+            await admin.firestore().collection("proj_customers").doc(key).update({
+                zendesk_ticket_id: `${ticket["id"]}`
+            })
+
+            await admin.firestore().collection("proj-users").doc(userId).collection("configs").doc("tickets").update({
+                zendesk: admin.firestore.FieldValue.increment(1)
+            })
+        }
+    }else { //customer exists
+        const data = customerQuery.docs[0].data()
+        zendesk_customer_id = data["zendesk_customer_id"]
+        const zendesk_ticket_id = data["zendesk_ticket_id"]
+
+        const updateTicketUrl = `${zendesk_subdomain}/api/v2/tickets/${zendesk_ticket_id}.json`
+        console.log(updateTicketUrl, zendesk_customer_id)
+        const updateTickeBody = {
+            "ticket": {
+                "status": "open", 
+                "comment": { 
+                    "body": data["comments"],
+                    "author_id": Number(`${zendesk_customer_id}`), //customer id // Number(`${data["fullname"]}`.split("_")[1]), //agent id
+                }
+            }
+        }
+        axios.put(updateTicketUrl, updateTickeBody, { headers: header }).then(async resp => {
+            console.log(resp.config.data)
+            const resData = resp.data
+            if (resData["ticket"]) {
+
+                await admin.firestore().collection("proj-users").doc(userId).collection("configs").doc("tickets").update({
+                    zendesk: admin.firestore.FieldValue.increment(1)
+                })
+            }
+        }).catch(err => {
+            console.log(`error = ${err}`)
+        })
+        
+
     }
-
-
 }
 
 async function createTicketForZoho(config: any, userId: any, data: any) {
