@@ -127,8 +127,8 @@ export const getcalls = functions.https.onRequest(async (request, response) => {
 async function createTicketForZendesk(config: any, userId: any, data: any) {
     // console.log(data["agent_email"])
     const zendesk_subdomain = config.zendesk_subdomain
-    // const zendesk_email = config.zendesk_email
-    // const zendesk_password = config.zendesk_password
+    const zendesk_email = config.zendesk_email
+    const zendesk_password = config.zendesk_password
     // const zendesk_token = config.zendesk_token
 
     const header = {
@@ -189,7 +189,7 @@ async function createTicketForZendesk(config: any, userId: any, data: any) {
         }
         // console.log(body)
         const url = `${zendesk_subdomain}/api/v2/tickets.json`
-        const resp = await axios.post(url, body, { headers: header })
+        const resp = await axios.post(url, body, { headers: header, auth: {username: zendesk_email, password: zendesk_password}, withCredentials: true })
         const resData = resp.data
         const ticket = resData["ticket"]
     
@@ -206,22 +206,24 @@ async function createTicketForZendesk(config: any, userId: any, data: any) {
             })
         }
     }else { //customer exists
-        const data = customerQuery.docs[0].data()
-        zendesk_customer_id = data["zendesk_customer_id"]
-        const zendesk_ticket_id = data["zendesk_ticket_id"]
+        const _data = customerQuery.docs[0].data()
+        zendesk_customer_id = _data["zendesk_customer_id"]
+        const zendesk_ticket_id = _data["zendesk_ticket_id"]
 
-        const updateTicketUrl = `${zendesk_subdomain}/api/v2/tickets/${zendesk_ticket_id}.json`
+        const updateTicketUrl = `${zendesk_subdomain}/api/v2/tickets/${zendesk_ticket_id}`
         console.log(updateTicketUrl, zendesk_customer_id)
         const updateTickeBody = {
             "ticket": {
                 "status": "open", 
                 "comment": { 
                     "body": data["comments"],
-                    "author_id": Number(`${zendesk_customer_id}`), //customer id // Number(`${data["fullname"]}`.split("_")[1]), //agent id
+                    "author_id": Number(`${zendesk_customer_id}`) //customer id // Number(`${data["fullname"]}`.split("_")[1]), //agent id
                 }
             }
         }
-        axios.put(updateTicketUrl, updateTickeBody, { headers: header }).then(async resp => {
+        console.log(JSON.stringify(updateTickeBody))
+        
+        axios.put(updateTicketUrl, updateTickeBody, { headers: header, method: "PUT", auth: {username: zendesk_email, password: zendesk_password}, withCredentials: true }).then(async resp => {
             console.log(resp.config.data)
             const resData = resp.data
             if (resData["ticket"]) {
@@ -230,8 +232,24 @@ async function createTicketForZendesk(config: any, userId: any, data: any) {
                     zendesk: admin.firestore.FieldValue.increment(1)
                 })
             }
-        }).catch(err => {
-            console.log(`error = ${err}`)
+        }).catch(error => {
+            console.log(`tayo = ${error.toJSON()}`)
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+              }
+              console.log(error.config);
         })
         
 
